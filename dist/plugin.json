@@ -1,0 +1,12 @@
+{
+  "dwcWebpackChunk" : "BtnCmd",
+  "name": "BtnCmd",
+  "author": "Minty Trebor",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/MintyTrebor",
+  "dwcVersion": "3.2",
+  "dependencies": {
+    "mqtt": "^4.2.6"
+  }
+}
