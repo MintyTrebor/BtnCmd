@@ -19,7 +19,7 @@
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-text-field v-bind="attrs" v-on="on" label="Icon (mdi-[icon name])" v-model="passedObject.icon" placeholder="mdi-"></v-text-field>
                                         </template>
-                                        <span>Material design icons from https://material.io/resources/icons/?style=baseline (Format = mdi-[icon name])</span>
+                                        <span>Material design icons from https://materialdesignicons.com/ (Format = mdi-[icon name])</span>
                                     </v-tooltip>
                                 </div>
                             </v-col>
