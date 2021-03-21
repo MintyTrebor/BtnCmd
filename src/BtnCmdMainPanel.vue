@@ -4,24 +4,24 @@
 			<v-col :cols="getMainCols()">
 				<v-tabs class="elevation-2 mt-0">
 					<v-tabs-slider></v-tabs-slider>
-					<v-tab v-for="(tab, index) in btnCmd.tabs" :key="tab.tabID" :href="`#general-tab-${index}`" ref="btnGroupTab" @click="onChangeTab(tab.tabID)">
+					<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="tab.tabID" :href="`#general-tab-${index2}`" ref="btnGroupTab" @click="onChangeTab(tab.tabID, index2)">
 						<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
 					</v-tab>
 					<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
 						<div style="width: 100%">
 							<v-container>
 								<v-row class="fill-height overflow-auto" id="container" no-gutters>
-									<v-col v-for="(btn, btnIdx) in getTabBtns(index+1)" :key="btn.btnID" :cols="tab.numberOfColumns" class="py-2"> 
+									<v-col v-for="btn in getTabBtns(tab.tabID)" :key="btn.btnID" :cols="tab.numberOfColumns" class="py-2"> 
 										<v-card class="pa-2">
 											<v-card-actions class="justify-center">
-												<div v-if="btn.btnGroupIdx==index+1 && !editMode">
+												<div v-if="btn.btnGroupIdx==tab.tabID && !editMode">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
-															<v-btn v-if="btn.btnType != 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="uiFrozen || chkJobEnabled(btn)" @click="onBtnClick(btn)">
+															<v-btn v-if="btn.btnType != 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 																<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 															</v-btn>
-															<v-btn v-if="btn.btnType == 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="uiFrozen || isPrinting" @click="onBtnClick(btn)">
+															<v-btn v-if="btn.btnType == 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="isPrinting" @click="onBtnClick(btn)">
 																<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 															</v-btn>
@@ -29,7 +29,7 @@
 														<span >{{ btn.btnHoverText }}</span>
 													</v-tooltip>
 												</div>
-												<div v-if="btn.btnGroupIdx==index+1 && editMode" class="pa-md-1">
+												<div v-if="btn.btnGroupIdx==tab.tabID && editMode" class="pa-md-1">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
 															<v-btn v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
@@ -39,17 +39,17 @@
 														<span>Edit Button Parameters</span>
 													</v-tooltip>
 												</div>
-												<div v-if="btn.btnGroupIdx==index+1 && editMode" class="pa-md-1">
+												<div v-if="btn.btnGroupIdx==tab.tabID && editMode" class="pa-md-1">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
-															<v-btn color="info" v-bind="attrs" v-on="on" :elevation="1" @click="btnDelete(btnIdx)">
+															<v-btn color="info" v-bind="attrs" v-on="on" :elevation="1" @click="btnDelete(btn.btnID)">
 																<v-icon class="mr-1">mdi-delete</v-icon>
 															</v-btn>
 														</template>
 														<span>Delete</span>
 													</v-tooltip>
 												</div>
-												<div v-if="btn.btnGroupIdx==index+1 && editMode" class="pa-md-1">
+												<div v-if="btn.btnGroupIdx==tab.tabID && editMode" class="pa-md-1">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
 															<v-btn color="info" v-bind="attrs" v-on="on" :elevation="1" @click="btnClone(btn)">
@@ -92,6 +92,16 @@
 														<span>Add new tab</span>
 													</v-tooltip>
 												</div>
+												<div v-if="editMode && !hasBtns()" class="pa-md-2">
+													<v-tooltip bottom>
+														<template v-slot:activator="{ on, attrs }">
+															<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onTabDelBtnClick()">
+																<v-icon class="mr-1">mdi-tab-remove</v-icon>
+															</v-btn>
+														</template>
+														<span>Delete current Tab</span>
+													</v-tooltip>
+												</div>
 												<div v-if="editMode" class="pa-md-2">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
@@ -105,7 +115,7 @@
 												<div class="pa-md-2">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
-															<v-btn :color="saveBtnCol" v-bind="attrs" v-on="on" :elevation="1" :disabled="uiFrozen" @click="editModeToggle()">
+															<v-btn :color="saveBtnCol" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
 																<v-icon v-if="!editMode" class="mr-1">mdi-square-edit-outline</v-icon>
 																<v-icon v-if="editMode" class="mr-1">mdi-content-save-all</v-icon>
 															</v-btn>
@@ -135,7 +145,17 @@
 				<div class="pa-md-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn v-bind="attrs" v-on="on" :disabled="uiFrozen || isPrinting" color="primary" @click="saveSettingsToFile()">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="resetSettings()">
+								<v-icon class="mr-1">mdi-autorenew</v-icon>
+							</v-btn>
+						</template>
+						<span>Reset config to default settings! Warning: this will remove all exisiting buttons and tabs. </span>
+					</v-tooltip>
+				</div>
+				<div class="pa-md-2">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="saveSettingsToFile()">
 								<v-icon class="mr-1">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
@@ -145,7 +165,7 @@
 				<div class="pa-md-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn v-bind="attrs" v-on="on" :disabled="uiFrozen || isPrinting" color="primary" @click="loadSettingsFromFile()">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="loadSettingsFromFile()">
 								<v-icon class="mr-1">mdi-backup-restore</v-icon>
 							</v-btn>
 						</template>
@@ -155,7 +175,7 @@
 				<div class="pa-md-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="uiFrozen" @click="showGSEdit = !showGSEdit">
+							<v-btn color="primary" v-bind="attrs" v-on="on" :elevation="1" @click="showGSEdit = !showGSEdit">
 								<v-icon class="mr-1">mdi-puzzle-edit</v-icon>
 							</v-btn>
 						</template>
@@ -194,7 +214,7 @@ export default {
 			macrosDirectory: state => state.directories.macros,
 			systemDirectory: state => state.directories.system
 		}),
-		...mapGetters('machine/model', ['jobProgress'], ['uiFrozen']),
+		...mapGetters('machine/model', ['jobProgress']),
 		isPrinting() { return isPrinting(this.status); },
 	},
 	data: function () {
@@ -207,6 +227,7 @@ export default {
 			objectToPass: null,
 			tabObjectToPass: null,
 			currTab: 1,
+			currTabIdx: 0,
 			saveBtnCol: 'primary',
 			displayWebCam: false,
 			directory: Path.macros,
@@ -255,7 +276,7 @@ export default {
 		...mapActions('machine', {machineDownload: 'download'}),
         ...mapActions('machine', ['upload']),
 		setupPage(){
-			this.onChangeTab(1);
+			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 		},
 		async saveSettingsToFile() {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);
@@ -287,7 +308,7 @@ export default {
 		onBtnClick(btnJSONOb){
 			this.setActionResponse('');
 			var tmpParent = this;
-			if(btnJSONOb.btnType == "Macro" && !this.uiFrozen){
+			if(btnJSONOb.btnType == "Macro"){
 				tmpParent.runFile(btnJSONOb.btnActionData);
 				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 			}else if(btnJSONOb.btnType == "http"){
@@ -354,7 +375,7 @@ export default {
 			this.actionResponse = actionTxt;
 		},
 		getTabBtns(tabIndex){
-			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx == tabIndex);
+			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === tabIndex);
 			return result;
 		},
 		onEditBtnClick(item) {
@@ -365,7 +386,23 @@ export default {
 		onTabEditBtnClick() {
 			this.setActionResponse('');
 			this.showTabEdit = true;
-			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == this.currTab);
+			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID === this.currTab);
+		},
+		hasBtns(){
+			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === this.currTab);
+			if(JSON.stringify(result) !== '[]'){
+				return true;
+			}else{
+				return false;
+			}
+		},
+		onTabDelBtnClick() {
+			this.setActionResponse('');
+			var tmpTabInx = this.currTabIdx;
+			if(tmpTabInx != 0){
+				this.btnCmd.tabs.splice(tmpTabInx, 1);
+			}
+			this.onChangeTab(this.btnCmd.tabs[tmpTabInx - 1].tabID, tmpTabInx - 1);
 		},
 		onTabAddBtnClick() {
 			this.setActionResponse('');
@@ -376,7 +413,8 @@ export default {
 				icon : '',
 				translated : false,
 				caption : tmpCaption,
-				numberOfColumns : 1
+				numberOfColumns : 12,
+				showWebCam: false
 			};
 			this.btnCmd.lastTabID = tmpTabID
 			this.btnCmd.tabs.push(newTab_object);			
@@ -389,13 +427,13 @@ export default {
 			this.btnCmd.lastID = tmpBtnID;
 			var newBtn_object = {
 				btnID: tmpBtnID,
-				btnLabel: '',
+				btnLabel: 'New',
 				btnType: 'Macro',
 				btnActionData: '',
 				btnTopicData: '',
 				btnEnableWhileJob : false,
                 btnColour: 'blue',
-				btnGroupIdx: this.currTab,
+				btnGroupIdx: this.btnCmd.tabs[this.currTabIdx].tabID,
 				btnIcon: '',
 				btnHoverText: ''
 			};
@@ -421,7 +459,11 @@ export default {
 		},
 		btnDelete(idx){
 			this.setActionResponse('');
-			this.btnCmd.btns.splice(idx, 1);
+			var requiredIndex = this.btnCmd.btns.findIndex(el => el.btnID == idx);
+			if(requiredIndex === -1){
+				return false;
+			}
+			this.btnCmd.btns.splice(requiredIndex, 1);
 		},
 		saveSettings() {
 			localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
@@ -477,7 +519,7 @@ export default {
 			this.setActionResponse('');
 			this.editMode = !this.editMode;
 			if(!this.editMode){
-				this.onChangeTab(this.currTab);
+				this.onChangeTab(this.currTab, this.currTabIdx);
 				this.saveSettings();
 				this.saveBtnCol = 'primary'
 			}else {
@@ -491,8 +533,9 @@ export default {
 				return 12;
 			}
 		},
-		onChangeTab(tmpTabID){
+		onChangeTab(tmpTabID, tmpTabIndex){
 			this.currTab = tmpTabID;
+			this.currTabIdx = tmpTabIndex;
 			var tmpTabObject = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
 			this.displayWebCam = tmpTabObject[0].showWebCam;
 		},
