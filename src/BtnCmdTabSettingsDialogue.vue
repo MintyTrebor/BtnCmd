@@ -71,8 +71,7 @@
                     {text: 1, value: 12, disabled: false},
                     {text: 2, value: 6, disabled: false},
                     {text: 3, value: 4, disabled: false},
-                    {text: 4, value: 3, disabled: false},
-                    {text: 'auto', value: 'auto', disabled: false}
+                    {text: 4, value: 3, disabled: false}
                 ]
             }
         },
