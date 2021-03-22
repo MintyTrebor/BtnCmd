@@ -1,20 +1,37 @@
+<style>
+	.tab-item-wrapper {
+		/* sets the button container height - Top display is always 500px */
+		height: calc(100vh - 625px);
+		overflow-y: scroll;
+		width: 100%;
+	}
+	.butheight {
+		height: 85%;
+	}
+	.btnContainer {
+		height: 100%;
+	}
+	.grid-item-green {
+		overflow-y: scroll;
+	}
+</style>
 <template>
-    <div style="width: 100%">
+     <v-container fluid ma-0 pa-0 fill-height fill-width>
 		<v-row>
-			<v-col :cols="getMainCols()">
+			<v-col :cols="getMainCols()" class="grid-item-green">
 				<v-tabs class="elevation-2 mt-0">
 					<v-tabs-slider></v-tabs-slider>
 					<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="tab.tabID" :href="`#general-tab-${index2}`" ref="btnGroupTab" @click="onChangeTab(tab.tabID, index2)">
 						<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
 					</v-tab>
 					<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
-						<div style="width: 100%">
-							<v-container>
-								<v-row class="fill-height overflow-auto" id="container" no-gutters>
+						<v-card class="tab-item-wrapper">
+							<v-container fluid fill-height overflow-y-auto pa-0 class="butheight" justify="start">
+								<v-row no-gutters>
 									<v-col v-for="btn in getTabBtns(tab.tabID)" :key="btn.btnID" :cols="tab.numberOfColumns" class="py-2"> 
 										<v-card class="pa-2">
 											<v-card-actions class="justify-center">
-												<div v-if="btn.btnGroupIdx==tab.tabID && !editMode">
+												<div v-if="btn.btnGroupIdx==tab.tabID && !editMode" class="justify-center">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
 															<v-btn v-if="btn.btnType != 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
@@ -65,72 +82,84 @@
 									</v-col>
 								</v-row>
 							</v-container>
-						</div>
-						<div id="grpCntrl" class="div-grpCntrl">
-							<v-simple-table style="width: 100%">
-								<tbody>           
-									<tr>
-										<td>
-											<v-layout justify-end>
-												<div v-if="editMode" class="pa-md-2">
-													<v-tooltip bottom>
-														<template v-slot:activator="{ on, attrs }">
-															<v-btn :elevation="1" color="blue-grey lighten-2" v-bind="attrs" v-on="on" @click="onTabEditBtnClick()">
-																<v-icon class="mr-1">mdi-tab</v-icon>
-															</v-btn>
-														</template>
-														<span>Edit this tab's properties</span>
-													</v-tooltip>
-												</div>
-												<div v-if="editMode" class="pa-md-2">
-													<v-tooltip bottom>
-														<template v-slot:activator="{ on, attrs }">
-															<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
-																<v-icon class="mr-1">mdi-tab-plus</v-icon>
-															</v-btn>
-														</template>
-														<span>Add new tab</span>
-													</v-tooltip>
-												</div>
-												<div v-if="editMode && !hasBtns()" class="pa-md-2">
-													<v-tooltip bottom>
-														<template v-slot:activator="{ on, attrs }">
-															<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onTabDelBtnClick()">
-																<v-icon class="mr-1">mdi-tab-remove</v-icon>
-															</v-btn>
-														</template>
-														<span>Delete current Tab</span>
-													</v-tooltip>
-												</div>
-												<div v-if="editMode" class="pa-md-2">
-													<v-tooltip bottom>
-														<template v-slot:activator="{ on, attrs }">
-															<v-btn color="blue-grey lighten-2" v-bind="attrs" v-on="on" :elevation="1" @click="onAddBtnClick()">
-																<v-icon class="mr-1">mdi-card-plus</v-icon>
-															</v-btn>
-														</template>
-														<span>Add new Button</span>
-													</v-tooltip>
-												</div>
-												<div class="pa-md-2">
-													<v-tooltip bottom>
-														<template v-slot:activator="{ on, attrs }">
-															<v-btn :color="saveBtnCol" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
-																<v-icon v-if="!editMode" class="mr-1">mdi-square-edit-outline</v-icon>
-																<v-icon v-if="editMode" class="mr-1">mdi-content-save-all</v-icon>
-															</v-btn>
-														</template>
-														<span v-if="!editMode">Edit Mode</span>
-														<span v-if="editMode">Save Changes</span>
-													</v-tooltip>
-												</div>
-												<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
-											</v-layout>
-										</td>
-									</tr>
-								</tbody>
-							</v-simple-table>
-						</div>
+						</v-card>
+						<v-card>
+							<v-footer absolute>
+								<v-simple-table style="width: 100%">
+									<tbody>           
+										<tr>
+											<td>
+												<v-layout justify-end>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn :elevation="1" color="blue-grey lighten-2" v-bind="attrs" v-on="on" @click="onTabEditBtnClick(tab.tabID)">
+																	<v-icon class="mr-1">mdi-tab</v-icon>
+																</v-btn>
+															</template>
+															<span>Edit this tab's properties</span>
+														</v-tooltip>
+													</div>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
+																	<v-icon class="mr-1">mdi-tab-plus</v-icon>
+																</v-btn>
+															</template>
+															<span>Add new tab</span>
+														</v-tooltip>
+													</div>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn color="blue-grey lighten-2" :elevation="1" :disabled="hasBtns()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(index)">
+																	<v-icon class="mr-1">mdi-tab-remove</v-icon>
+																</v-btn>
+															</template>
+															<span>Delete current Tab</span>
+														</v-tooltip>
+													</div>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn color="blue-grey lighten-2" v-bind="attrs" v-on="on" :elevation="1" @click="onAddBtnClick(tab.tabID)">
+																	<v-icon class="mr-1">mdi-card-plus</v-icon>
+																</v-btn>
+															</template>
+															<span>Add new Button</span>
+														</v-tooltip>
+													</div>
+													<div class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn :color="saveBtnCol" v-bind="attrs" v-on="on" :elevation="1" :disabled="backupMode" @click="editModeToggle()">
+																	<v-icon v-if="!editMode" class="mr-1">mdi-square-edit-outline</v-icon>
+																	<v-icon v-if="editMode" class="mr-1">mdi-content-save-all</v-icon>
+																</v-btn>
+															</template>
+															<span v-if="!editMode">Edit Mode</span>
+															<span v-if="editMode">Save Changes</span>
+														</v-tooltip>
+													</div>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
+																<v-btn color="green" v-bind="attrs" v-on="on" :elevation="1" @click="loadSettings()">
+																	<v-icon class="mr-1">mdi-undo-variant</v-icon>
+																</v-btn>
+															</template>
+															<span>Undo All Changes Since Last Save</span>
+														</v-tooltip>
+													</div>
+													<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
+												</v-layout>
+											</td>
+										</tr>
+									</tbody>
+								</v-simple-table>
+							</v-footer>
+						</v-card>
 					</v-tab-item>
 				</v-tabs>
 			</v-col>
@@ -138,11 +167,12 @@
 				<webcam-panel></webcam-panel>
 			</v-col>
 		</v-row>
+		<v-row>
 		<v-footer absolute>
 			<v-row class="pa-2">
 				<span v-if="btnCmd.globalSettings.enableActionMsg" class="text-caption">{{ actionResponse }}</span>
 				<v-spacer></v-spacer>
-				<div class="pa-md-2">
+				<div class="pa-md-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="resetSettings()">
@@ -152,7 +182,7 @@
 						<span>Reset config to default settings! Warning: this will remove all exisiting buttons and tabs. </span>
 					</v-tooltip>
 				</div>
-				<div class="pa-md-2">
+				<div class="pa-md-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="saveSettingsToFile()">
@@ -162,7 +192,7 @@
 						<span>Backup Config to system folder. Warning! This will overwrite current backup file.</span>
 					</v-tooltip>
 				</div>
-				<div class="pa-md-2">
+				<div class="pa-md-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="loadSettingsFromFile()">
@@ -175,17 +205,30 @@
 				<div class="pa-md-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn color="primary" v-bind="attrs" v-on="on" :elevation="1" @click="showGSEdit = !showGSEdit">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
+								<v-icon v-if="!backupMode" class="mr-1">mdi-database-arrow-left</v-icon>
+								<v-icon v-if="backupMode" class="mr-1">mdi-database-arrow-right</v-icon>
+							</v-btn>
+						</template>
+						<span v-if="!backupMode">Open Backup & Restore Options</span>
+						<span v-if="backupMode">Close Backup & Restore Options</span>
+					</v-tooltip>
+				</div>				
+				<div class="pa-md-2">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showGSEdit = !showGSEdit">
 								<v-icon class="mr-1">mdi-puzzle-edit</v-icon>
 							</v-btn>
 						</template>
-						<span v-if="!editMode">Edit Plugin Global Settings</span>
+						<span>Edit Plugin Global Settings</span>
 					</v-tooltip>
 				</div>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
 			</v-row>
 		</v-footer>
-	</div>
+		</v-row>
+	</v-container>
 </template>
 
 <script>
@@ -199,8 +242,6 @@ import BaseConnector from '../../store/machine/connector/BaseConnector';
 import mqtt from 'mqtt';
 import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
 import { isPrinting } from '../../store/machine/modelEnums.js';
-
-
 
 export default {
     components: {
@@ -229,6 +270,8 @@ export default {
 			currTab: 1,
 			currTabIdx: 0,
 			saveBtnCol: 'primary',
+			brBtnCol: 'primary',
+			backupMode: false,
 			displayWebCam: false,
 			directory: Path.macros,
 			actionResponse: null,
@@ -383,23 +426,23 @@ export default {
 			this.showEdit = true;
 			this.objectToPass = item;
 		},
-		onTabEditBtnClick() {
+		onTabEditBtnClick(TmpTabID) {
 			this.setActionResponse('');
 			this.showTabEdit = true;
-			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID === this.currTab);
+			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID === TmpTabID);
 		},
 		hasBtns(){
 			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === this.currTab);
-			if(JSON.stringify(result) !== '[]'){
+			if(result.length >= 1 || this.btnCmd.tabs.length == 1){
 				return true;
 			}else{
 				return false;
 			}
 		},
-		onTabDelBtnClick() {
+		onTabDelBtnClick(tabIndex) {
 			this.setActionResponse('');
-			var tmpTabInx = this.currTabIdx;
-			if(tmpTabInx != 0){
+			var tmpTabInx = tabIndex;
+			if(this.btnCmd.tabs.length > 1){
 				this.btnCmd.tabs.splice(tmpTabInx, 1);
 			}
 			this.onChangeTab(this.btnCmd.tabs[tmpTabInx - 1].tabID, tmpTabInx - 1);
@@ -421,7 +464,7 @@ export default {
 			this.showTabEdit = true;
 			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
 		},
-		onAddBtnClick(){					
+		onAddBtnClick(tmpTabID){					
 			this.setActionResponse('');
 			var tmpBtnID = this.btnCmd.lastID + 1
 			this.btnCmd.lastID = tmpBtnID;
@@ -433,7 +476,7 @@ export default {
 				btnTopicData: '',
 				btnEnableWhileJob : false,
                 btnColour: 'blue',
-				btnGroupIdx: this.btnCmd.tabs[this.currTabIdx].tabID,
+				btnGroupIdx: tmpTabID,
 				btnIcon: '',
 				btnHoverText: ''
 			};
@@ -472,6 +515,7 @@ export default {
 			var btnString = localStorage.getItem('btnCmdsettings');
 				if (btnString) {
 					this.btnCmd = JSON.parse(btnString);
+					this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 				} else {
 					this.resetSettings();
 			}
@@ -514,6 +558,8 @@ export default {
 					}
 				]
 			};
+			this.saveSettings();
+			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 		},
 		editModeToggle(){
 			this.setActionResponse('');
@@ -521,9 +567,19 @@ export default {
 			if(!this.editMode){
 				this.onChangeTab(this.currTab, this.currTabIdx);
 				this.saveSettings();
-				this.saveBtnCol = 'primary'
+				this.saveBtnCol = 'primary';
 			}else {
-				this.saveBtnCol = 'red'
+				this.saveBtnCol = 'red';
+				this.displayWebCam = false;
+			}
+		},
+		brBtnClick(){
+			this.setActionResponse('');
+			this.backupMode = !this.backupMode;
+			if(!this.backupMode){
+				this.brBtnCol = 'primary';
+			}else {
+				this.brBtnCol = 'red';
 			}
 		},
 		getMainCols() {
@@ -537,7 +593,11 @@ export default {
 			this.currTab = tmpTabID;
 			this.currTabIdx = tmpTabIndex;
 			var tmpTabObject = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
-			this.displayWebCam = tmpTabObject[0].showWebCam;
+			if(this.editMode){
+				this.displayWebCam = false;
+			}else{
+				this.displayWebCam = tmpTabObject[0].showWebCam;
+			}
 		},
 		runFile(filename) {
 			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
@@ -548,13 +608,5 @@ export default {
 		this.loadSettings();
 		this.setupPage();
 	},
-	/*watch: {
-		macrosDirectory(to, from) {
-			if (Path.equals(this.directory, from) || !Path.startsWith(this.directory, to)) {
-				this.directory = to;
-			}
-		}
-	}*/
-
 }
 </script>
