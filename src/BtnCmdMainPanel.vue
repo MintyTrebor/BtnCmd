@@ -1,30 +1,35 @@
 <style>
 	.tab-item-wrapper {
-		/* sets the button container height - Top display is always 500px */
-		height: calc(100vh - 625px);
-		overflow-y: scroll;
+		height: calc(100vh - 550px);
+		width: 100%;
+	}
+	.tabs-default {
+		height: 100%;
 		width: 100%;
 	}
 	.butheight {
-		height: 85%;
+		height: calc(100% - 60px);
 	}
-	.btnContainer {
-		height: 100%;
+	#table .v-data-footer {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		background: white;
 	}
-	.grid-item-green {
-		overflow-y: scroll;
+	#table .v-data-table__wrapper {
+		margin-bottom: 60px;
 	}
 </style>
 <template>
      <v-container fluid ma-0 pa-0 fill-height fill-width>
 		<v-row>
-			<v-col :cols="getMainCols()" class="grid-item-green">
-				<v-tabs class="elevation-2 mt-0">
+			<v-col :cols="getMainCols()">
+				<v-tabs class="elevation-2 mt-0 tabs-default">
 					<v-tabs-slider></v-tabs-slider>
 					<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="tab.tabID" :href="`#general-tab-${index2}`" ref="btnGroupTab" @click="onChangeTab(tab.tabID, index2)">
 						<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
 					</v-tab>
-					<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
+					<v-tab-item class="v-data-table__wrapper" v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
 						<v-card class="tab-item-wrapper">
 							<v-container fluid fill-height overflow-y-auto pa-0 class="butheight" justify="start">
 								<v-row no-gutters>
@@ -168,7 +173,7 @@
 			</v-col>
 		</v-row>
 		<v-row>
-		<v-footer absolute>
+		<v-footer absolute class="v-data-footer">
 			<v-row class="pa-2">
 				<span v-if="btnCmd.globalSettings.enableActionMsg" class="text-caption">{{ actionResponse }}</span>
 				<v-spacer></v-spacer>
@@ -210,8 +215,8 @@
 								<v-icon v-if="backupMode" class="mr-1">mdi-database-arrow-right</v-icon>
 							</v-btn>
 						</template>
-						<span v-if="!backupMode">Open Backup & Restore Options</span>
-						<span v-if="backupMode">Close Backup & Restore Options</span>
+						<span v-if="!backupMode">Show Backup & Restore Options</span>
+						<span v-if="backupMode">Hide Backup & Restore Options</span>
 					</v-tooltip>
 				</div>				
 				<div class="pa-md-2">
