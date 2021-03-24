@@ -108,6 +108,16 @@
 													<div v-if="editMode" class="pa-md-2">
 														<v-tooltip bottom>
 															<template v-slot:activator="{ on, attrs }">
+																<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(tab.tabID)">
+																	<v-icon class="mr-1">mdi-table-multiple</v-icon>
+																</v-btn>
+															</template>
+															<span>Clone Current Tab</span>
+														</v-tooltip>
+													</div>
+													<div v-if="editMode" class="pa-md-2">
+														<v-tooltip bottom>
+															<template v-slot:activator="{ on, attrs }">
 																<v-btn color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
 																	<v-icon class="mr-1">mdi-tab-plus</v-icon>
 																</v-btn>
@@ -168,8 +178,11 @@
 					</v-tab-item>
 				</v-tabs>
 			</v-col>
-			<v-col v-if="displayWebCam" cols="5">
+			<v-col v-if="displayWebCam && !displayAltWebCam" cols="5">
 				<webcam-panel></webcam-panel>
+			</v-col>
+			<v-col v-if="displayWebCam && displayAltWebCam" cols="5">
+				<altWebCamPanel :passedObject="altWebCamToPass"></altWebCamPanel>
 			</v-col>
 		</v-row>
 		<v-row>
@@ -247,12 +260,14 @@ import BaseConnector from '../../store/machine/connector/BaseConnector';
 import mqtt from 'mqtt';
 import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
 import { isPrinting } from '../../store/machine/modelEnums.js';
+import altWebCamPanel from './altWebCamPanel.vue';
 
 export default {
     components: {
         BtnCmdSettingsDialogue,
 		BtnCmdTabSettingsDialogue,
-		BtnCmdGlobalSettingsDialogue
+		BtnCmdGlobalSettingsDialogue,
+		altWebCamPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -278,8 +293,10 @@ export default {
 			brBtnCol: 'primary',
 			backupMode: false,
 			displayWebCam: false,
+			displayAltWebCam: false,
 			directory: Path.macros,
 			actionResponse: null,
+			altWebCamToPass: null,
 			btnCmd : {
 				lastID: 1,
 				lastTabID: 1,
@@ -313,7 +330,17 @@ export default {
 						translated: false,
 						caption: "Group 1",
 						numberOfColumns: 12,
-						showWebCam: false						
+						showWebCam: false,
+						showAltWebCam : false,
+						altWebCamParams : {
+							altWebCamURL : '',
+							altWebCamRotation : 0,
+							altWebCamFlip : 'none',
+							altWebCamUpdateTimer :  5000,
+							altWebCamiFrame : false,
+							altWebCamAppndHTTP : false,
+							altWebCamClickURL : ''
+						}						
 					}
 				]
 			}
@@ -462,12 +489,74 @@ export default {
 				translated : false,
 				caption : tmpCaption,
 				numberOfColumns : 12,
-				showWebCam: false
+				showWebCam : false,
+				showAltWebCam : false,
+				altWebCamParams : {
+					altWebCamURL : '',
+					altWebCamRotation : 0,
+					altWebCamFlip : 'none',
+					altWebCamUpdateTimer :  5000,
+					altWebCamiFrame : false,
+					altWebCamAppndHTTP : false,
+					altWebCamClickURL : ''
+				}
 			};
-			this.btnCmd.lastTabID = tmpTabID
+			this.btnCmd.lastTabID = tmpTabID;
 			this.btnCmd.tabs.push(newTab_object);			
 			this.showTabEdit = true;
 			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
+		},
+		onCloneTabBtnClick(tmpTabID){
+			this.setActionResponse('');
+			var tmpBtn_object = null;
+			var tmpBtnID = null;
+			var tmpNextTabID = this.btnCmd.lastTabID + 1;
+			//get the current tab JSON object
+			var currTabObject = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
+			currTabObject = currTabObject[0];
+			//get the buttons associated with the current tab
+			var currTabBtnsObject = this.btnCmd.btns.filter(item => item.btnGroupIdx === tmpTabID);
+			//Create the new Tab
+			var tmpNewCaption = currTabObject.caption + '-' + tmpTabID;
+			var newTab_object = {
+				tabID : tmpNextTabID,
+				icon : currTabObject.icon,
+				translated : currTabObject.translated,
+				caption : tmpNewCaption,
+				numberOfColumns : currTabObject.numberOfColumns,
+				showWebCam : currTabObject.showWebCam,
+				showAltWebCam : currTabObject.showAltWebCam,
+				altWebCamParams : {
+					altWebCamURL : currTabObject.altWebCamParams.altWebCamURL,
+					altWebCamRotation : currTabObject.altWebCamParams.altWebCamRotation,
+					altWebCamFlip : currTabObject.altWebCamParams.altWebCamFlip,
+					altWebCamUpdateTimer :  currTabObject.altWebCamParams.altWebCamUpdateTimer,
+					altWebCamiFrame : currTabObject.altWebCamParams.altWebCamiFrame,
+					altWebCamAppndHTTP : currTabObject.altWebCamParams.altWebCamAppndHTTP,
+					altWebCamClickURL : currTabObject.altWebCamParams.altWebCamClickURL
+				}
+			};
+			this.btnCmd.lastTabID = tmpNextTabID;
+			this.btnCmd.tabs.push(newTab_object);
+			//Now create the buttons
+			var bi;
+			for (bi in currTabBtnsObject) {
+				tmpBtnID = this.btnCmd.lastID + 1
+				tmpBtn_object = {
+					btnID: tmpBtnID,
+					btnLabel: currTabBtnsObject[bi].btnLabel,
+					btnType: currTabBtnsObject[bi].btnType,
+					btnActionData: currTabBtnsObject[bi].btnActionData,
+					btnTopicData: currTabBtnsObject[bi].btnTopicData,
+					btnEnableWhileJob : currTabBtnsObject[bi].btnEnableWhileJob,
+					btnColour: currTabBtnsObject[bi].btnColour,
+					btnGroupIdx: tmpNextTabID,
+					btnIcon: currTabBtnsObject[bi].btnIcon,
+					btnHoverText: currTabBtnsObject[bi].btnHoverText
+				};
+				this.btnCmd.lastID = tmpBtnID;
+				this.btnCmd.btns.push(tmpBtn_object);
+			}
 		},
 		onAddBtnClick(tmpTabID){					
 			this.setActionResponse('');
@@ -559,7 +648,17 @@ export default {
 						translated: false,
 						caption: "Group 1",
 						numberOfColumns: 12,
-						showWebCam: false						
+						showWebCam: false,
+						showAltWebCam : false,
+						altWebCamParams : {
+							altWebCamURL : '',
+							altWebCamRotation : 0,
+							altWebCamFlip : 'none',
+							altWebCamUpdateTimer :  5000,
+							altWebCamiFrame : false,
+							altWebCamAppndHTTP : false,
+							altWebCamClickURL : ''						
+						}
 					}
 				]
 			};
@@ -602,6 +701,8 @@ export default {
 				this.displayWebCam = false;
 			}else{
 				this.displayWebCam = tmpTabObject[0].showWebCam;
+				this.displayAltWebCam = tmpTabObject[0].showAltWebCam;
+				this.altWebCamToPass = tmpTabObject[0].altWebCamParams;
 			}
 		},
 		runFile(filename) {
