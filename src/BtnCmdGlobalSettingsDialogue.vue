@@ -1,93 +1,82 @@
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        overflow-x: hidden;
+    }
+    .custom-label-color .v-label {
+        color: red;
+        opacity: 1;
+    }
+</style>
 <template>
-    <v-dialog v-model="show" persistent max-width="360">
-        <v-row align="center" justify="center">
-            <v-card>
-                <v-card-title >
-                    <span class="headline">BtnCmd Plugin Settings</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container>
-                        <v-row>
-                            <v-col cols="12">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <span v-bind="attrs" v-on="on"><v-checkbox label="Show Action Messages in Footer" v-model="passedObject.enableActionMsg"></v-checkbox></span>
-                                        </template>
-                                        <span>Enable to see any relevant information in the page footer following a button click.</span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <span v-bind="attrs" v-on="on"><v-checkbox label="Enable MQTT" v-model="passedObject.enableMQTT"></v-checkbox></span>
-                                        </template>
-                                        <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" v-if="passedObject.enableMQTT">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-text-field v-bind="attrs" v-on="on" label="MQTT Server*" v-model="passedObject.MQTTServer" placeholder="mqtt://<broker addr>:<port>"></v-text-field>
-                                        </template>
-                                        <span>Normally mqtt://[address]:[port] (port is optional)</span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <!--<v-row>
-                            <v-col cols="12" v-if="passedObject.enableMQTT">
-                                <v-text-field label="MQTT Port*" v-model="passedObject.MQTTPort" placeholder="1883"></v-text-field>
-                            </v-col>
-                        </v-row>-->
-                        <v-row>
-                            <v-col cols="12" v-if="passedObject.enableMQTT">
-                                <v-text-field label="MQTT Client ID*" v-model="passedObject.MQTTClientID" placeholder="BtnCmd"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" v-if="passedObject.enableMQTT">
-                                <v-text-field label="MQTT User Name" v-model="passedObject.MQTTUserName"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" v-if="passedObject.enableMQTT">
-                                <v-text-field label="MQTT Password" v-model="passedObject.MQTTPassword"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <div><span> </span></div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <div><span> </span></div>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                    <v-row>
+    <v-dialog v-model="show" persistent max-width="600">
+        <v-card class="pa-2" max-width="600">
+			<v-card-title class="container">
+                <v-toolbar dark dense>
+                    <v-toolbar-title>BtnCmd Settings</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="validateData()">
+                        Close
+                    </v-btn>
+                </v-toolbar>
+                <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
+            </v-card-title>
+            <v-card-text>
+                <v-form lazy-validation class="mx-2" ref="form">
+                    <v-row dense>
                         <v-col cols="12">
-                            <v-card-actions>
-                                <small>*indicates required field</small>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="validateData()">
-                                    Close
-                                </v-btn>
-                            </v-card-actions>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Show Action Messages in Footer" v-model="passedObject.enableActionMsg"></v-checkbox></span>
+                                </template>
+                                <span>Enable to see any relevant information in the page footer following a button click.</span>
+                            </v-tooltip>
                         </v-col>
                     </v-row>
-                </v-card-text>
-            </v-card>
-        </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable MQTT" v-model="passedObject.enableMQTT"></v-checkbox></span>
+                                </template>
+                                <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableMQTT" dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="MQTT Server*" v-model="passedObject.MQTTServer" required placeholder="mqtt://<broker addr>:<port>"></v-text-field>
+                                </template>
+                                <span>Normally mqtt://[address]:[port] (port is optional)</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableMQTT" dense>
+                        <v-col cols="12">
+                            <v-text-field class="custom-label-color" label="MQTT Client ID*" v-model="passedObject.MQTTClientID" placeholder="BtnCmd" required></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableMQTT" dense>
+                        <v-col cols="12">
+                            <v-text-field label="MQTT User Name" v-model="passedObject.MQTTUserName"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableMQTT" dense>
+                        <v-col cols="12">
+                            <v-text-field label="MQTT Password" v-model="passedObject.MQTTPassword"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableMQTT" dense>
+                        <v-col cols="12">
+                            <small>*indicates required field</small>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+        </v-card>
     </v-dialog>
 </template>
 
@@ -111,8 +100,16 @@
                 }
             }
         },
+        data: function () {
+            return {
+                alertReqVal: false
+            }
+        },
         methods: {
-            validateData() {
+            async sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
+            async validateData() {
                 if(!this.passedObject.enableMQTT){
                     this.$emit('exit', true)
                     this.show = false;
@@ -122,7 +119,9 @@
                     this.show = false;
                     return;
                 }
-                
+                this.alertReqVal = true;
+                await this.sleep(2000);
+                this.alertReqVal = false;
             }
         }
     }
