@@ -1,90 +1,92 @@
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+    }
+    .custom-label-color .v-label {
+        color: red;
+        opacity: 1;
+    }
+</style>
 <template>
-    <v-dialog v-model="show" persistent max-width="400">
-        <v-row align="center" justify="center">
-                <v-card>
-                    <v-card-title>
-                        <span class="headline">Edit Button</span>
-                    </v-card-title>
-                    <v-card-text>
-                    <v-container>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-text-field label="Label" v-model="passedObject.btnLabel"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-text-field label="Hover Text" v-model="passedObject.btnHoverText"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-text-field v-bind="attrs" v-on="on" label="Icon [mdi-#]" v-model="passedObject.btnIcon" placeholder="mdi-"></v-text-field>
-                                        </template>
-                                        <span>Material design icons from https://materialdesignicons.com/ (Format = mdi-[icon name])</span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-select :items="typeItems" label="Type*" required v-model="passedObject.btnType"></v-select>
-                            </v-col>  
-                        </v-row>
-                        <v-row>                         
-                            <v-col cols="12">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-text-field v-bind="attrs" v-on="on" :label="actionLabel()" required v-model="passedObject.btnActionData"></v-text-field>
-                                        </template>
-                                        <span v-if="passedObject.btnType=='http'">Enter GET url. e.g http://[address]/params . </span>
-                                        <span v-if="passedObject.btnType=='Macro'">Enter the full macro filename [name.g].</span>
-                                        <span v-if="passedObject.btnType=='MQTT'">Enter the message text to send</span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12" v-if="passedObject.btnType=='MQTT'">
-                                <v-text-field label="MQTT Topic*" v-model="passedObject.btnTopicData"></v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-row v-if="passedObject.btnType != 'Macro'">
-                            <v-col cols="12">
-                                <div>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <span v-bind="attrs" v-on="on"><v-checkbox label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-checkbox></span>
-                                        </template>
-                                        <span>Allow button to operate while a Job is active. (Note: All buttons of type "Macro" will be disabled while a Job is Active.)</span>
-                                    </v-tooltip>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-card>
-									<v-card-actions class="justify-center">
-                                        <v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                    <v-card-actions>
-                        <small>*indicates required field</small>
-                        <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" text @click="validateData()">
-                            Close
-                        </v-btn>
-                    </v-card-actions>
-                </v-card-text>
-            </v-card>
-        </v-row>
+    <v-dialog v-model="show" persistent max-width="600">
+        <v-card style="overflow-x: hidden;">
+			<v-card-title class="container">
+				<v-toolbar dark dense>
+                    <v-toolbar-title>Edit Button</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="validateData()">
+                        Close
+                    </v-btn>
+                </v-toolbar>
+                <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
+			</v-card-title>
+            <v-card-text>
+                <v-form lazy-validation class="mx-2">
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-radio-group v-model="passedObject.btnType" row required>
+                                <v-subheader>Type:</v-subheader>
+                                <v-radio v-for="type in radioItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                            </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field label="Label" v-model="passedObject.btnLabel"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field label="Hover Text" v-model="passedObject.btnHoverText"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Icon [mdi-#]" v-model="passedObject.btnIcon" placeholder="mdi-"></v-text-field>
+                                </template>
+                                <span>Material design icons from https://materialdesignicons.com/ (Format = mdi-[icon name])</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" :label="actionLabel()" v-model="passedObject.btnActionData"></v-text-field>
+                                </template>
+                                <span v-if="passedObject.btnType=='http'">Enter GET url. e.g http://[address]/params . </span>
+                                <span v-if="passedObject.btnType=='Macro'">Enter the full macro filename [name.g].</span>
+                                <span v-if="passedObject.btnType=='MQTT'">Enter the message text to send</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="passedObject.btnType == 'MQTT'">
+                        <v-col cols="12">
+                            <v-text-field class="custom-label-color" label="MQTT Topic*" v-model="passedObject.btnTopicData" required></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-checkbox></span>
+                                </template>
+                                <span>Allow button to operate while a Job is active.</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <div class="container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
+                        </v-col>
+                    </v-row>
+                    <small>*indicates required field</small>
+                </v-form>
+            </v-card-text>
+        </v-card>
     </v-dialog>
 </template>
 
@@ -106,31 +108,46 @@
                 set (value) {
                     this.$emit('input', value)
                 }
-            }
-        },
-        data: function () {
-            return {
-                typeItems: [
+            },
+            typeItems() {
+                return [
                     {text: 'Macro', value: 'Macro', disabled: false},
                     {text: 'http', value: 'http', disabled: false},
                     {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT}
                 ]
+            },
+            radioItems() {
+                return this.typeItems.filter(item => {return item.disabled === false});
+            }
+        },
+        data: function () {
+            return {
+                alertReqVal: false
             }
         },
         methods: {
+            async sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            },
             actionLabel() {
                 if (this.passedObject.btnType == "Macro") {return "Macro Name*";}
                 if (this.passedObject.btnType == "http") {return "URL*";}
                 if (this.passedObject.btnType == "MQTT") {return "MQTT MSG*";}
             },
-            validateData() {
+            async validateData() {
                 if (this.passedObject.btnLabel && this.passedObject.btnActionData) {
                     if (this.passedObject.btnType == "MQTT" && !this.passedObject.btnTopicData){
+                        this.alertReqVal = true;
+                        await this.sleep(2000);
+                        this.alertReqVal = false;
                         return;
                     }
                     this.show = false;
                     return;
                 }
+                this.alertReqVal = true;
+                await this.sleep(2000);
+                this.alertReqVal = false;
             }
         }
 
