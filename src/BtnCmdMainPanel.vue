@@ -39,11 +39,7 @@
 												<div v-if="btn.btnGroupIdx==tab.tabID && !editMode" class="justify-center">
 													<v-tooltip bottom>
 														<template v-slot:activator="{ on, attrs }">
-															<v-btn v-if="btn.btnType != 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
-																<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-															</v-btn>
-															<v-btn v-if="btn.btnType == 'Macro'" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="isPrinting" @click="onBtnClick(btn)">
+															<v-btn v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 																<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 															</v-btn>
@@ -154,17 +150,17 @@
 																</v-btn>
 															</template>
 															<span v-if="!editMode">Edit Mode</span>
-															<span v-if="editMode">Save Changes</span>
+															<span v-if="editMode">Save Changes & Close</span>
 														</v-tooltip>
 													</div>
 													<div v-if="editMode" class="pa-md-2">
 														<v-tooltip bottom>
 															<template v-slot:activator="{ on, attrs }">
-																<v-btn color="green" v-bind="attrs" v-on="on" :elevation="1" @click="loadSettings()">
-																	<v-icon class="mr-1">mdi-undo-variant</v-icon>
+																<v-btn color="red" v-bind="attrs" v-on="on" :elevation="1" @click="loadSettings(); editMode=!editMode">
+																	<v-icon class="mr-1">mdi-progress-close</v-icon>
 																</v-btn>
 															</template>
-															<span>Undo All Changes Since Last Save</span>
+															<span>Close & Undo All Changes Since Last Save</span>
 														</v-tooltip>
 													</div>
 													<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
@@ -193,7 +189,7 @@
 				<div class="pa-md-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="resetSettings()">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
 								<v-icon class="mr-1">mdi-autorenew</v-icon>
 							</v-btn>
 						</template>
@@ -243,6 +239,7 @@
 					</v-tooltip>
 				</div>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
+				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 			</v-row>
 		</v-footer>
 		</v-row>
@@ -297,9 +294,12 @@ export default {
 			directory: Path.macros,
 			actionResponse: null,
 			altWebCamToPass: null,
+			confirmRstSettings: false,
+			btnCmdVersion: '0.6.0',
 			btnCmd : {
 				lastID: 1,
 				lastTabID: 1,
+				btnCmdVersion: '0.6.0',
 				globalSettings: {
 					enableActionMsg: true,
 					enableMQTT: false,
@@ -317,7 +317,7 @@ export default {
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
-						btnColour: 'red',
+						btnColour: '#FF0000FF',
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text'
@@ -569,7 +569,7 @@ export default {
 				btnActionData: '',
 				btnTopicData: '',
 				btnEnableWhileJob : false,
-                btnColour: 'blue',
+                btnColour: '#0077FFFF',
 				btnGroupIdx: tmpTabID,
 				btnIcon: '',
 				btnHoverText: ''
@@ -618,6 +618,7 @@ export default {
 			this.btnCmd = {
 				lastID: 1,
 				lastTabID: 1,
+				btnCmdVersion: this.btnCmdVersion,
 				globalSettings: {
 					enableActionMsg: true,
 					enableMQTT: false,
@@ -635,7 +636,7 @@ export default {
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
-						btnColour: 'red',
+						btnColour: '#FF0000FF',
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text'
@@ -662,6 +663,7 @@ export default {
 					}
 				]
 			};
+			this.confirmRstSettings = false;
 			this.saveSettings();
 			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 		},
@@ -673,7 +675,7 @@ export default {
 				this.saveSettings();
 				this.saveBtnCol = 'primary';
 			}else {
-				this.saveBtnCol = 'red';
+				this.saveBtnCol = 'green';
 				this.displayWebCam = false;
 			}
 		},
