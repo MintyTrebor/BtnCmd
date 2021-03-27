@@ -251,13 +251,15 @@
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
-import { mapGetters, mapState, mapActions } from 'vuex';
+import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
 import BaseConnector from '../../store/machine/connector/BaseConnector';
 import mqtt from 'mqtt';
 import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
 import { isPrinting } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
+
+const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
 
 export default {
     components: {
@@ -273,6 +275,7 @@ export default {
 			systemDirectory: state => state.directories.system
 		}),
 		...mapGetters('machine/model', ['jobProgress']),
+		...mapState('machine/settings', ['codes']),
 		isPrinting() { return isPrinting(this.status); },
 	},
 	data: function () {
@@ -296,6 +299,8 @@ export default {
 			altWebCamToPass: null,
 			confirmRstSettings: false,
 			btnCmdVersion: '0.6.0',
+			code: '',
+			doingCode: false,
 			btnCmd : {
 				lastID: 1,
 				lastTabID: 1,
@@ -350,6 +355,7 @@ export default {
 		...mapActions('machine', ['sendCode']),
 		...mapActions('machine', {machineDownload: 'download'}),
         ...mapActions('machine', ['upload']),
+		...mapMutations('machine/settings', ['addCode', 'removeCode']),
 		setupPage(){
 			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 		},
@@ -392,10 +398,10 @@ export default {
 						.then(function(result) {
 							if (result instanceof Object && result.err === 0) {
 								//it worked
-								tmpParent.setActionResponse("Last Action :  -- http -- Success Result : " + result);
+								tmpParent.setActionResponse("Last Action :  -- http -- Success Result : " + JSON.stringify(result));
 							} else {
 								//it failed
-								tmpParent.setActionResponse("Last Action :  -- http -- Failed Result : " + result);
+								tmpParent.setActionResponse("Last Action :  -- http -- Returned Result : " + JSON.stringify(result));
 							}
 						});
 			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
@@ -441,6 +447,11 @@ export default {
 					client.end();
 					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
 				});
+
+			}else if(btnJSONOb.btnType == "gcode"){
+				tmpParent.setActionResponse("Last Action :  -- gcode -- " + btnJSONOb.btnActionData);
+				tmpParent.code = btnJSONOb.btnActionData;
+				tmpParent.send();
 
 			}else if(btnJSONOb.btnType == "MQTT" && !this.btnCmd.globalSettings.enableMQTT){
 				tmpParent.setActionResponse("This button has been configured as MQTT, but MQTT is disabled. No Action Taken. Please re-enable MQTT.");
@@ -709,6 +720,81 @@ export default {
 		},
 		runFile(filename) {
 			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
+		},
+	
+		hasUnprecedentedParameters: (code) => !code || /(M23|M28|M30|M32|M36|M117)[^0-9]/i.test(code),
+		async send() {
+			this.showItems = false;
+
+			const code = (!this.code || this.code.constructor === String) ? this.code : this.code.value;
+			if (code && code.trim() !== '' && !this.doingCode) {
+				let codeToSend = '', bareCode = '', inQuotes = false, inExpression = false, inWhiteSpace = false, inComment = false;
+				if (!this.hasUnprecedentedParameters(codeToSend) &&
+					!conditionalKeywords.some(keyword => code.trim().startsWith(keyword))) {
+					// Convert code to upper-case and remove comments
+					for (let i = 0; i < code.length; i++) {
+						const char = code[i];
+						if (inQuotes) {
+							if (i < code.length - 1 && char === '\\' && code[i + 1] === '"') {
+								codeToSend += '\\"';
+								i++;
+							} else {
+								if (char === '"') {
+									inQuotes = false;
+								}
+								codeToSend += char;
+							}
+						} else if (inExpression) {
+							codeToSend += char;
+							inExpression = (char !== '}');
+						} else if (inComment) {
+							codeToSend += char;
+							inComment = (char !== ')');
+						} else {
+							if (char === '"') {
+								// don't convert escaped strings
+								inQuotes = true;
+							} else if (char === ' ' || char === '\t') {
+								// remove duplicate white spaces
+								if (inWhiteSpace) {
+									continue;
+								}
+								inWhiteSpace = true;
+							} else if (char === ';') {
+								// stop when final comments start
+								break;
+							} else if (char === '(') {
+								// don't process chars from encapsulated comments
+								inComment = true;
+							} else if (char === '{') {
+								// don't process chars from expressions
+								inExpression = true;
+							}
+							inWhiteSpace = false;
+							codeToSend += char.toUpperCase();
+							bareCode += code.toUpperCase();
+						}
+					}
+				} else {
+					// Don't modify the user input
+					codeToSend = code;
+				}
+
+				// Send the code and wait for completion
+				this.doingCode = true;
+				try {
+					const reply = await this.sendCode({ code: codeToSend, fromInput: true });
+					if (!inQuotes && !reply.startsWith('Error: ') && !reply.startsWith('Warning: ') &&
+						bareCode.indexOf('M587') === -1 && bareCode.indexOf('M589') === -1 &&
+						!this.disableAutoComplete && this.codes.indexOf(codeToSend.trim()) === -1) {
+						// Automatically remember successful codes
+						//this.addCode(codeToSend.trim());
+					}
+				} catch {
+					// handled before we get here
+				}
+				this.doingCode = false;
+			}
 		}
 	},
 	mounted() {
