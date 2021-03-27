@@ -60,6 +60,7 @@
                                 <span v-if="passedObject.btnType=='http'">Enter GET url. e.g http://[address]/params . </span>
                                 <span v-if="passedObject.btnType=='Macro'">Enter the full macro filename [name.g].</span>
                                 <span v-if="passedObject.btnType=='MQTT'">Enter the message text to send</span>
+                                <span v-if="passedObject.btnType=='gcode'">Enter the gcode command to send</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -113,6 +114,7 @@
                 return [
                     {text: 'Macro', value: 'Macro', disabled: false},
                     {text: 'http', value: 'http', disabled: false},
+                    {text: 'gcode', value: 'gcode', disabled: false},
                     {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT}
                 ]
             },
@@ -133,6 +135,7 @@
                 if (this.passedObject.btnType == "Macro") {return "Macro Name*";}
                 if (this.passedObject.btnType == "http") {return "URL*";}
                 if (this.passedObject.btnType == "MQTT") {return "MQTT MSG*";}
+                if (this.passedObject.btnType == "gcode") {return "gcode Command*";}
             },
             async validateData() {
                 if (this.passedObject.btnLabel && this.passedObject.btnActionData) {
