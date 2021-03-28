@@ -23,12 +23,17 @@
 			</v-card-title>
             <v-card-text>
                 <v-form lazy-validation class="mx-2">
-                    <v-row dense>
+                    <v-row dense v-if="!enableSelects">
                         <v-col cols="12">
                             <v-radio-group v-model="passedObject.btnType" row required>
                                 <v-subheader>Type:</v-subheader>
                                 <v-radio v-for="type in radioItems" :key="type" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="enableSelects">
+                        <v-col cols="12">
+                            <v-select :items="radioItems" item-text="text" item-value="value" label="Type*" required v-model="passedObject.btnType"></v-select>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -99,7 +104,8 @@
             passedObject: {
                 type: Object
             },
-            bMQTT: Boolean
+            bMQTT: Boolean,
+            enableSelects: Boolean
         },
         computed: {
             show: {
