@@ -38,11 +38,16 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row dense v-if="!enableSelects">
                         <v-col cols="12">
                             <v-radio-group label="Number Of Columns:" v-model="passedObject.numberOfColumns" row required>
                                 <v-radio v-for="type in colItems" :key="type" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="enableSelects">
+                        <v-col cols="12">
+                            <v-select :items="colItems" item-text="text" item-value="value" label="Number of Columns*" required v-model="passedObject.numberOfColumns"></v-select>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -80,7 +85,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.showAltWebCam">
+                    <v-row dense v-if="passedObject.showAltWebCam && !enableSelects">
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
@@ -92,13 +97,33 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.showAltWebCam">
+                    <v-row dense v-if="passedObject.showAltWebCam && enableSelects">
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Webcam Rotation:" v-model="passedObject.altWebCamParams.altWebCamFlip" row required>
+                                    <v-select v-bind="attrs" v-on="on" :items="rotateItems" item-text="text" item-value="value" label="Webcam Rotation" required v-model="passedObject.altWebCamParams.altWebCamRotation"></v-select>
+                                </template>
+                                <span>Rotation Angle</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="passedObject.showAltWebCam && !enableSelects">
+                        <v-col cols="12">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Flip Webcam Img:" v-model="passedObject.altWebCamParams.altWebCamFlip" row required>
                                         <v-radio v-for="type in flipItems" :key="type" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
+                                </template>
+                                <span>Flip Webcam Image</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="passedObject.showAltWebCam && enableSelects">
+                        <v-col cols="12">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-select v-bind="attrs" v-on="on" :items="flipItems" item-text="text" item-value="value" label="Flip Webcam Img" required v-model="passedObject.altWebCamParams.altWebCamFlip"></v-select>
                                 </template>
                                 <span>Flip Webcam Image</span>
                             </v-tooltip>
@@ -148,7 +173,8 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            }
+            },
+            enableSelects: Boolean
         },
         computed: {
             show: {
