@@ -38,6 +38,16 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable Selections" v-model="passedObject.enableSelects"></v-checkbox></span>
+                                </template>
+                                <span>Enable dropdown selections instead of radio buttons in settings windows</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-checkbox label="Enable MQTT" v-model="passedObject.enableMQTT"></v-checkbox></span>
                                 </template>
                                 <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
