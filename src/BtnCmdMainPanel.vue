@@ -21,7 +21,7 @@
 	}
 </style>
 <template>
-     <v-container fluid ma-0 pa-0 fill-height fill-width>
+     <v-container fluid ma-0 pa-0 fill-height fill-width overflow-y-hidden overflow-x-hidden>
 		<v-row>
 			<v-col :cols="getMainCols()">
 				<v-tabs class="elevation-2 mt-0 tabs-default">
@@ -77,7 +77,7 @@
 														<span>Clone</span>
 													</v-tooltip>
 												</div>
-												<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT"></BtnCmdSettingsDialogue>
+												<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
 											</v-card-actions>
 										</v-card>
 									</v-col>
@@ -163,7 +163,7 @@
 															<span>Close & Undo All Changes Since Last Save</span>
 														</v-tooltip>
 													</div>
-													<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
+													<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
 												</v-layout>
 											</td>
 										</tr>
@@ -312,7 +312,8 @@ export default {
 					MQTTPassword: '',
 					MQTTServer: '',
 					MQTTPort: 1883,
-					MQTTClientID: 'BtnCmd'
+					MQTTClientID: 'BtnCmd',
+					enableSelects: false
 				},
 				btns: [
 					{
@@ -637,7 +638,8 @@ export default {
 					MQTTPassword: '',
 					MQTTServer: '',
 					MQTTPort: 1883,
-					MQTTClientID: 'BtnCmd'
+					MQTTClientID: 'BtnCmd',
+					enableSelects: false
 				},
 				btns: [
 					{
