@@ -33,7 +33,7 @@
                     </v-row>
                     <v-row dense v-if="enableSelects">
                         <v-col cols="12">
-                            <v-select :items="radioItems" item-text="text" item-value="value" label="Type*" required v-model="passedObject.btnType"></v-select>
+                            <v-select :items="radioItems" class="custom-label-color" item-text="text" item-value="value" label="Type*" required v-model="passedObject.btnType"></v-select>
                         </v-col>
                     </v-row>
                     <v-row dense>
