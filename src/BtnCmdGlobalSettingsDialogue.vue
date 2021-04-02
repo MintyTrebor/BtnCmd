@@ -48,6 +48,17 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable Events" v-model="passedObject.enableEvents" @click="cnfrmEnableEvents()"></v-checkbox></span>
+                                </template>
+                                <span>Enable plugin Event based monitoring</span>
+                            </v-tooltip>
+                            <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-checkbox label="Enable MQTT" v-model="passedObject.enableMQTT"></v-checkbox></span>
                                 </template>
                                 <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
@@ -112,7 +123,9 @@
         },
         data: function () {
             return {
-                alertReqVal: false
+                alertReqVal: false,
+                confirmEnableEvents: false,
+                eventText: "Event based monitoring relies on your browsers settings and the plugin being loaded in the window. If you run DWC in a browser tab, and DWC does not remain as the active tab then Event monitoring may fail. You sould not use event monitoring as part of any critical function. By clicking yes you are confirming that you understand and agree with the above statement.",
             }
         },
         methods: {
@@ -132,7 +145,29 @@
                 this.alertReqVal = true;
                 await this.sleep(2000);
                 this.alertReqVal = false;
+            },
+            cnfrmEnableEvents(){
+                if(this.passedObject.enableEvents) {
+                    this.confirmEnableEvents = true;
+                }
             }
+            //Browser Notifications cannot work on non https sites - left here incase this changes
+            /*requestAndShowPermission() {
+                Notification.requestPermission(function (permission) {
+                    if (permission === "granted") {
+                            this.showNotification();
+                    }
+                });
+            },
+            showNotification() {
+                var title = "BtnCmd Alert";
+                var icon = "image-url"
+                var body = "Browser Notifications have been enabled!";
+                var notification = new Notification(title, { body, icon });
+                notification.onclick = () => { 
+                        notification.close();
+                }
+            },*/
         }
     }
 </script>
