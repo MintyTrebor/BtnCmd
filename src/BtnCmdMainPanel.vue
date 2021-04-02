@@ -227,6 +227,16 @@
 						<span v-if="!backupMode">Show Backup & Restore Options</span>
 						<span v-if="backupMode">Hide Backup & Restore Options</span>
 					</v-tooltip>
+				</div>
+				<div class="pa-md-2" v-if="btnCmd.globalSettings.enableEvents">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="showESEdit = !showESEdit">
+								<v-icon class="mr-1">mdi-monitor-eye</v-icon>
+							</v-btn>
+						</template>
+						<span>Configure Status Event Monitoring</span>
+					</v-tooltip>
 				</div>				
 				<div class="pa-md-2">
 					<v-tooltip top>
@@ -239,6 +249,7 @@
 					</v-tooltip>
 				</div>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
+				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 			</v-row>
 		</v-footer>
@@ -251,14 +262,16 @@
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
+import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
 import BaseConnector from '../../store/machine/connector/BaseConnector';
 import mqtt from 'mqtt';
 import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
-import { isPrinting } from '../../store/machine/modelEnums.js';
+import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
 
+//needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
 
 export default {
@@ -266,7 +279,8 @@ export default {
         BtnCmdSettingsDialogue,
 		BtnCmdTabSettingsDialogue,
 		BtnCmdGlobalSettingsDialogue,
-		altWebCamPanel
+		altWebCamPanel,
+		BtnCmdEventSettingsDialogue
     },
 	computed: {
 		...mapState('machine/model', {
@@ -277,6 +291,8 @@ export default {
 		...mapGetters('machine/model', ['jobProgress']),
 		...mapState('machine/settings', ['codes']),
 		isPrinting() { return isPrinting(this.status); },
+		isPaused() { return isPaused(this.status); },
+		eventStatusText() { return this.status; },
 	},
 	data: function () {
 		return {
@@ -285,6 +301,7 @@ export default {
 			showEdit: false,
 			showTabEdit: false,
 			showGSEdit: false,
+			showESEdit: false,
 			objectToPass: null,
 			tabObjectToPass: null,
 			currTab: 1,
@@ -298,16 +315,19 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.6.0',
+			btnCmdVersion: '0.8.0',
 			code: '',
 			doingCode: false,
+			isSimulating: false,
 			btnCmd : {
 				lastID: 1,
 				lastTabID: 1,
-				btnCmdVersion: '0.6.0',
+				lastEventID: 1,
+				btnCmdVersion: '0.8.0',
 				globalSettings: {
 					enableActionMsg: true,
 					enableMQTT: false,
+					enableEvents: false,
 					MQTTUserName: '',
 					MQTTPassword: '',
 					MQTTServer: '',
@@ -315,6 +335,21 @@ export default {
 					MQTTClientID: 'BtnCmd',
 					enableSelects: false
 				},
+				monitoredEvents: [
+					{
+						eventID: 1,
+						eventType: 'status',
+						eventOnlyInPrint: true,
+						eventTrigValue: 'busy',
+						eventTrigActionType: 'http',
+						eventTrigActionCmd: 'http://',
+						eventTrigActionTopic: '',
+						eventEnabled: false,
+						eventName: 'Example Event',
+						eventTgrmChatID: '',
+						eventTgrmAPIToken: ''
+					}
+				],
 				btns: [
 					{
 						btnID: '1',
@@ -360,6 +395,7 @@ export default {
 		setupPage(){
 			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
 		},
+		//plugin UI functions
 		async saveSettingsToFile() {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);
 			const setFileName = Path.combine(this.systemDirectory, 'BtnCmdSettings.json');
@@ -387,80 +423,7 @@ export default {
 				return false;
 			}
 		},
-		onBtnClick(btnJSONOb){
-			this.setActionResponse('');
-			var tmpParent = this;
-			if(btnJSONOb.btnType == "Macro"){
-				tmpParent.runFile(btnJSONOb.btnActionData);
-				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
-			}else if(btnJSONOb.btnType == "http"){
-				tmpParent.setActionResponse("Last Action :  -- http -- Sending: " + btnJSONOb.btnActionData);
-				BaseConnector.request('GET', `${btnJSONOb.btnActionData}`)
-						.then(function(result) {
-							if (result instanceof Object && result.err === 0) {
-								//it worked
-								tmpParent.setActionResponse("Last Action :  -- http -- Success Result : " + JSON.stringify(result));
-							} else {
-								//it failed
-								tmpParent.setActionResponse("Last Action :  -- http -- Returned Result : " + JSON.stringify(result));
-							}
-						});
-			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
-				var mqttOptions;
-				
-				if(this.btnCmd.globalSettings.MQTTUserName){
-					mqttOptions = {
-						clientid: this.btnCmd.globalSettings.MQTTClientID,
-						username: this.btnCmd.globalSettings.MQTTUserName,
-						password: this.btnCmd.globalSettings.MQTTPassword,
-						reconnectPeriod: 0
-					};
-				}else {
-					mqttOptions = {
-						clientid: this.btnCmd.globalSettings.MQTTClientID,
-						reconnectPeriod: 0
-					};
-				}
-				
-				var client  = mqtt.connect(this.btnCmd.globalSettings.MQTTServer, mqttOptions);
-				
-				client.on('connect', function () {
-					client.subscribe(btnJSONOb.btnTopicData, function (e) {
-						if(!e){
-							client.publish(btnJSONOb.btnTopicData, btnJSONOb.btnActionData, function (err) {
-								if (err){
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Failed Result = " + err);
-								}else{
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Sent = " + btnJSONOb.btnActionData);
-								}
-							});
-						}else{
-							client.end();
-							tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed to Subscribe Topic = " + btnJSONOb.btnTopicData + ". Reason = " + e);
-						}
-					});
-					
-				});
 		
-				client.on('error', function (error) {
-					client.end();
-					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
-				});
-
-			}else if(btnJSONOb.btnType == "gcode"){
-				tmpParent.setActionResponse("Last Action :  -- gcode -- " + btnJSONOb.btnActionData);
-				tmpParent.code = btnJSONOb.btnActionData;
-				tmpParent.send();
-
-			}else if(btnJSONOb.btnType == "MQTT" && !this.btnCmd.globalSettings.enableMQTT){
-				tmpParent.setActionResponse("This button has been configured as MQTT, but MQTT is disabled. No Action Taken. Please re-enable MQTT.");
-			}
-		},
-		setActionResponse(actionTxt){
-			this.actionResponse = actionTxt;
-		},
 		getTabBtns(tabIndex){
 			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === tabIndex);
 			return result;
@@ -630,10 +593,12 @@ export default {
 			this.btnCmd = {
 				lastID: 1,
 				lastTabID: 1,
+				lastEventID: 1,
 				btnCmdVersion: this.btnCmdVersion,
 				globalSettings: {
 					enableActionMsg: true,
 					enableMQTT: false,
+					enableEvents: false,
 					MQTTUserName: '',
 					MQTTPassword: '',
 					MQTTServer: '',
@@ -641,6 +606,21 @@ export default {
 					MQTTClientID: 'BtnCmd',
 					enableSelects: false
 				},
+				monitoredEvents: [
+					{
+						eventID: 1,
+						eventType: 'status',
+						eventOnlyInPrint: true,
+						eventTrigValue: 'busy',
+						eventTrigActionType: 'http',
+						eventTrigActionCmd: 'http://',
+						eventTrigActionTopic: '',
+						eventEnabled: false,
+						eventName: 'Example Event',
+						eventTgrmChatID: '',
+						eventTgrmAPIToken: ''
+					}
+				],
 				btns: [
 					{
 						btnID: '1',
@@ -720,10 +700,92 @@ export default {
 				this.altWebCamToPass = tmpTabObject[0].altWebCamParams;
 			}
 		},
+		//mqtt Msg Send Functions
+		sendMQTTMsg(msgStr, topicStr){
+			var mqttOptions;
+			var tmpParent = this;
+				
+				if(this.btnCmd.globalSettings.MQTTUserName){
+					mqttOptions = {
+						clientid: this.btnCmd.globalSettings.MQTTClientID,
+						username: this.btnCmd.globalSettings.MQTTUserName,
+						password: this.btnCmd.globalSettings.MQTTPassword,
+						reconnectPeriod: 0
+					};
+				}else {
+					mqttOptions = {
+						clientid: this.btnCmd.globalSettings.MQTTClientID,
+						reconnectPeriod: 0
+					};
+				}
+				
+				var client  = mqtt.connect(this.btnCmd.globalSettings.MQTTServer, mqttOptions);
+				
+				client.on('connect', function () {
+					client.subscribe(topicStr, function (e) {
+						if(!e){
+							client.publish(topicStr, msgStr, function (err) {
+								if (err){
+									client.end();
+									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Failed Result = " + err);
+								}else{
+									client.end();
+									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Sent = " + msgStr);
+								}
+							});
+						}else{
+							client.end();
+							tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed to Subscribe Topic = " + topicStr + ". Reason = " + e);
+						}
+					});
+					
+				});
+		
+				client.on('error', function (error) {
+					client.end();
+					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
+				});
+
+		},
+		//function triggered by custom button click
+		onBtnClick(btnJSONOb){
+			this.setActionResponse('');
+			var tmpParent = this;
+			if(btnJSONOb.btnType == "Macro"){
+				tmpParent.runFile(btnJSONOb.btnActionData);
+				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
+			}else if(btnJSONOb.btnType == "http"){
+				tmpParent.setActionResponse("Last Action :  -- http -- Sending: " + btnJSONOb.btnActionData);
+				BaseConnector.request('GET', `${btnJSONOb.btnActionData}`)
+						.then(function(result) {
+							if (result instanceof Object && result.err === 0) {
+								//it worked
+								tmpParent.setActionResponse("Last Action :  -- http -- Success Result : " + JSON.stringify(result));
+							} else {
+								//it failed
+								tmpParent.setActionResponse("Last Action :  -- http -- Returned Result : " + JSON.stringify(result));
+							}
+						});
+			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
+				this.sendMQTTMsg(btnJSONOb.btnActionData, btnJSONOb.btnTopicData);
+			}else if(btnJSONOb.btnType == "gcode"){
+				tmpParent.setActionResponse("Last Action :  -- gcode -- " + btnJSONOb.btnActionData);
+				tmpParent.code = btnJSONOb.btnActionData;
+				tmpParent.send();
+
+			}else if(btnJSONOb.btnType == "MQTT" && !this.btnCmd.globalSettings.enableMQTT){
+				tmpParent.setActionResponse("This button has been configured as MQTT, but MQTT is disabled. No Action Taken. Please re-enable MQTT.");
+			}
+		},
+		//set the value of the action footer msg
+		setActionResponse(actionTxt){
+			this.actionResponse = actionTxt;
+		},
+		//run maro file
 		runFile(filename) {
 			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
 		},
-	
+		//run gcode commands - taken from codeinput.vue
 		hasUnprecedentedParameters: (code) => !code || /(M23|M28|M30|M32|M36|M117)[^0-9]/i.test(code),
 		async send() {
 			this.showItems = false;
@@ -797,12 +859,53 @@ export default {
 				}
 				this.doingCode = false;
 			}
+		},
+		//Event monitoring functions
+		checkEvents(typeStr, val){
+			var bi;
+			for (bi in this.btnCmd.monitoredEvents) {
+				this.setActionResponse("In checkEvents Sending: " + this.btnCmd.monitoredEvents[bi].eventTrigActionCmd);
+				if(this.btnCmd.monitoredEvents[bi].eventType === typeStr && this.btnCmd.monitoredEvents[bi].eventEnabled && this.btnCmd.monitoredEvents[bi].eventTrigValue === val) {
+					if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "http" || this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
+						var tmpURL = null;
+						if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
+							tmpURL = `https://api.telegram.org/bot${this.btnCmd.monitoredEvents[bi].eventTgrmAPIToken}/sendMessage?chat_id=${this.btnCmd.monitoredEvents[bi].eventTgrmChatID}&text=${this.btnCmd.monitoredEvents[bi].eventTrigActionCmd}`;
+						}else{
+							tmpURL = this.btnCmd.monitoredEvents[bi].eventTrigActionCmd;
+						}
+						this.setActionResponse("Event Action : -- Sending: " + tmpURL);
+						BaseConnector.request('GET', `${tmpURL}`)
+							.then(function(result) {
+								if (result instanceof Object && result.err === 0) {
+									//it worked
+									this.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(result));
+								} else {
+									//it failed
+									this.setActionResponse("Event Action : -- Returned Result : " + JSON.stringify(result));
+								}
+							});
+					}else if (this.btnCmd.monitoredEvents[bi].eventTrigActionType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
+						this.sendMQTTMsg(this.btnCmd.monitoredEvents[bi].eventTrigActionCmd, this.btnCmd.monitoredEvents[bi].eventTrigActionTopic);	
+					}
+				}
+			}
 		}
 	},
+	//automated functions
 	mounted() {
 		this.directory = this.macrosDirectory;
 		this.loadSettings();
 		this.setupPage();
+		this.isSimulating = (this.status === StatusType.simulating);
 	},
+	watch: {
+		status: function (val) {
+					//console.log("Checking Conditions Status change to :" + val);
+					if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating){
+						//console.log("Conditions Met lauching checkEvents");
+						this.checkEvents('status', val);
+					}
+				}	
+	}
 }
 </script>
