@@ -231,7 +231,7 @@
 				<div class="pa-md-2" v-if="btnCmd.globalSettings.enableEvents">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="showESEdit = !showESEdit">
+							<v-btn v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" color="primary" @click="showESEdit = !showESEdit">
 								<v-icon class="mr-1">mdi-monitor-eye</v-icon>
 							</v-btn>
 						</template>
@@ -864,7 +864,7 @@ export default {
 		checkEvents(typeStr, val){
 			var bi;
 			for (bi in this.btnCmd.monitoredEvents) {
-				this.setActionResponse("In checkEvents Sending: " + this.btnCmd.monitoredEvents[bi].eventTrigActionCmd);
+				//this.setActionResponse("In checkEvents Sending: " + this.btnCmd.monitoredEvents[bi].eventTrigActionCmd);
 				if(this.btnCmd.monitoredEvents[bi].eventType === typeStr && this.btnCmd.monitoredEvents[bi].eventEnabled && this.btnCmd.monitoredEvents[bi].eventTrigValue === val) {
 					if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "http" || this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
 						var tmpURL = null;
