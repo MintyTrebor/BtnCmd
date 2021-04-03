@@ -1,5 +1,5 @@
 # BtnCmd
-Duet Web Control Custom Buttons Plugin - Run Macros, Post http GET requests, &amp; send MQTT messages, get status updates.
+Duet Web Control Custom Buttons Plugin - Run Macros, Post http GET requests, send MQTT messages, &amp; get status update alerts.
 
 ![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_BLTouchTab_Main.png)
 
