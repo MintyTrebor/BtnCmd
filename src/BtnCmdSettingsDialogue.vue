@@ -78,6 +78,16 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Auto Size" v-model="passedObject.autoSize" @click="checkBtnSize()"></v-checkbox></span>
+                                </template>
+                                <span>Auto Size button to fit contents</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-checkbox label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-checkbox></span>
                                 </template>
                                 <span>Allow button to operate while a Job is active.</span>
@@ -89,7 +99,7 @@
                             <div class="container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
                         </v-col>
                     </v-row>
-                    <small>*indicates required field</small>
+                    <small>*indicates required field. You must enter either an icon or a label, or both.</small>
                 </v-form>
             </v-card-text>
         </v-card>
@@ -137,6 +147,15 @@
             async sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
+            checkBtnSize() {
+                if(!this.passedObject.autoSize){
+                    this.passedObject.btnWsize = 200;
+                    this.passedObject.btnHsize = 100;
+                }else {
+                    this.passedObject.btnWsize = 'auto';
+                    this.passedObject.btnHsize = 'auto';
+                }
+            },
             actionLabel() {
                 if (this.passedObject.btnType == "Macro") {return "Macro Name*";}
                 if (this.passedObject.btnType == "http") {return "URL*";}
@@ -144,13 +163,18 @@
                 if (this.passedObject.btnType == "gcode") {return "gcode Command*";}
             },
             async validateData() {
-                if (this.passedObject.btnLabel && this.passedObject.btnActionData) {
+                if (this.passedObject.btnActionData) {
                     if (this.passedObject.btnType == "MQTT" && !this.passedObject.btnTopicData){
                         this.alertReqVal = true;
                         await this.sleep(2000);
                         this.alertReqVal = false;
                         return;
-                    }
+                    }else if(!this.passedObject.btnLabel && !this.passedObject.btnIcon){
+                        this.alertReqVal = true;
+                        await this.sleep(2000);
+                        this.alertReqVal = false;
+                        return;
+                    } 
                     this.show = false;
                     return;
                 }
