@@ -276,8 +276,8 @@
                 this.confirmDelEvents = true;
             },
             newEvent(){
-                var newEventID = this.passedObject.lastEventID + 1;
-                this.passedObject.lastEventID = newEventID;
+                var newEventID = this.passedObject.systemSettings.lastEventID + 1;
+                this.passedObject.systemSettings.lastEventID = newEventID;
                 var newEventObj ={
                     eventID: newEventID,
                     eventType: 'status',
@@ -295,8 +295,8 @@
                 this.editEvent(newEventObj);
             },
             cloneEvent(eventItem){
-                var newEventID = this.passedObject.lastEventID + 1;
-                this.passedObject.lastEventID = newEventID;
+                var newEventID = this.passedObject.systemSettings.lastEventID + 1;
+                this.passedObject.systemSettings.lastEventID = newEventID;
                 var newEventObj ={
                     eventID: newEventID,
                     eventType: eventItem.eventType,
