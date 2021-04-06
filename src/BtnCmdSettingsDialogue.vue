@@ -23,7 +23,7 @@
 			</v-card-title>
             <v-card-text>
                 <v-form lazy-validation class="mx-2">
-                    <v-row dense v-if="!enableSelects">
+                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects">
                         <v-col cols="12">
                             <v-radio-group v-model="passedObject.btnType" row required>
                                 <v-subheader>Type:</v-subheader>
@@ -31,22 +31,22 @@
                             </v-radio-group>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="enableSelects">
+                    <v-row class="mx-2 my-n4" dense v-if="enableSelects">
                         <v-col cols="12">
                             <v-select :items="radioItems" class="custom-label-color" item-text="text" item-value="value" label="Type*" required v-model="passedObject.btnType"></v-select>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-text-field label="Label" v-model="passedObject.btnLabel"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-text-field label="Hover Text" v-model="passedObject.btnHoverText"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -56,7 +56,43 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http'">
+                        <v-col cols="12">
+                            <v-radio-group v-model="passedObject.btnHttpType" row required>
+                                <v-subheader>Http Type:</v-subheader>
+                                <v-radio v-for="type in radioHttpItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                            </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http'">
+                        <v-col cols="12">
+                            <v-select :items="radioHttpItems" class="custom-label-color" item-text="text" item-value="value" label="Http Type" required v-model="passedObject.btnHttpType"></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
+                        <v-col cols="12">
+                            <v-radio-group v-model="passedObject.btnHttpContType" row required>
+                                <v-subheader>Get Type:</v-subheader>
+                                <v-radio v-for="type in radioGetItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                            </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
+                        <v-col cols="12">
+                            <v-select :items="radioGetItems" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="passedObject.btnHttpContType"></v-select>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='http' && passedObject.btnHttpType=='POST'">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" class="custom-label-color" required label="Post Data*" v-model="passedObject.btnHttpData" placeholder="{}"></v-text-field>
+                                </template>
+                                <span>Data to send with Post</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -69,22 +105,12 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.btnType == 'MQTT'">
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType == 'MQTT'">
                         <v-col cols="12">
                             <v-text-field class="custom-label-color" label="MQTT Topic*" v-model="passedObject.btnTopicData" required></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row dense>
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Auto Size" v-model="passedObject.autoSize" @click="checkBtnSize()"></v-checkbox></span>
-                                </template>
-                                <span>Auto Size button to fit contents</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -94,7 +120,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <div class="container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
                         </v-col>
@@ -136,6 +162,18 @@
             },
             radioItems() {
                 return this.typeItems.filter(item => {return item.disabled === false});
+            },
+            radioHttpItems() {
+                return [
+                    {text: 'Get', value: 'GET', disabled: false},
+                    {text: 'Post', value: 'POST', disabled: false}
+                ]
+            },
+            radioGetItems() {
+                return [
+                    {text: 'Text', value: 'text', disabled: false},
+                    {text: 'JSON', value: 'json', disabled: false}
+                ]
             }
         },
         data: function () {
@@ -146,15 +184,6 @@
         methods: {
             async sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
-            },
-            checkBtnSize() {
-                if(!this.passedObject.autoSize){
-                    this.passedObject.btnWsize = 200;
-                    this.passedObject.btnHsize = 100;
-                }else {
-                    this.passedObject.btnWsize = 'auto';
-                    this.passedObject.btnHsize = 'auto';
-                }
             },
             actionLabel() {
                 if (this.passedObject.btnType == "Macro") {return "Macro Name*";}
