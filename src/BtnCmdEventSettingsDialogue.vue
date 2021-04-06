@@ -82,6 +82,42 @@
                                                 </v-tooltip>
                                             </v-col>
                                         </v-row>
+                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects && editItem.eventTrigActionType=='http'">
+                                            <v-col cols="12">
+                                                <v-radio-group v-model="editItem.eventHttpType" row required>
+                                                    <v-subheader>Http Type:</v-subheader>
+                                                    <v-radio v-for="type in radioHttpItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                </v-radio-group>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects && editItem.eventTrigActionType=='http'">
+                                            <v-col cols="12">
+                                                <v-select :items="radioHttpItems" class="custom-label-color" item-text="text" item-value="value" label="Http Type" required v-model="editItem.eventHttpType"></v-select>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects && editItem.eventTrigActionType=='http' && editItem.eventHttpType=='GET'">
+                                            <v-col cols="12">
+                                                <v-radio-group v-model="editItem.eventHttpContType" row required>
+                                                    <v-subheader>Get Type:</v-subheader>
+                                                    <v-radio v-for="type in radioGetItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                </v-radio-group>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects && editItem.eventTrigActionType=='http' && editItem.eventHttpType=='GET'">
+                                            <v-col cols="12">
+                                                <v-select :items="radioGetItems" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="editItem.eventHttpContType"></v-select>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row dense class="mx-2 my-n4" v-if="editItem.eventTrigActionType=='http' && editItem.eventHttpType=='POST'">
+                                            <v-col cols="12">
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-text-field v-bind="attrs" v-on="on" class="custom-label-color" required label="Post Data*" v-model="editItem.eventHttpData" placeholder="{}"></v-text-field>
+                                                    </template>
+                                                    <span>Data to send with Post</span>
+                                                </v-tooltip>
+                                            </v-col>
+                                        </v-row>
                                         <v-row dense class="mx-2 my-n4">
                                             <v-col cols="12">
                                                 <v-tooltip bottom>
@@ -190,7 +226,18 @@
             radioItems() {
                 return this.typeItems.filter(item => {return item.disabled === false});
             },
-            
+            radioHttpItems() {
+                return [
+                    {text: 'Get', value: 'GET', disabled: false},
+                    {text: 'Post', value: 'POST', disabled: false}
+                ]
+            },
+            radioGetItems() {
+                return [
+                    {text: 'Text', value: 'text', disabled: false},
+                    {text: 'JSON', value: 'json', disabled: false}
+                ]
+            }            
         },
         data: function () {
             return {
