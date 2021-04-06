@@ -21,4 +21,4 @@ BtnCmd also offers the ability to monitor the status of the Duet Board and trigg
 * Send a MQTT Message
 
 
-BtnCmd runs completely in the browser.
+BtnCmd runs in the browser.
