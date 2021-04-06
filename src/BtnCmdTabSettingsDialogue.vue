@@ -38,7 +38,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!enableSelects">
+                    <!--<v-row dense v-if="!enableSelects">
                         <v-col cols="12">
                             <v-radio-group label="Number Of Columns:" v-model="passedObject.numberOfColumns" row required>
                                 <v-radio v-for="type in colItems" :key="type" :label="type.text" :value="type.value"></v-radio>
@@ -48,6 +48,16 @@
                     <v-row dense v-if="enableSelects">
                         <v-col cols="12">
                             <v-select :items="colItems" item-text="text" item-value="value" label="Number of Columns*" required v-model="passedObject.numberOfColumns"></v-select>
+                        </v-col>
+                    </v-row>-->
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Snap Buttons to Grid" v-model="passedObject.tabEnableSnap" @click="setGridSize()"></v-checkbox></span>
+                                </template>
+                                <span>Snap items to a grid when dragging</span>
+                            </v-tooltip>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -230,6 +240,13 @@
                 this.alertReqVal = true;
                 await this.sleep(2000);
                 this.alertReqVal = false;
+            },
+            setGridSize(){
+                if(this.passedObject.tabEnableSnap){
+                    this.passedObject.tabGridSize = [20,20];
+                }else {
+                    this.passedObject.tabGridSize = [1,1];
+                }
             },
             checkAltWebCam(){
                 if(!this.passedObject.showWebCam){
