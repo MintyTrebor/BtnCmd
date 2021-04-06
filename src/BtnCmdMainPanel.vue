@@ -28,13 +28,13 @@
 	.handle,
 	.vdr{position:absolute;box-sizing:border-box}
 	.handle{width:10px;height:10px;background:#eee;border:1px solid #333}
-	.handle-tl{top:-10px;left:-10px;cursor:nw-resize}
-	.handle-tm{top:-10px;left:50%;margin-left:-5px;cursor:n-resize}
-	.handle-tr{top:-10px;right:-10px;cursor:ne-resize}
-	.handle-ml{left:-10px;cursor:w-resize}
+	.handle-tl{top:-20px;left:-20px;cursor:nw-resize}
+	.handle-tm{top:-20px;left:50%;margin-left:-5px;cursor:n-resize}
+	.handle-tr{top:-20px;right:-10px;cursor:ne-resize}
+	.handle-ml{left:-20px;cursor:w-resize}
 	.handle-ml,.handle-mr{top:50%;margin-top:-5px}
 	.handle-mr{right:-10px;cursor:e-resize}
-	.handle-bl{bottom:-70px;left:-10px;cursor:sw-resize}
+	.handle-bl{bottom:-70px;left:-20px;cursor:sw-resize}
 	.handle-bm{bottom:-70px;left:50%;margin-left:-5px;cursor:s-resize}
 	.handle-br{bottom:-70px;right:-10px;cursor:se-resize}@media only screen and (max-width:768px){[class*=handle-]:before{content:"";left:-10px;right:-10px;bottom:-10px;top:-10px;position:absolute}}
 </style>
@@ -88,7 +88,7 @@
 				<div class="my-2 ma-2" v-if="btnCmd.globalSettings.enableEvents">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" color="primary" @click="showESEdit = !showESEdit">
+							<v-btn small v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
 								<v-icon>mdi-monitor-eye</v-icon>
 							</v-btn>
 						</template>
@@ -117,12 +117,12 @@
 					</v-tab>
 					<v-tab-item class="v-data-table__wrapper" v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
 						<v-card class="tab-item-wrapper">
-							<vue-draggable-resizable @mouseover="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="my-2" v-for="btn in getTabBtns(tab.tabID)" :key="btn.autoSize" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-								<v-card style="height: 98%; width: 98%">
-									<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" style="width: 99%; height: 99%" align="center" justify="center">
+							<vue-draggable-resizable :grid="tab.tabGridSize" @mouseover="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" v-for="btn in getTabBtns(tab.tabID)" :key="btn.autoSize" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+								<v-card :key="btn.autoSize" style="height: 98%; width: 98%" class="ma-0 pa-0">
+									<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="width: 100%; height: 100%" align="center" justify="center">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn v-if="!btn.autoSize" class="ma-1 pa-1" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
+												<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 													<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 													<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 												</v-btn>
@@ -130,10 +130,10 @@
 											<span >{{ btn.btnHoverText }}</span>
 										</v-tooltip>
 									</div>
-									<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
+									<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize" :key="btn.autoSize">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn v-if="btn.autoSize" class="ma-1 pa-1" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
+												<v-btn :key="btn.autoSize" v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 													<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 													<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 												</v-btn>
@@ -141,20 +141,20 @@
 											<span >{{ btn.btnHoverText }}</span>
 										</v-tooltip>
 									</div>
-									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" style="width: 99%; height: 99%" align="center" justify="center">
+									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="ma-0 pa-0" style="width: 100%; height: 100%" align="center" justify="center">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn block v-bind="attrs" class="ma-1 pa-1" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
+												<v-btn block v-bind="attrs" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
 													<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 												</v-btn>
 											</template>
 											<span>Edit Button Parameters</span>
 										</v-tooltip>
 									</div>
-									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize">
+									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" :key="btn.autoSize">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn v-bind="attrs" v-on="on" class="ma-1 pa-1" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
+												<v-btn :key="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
 													<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 												</v-btn>
 											</template>
@@ -164,6 +164,17 @@
 									<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
 									<v-card-actions v-if="btn.btnGroupIdx==tab.tabID && editMode">
 										<v-spacer></v-spacer>
+										<div class="pa-md-1">
+											<v-tooltip bottom>
+												<template v-slot:activator="{ on, attrs }">
+													<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="checkBtnSize(btn)">
+														<v-icon>mdi-image-size-select-small</v-icon>
+													</v-btn>
+												</template>
+												<span v-if="!btn.autoSize">Toggle Auto Sizing</span>
+												<span v-if="btn.autoSize">Toggle Manual Sizing</span>
+											</v-tooltip>
+										</div>
 										<div class="pa-md-1">
 											<v-tooltip bottom>
 												<template v-slot:activator="{ on, attrs }">
@@ -195,12 +206,15 @@
 												<span v-if="!btn.autoSize">Click to enable resize - Click & Hold to drag</span>
 											</v-tooltip>
 										</div>
+										<v-spacer></v-spacer>							
 									</v-card-actions>
 								</v-card>
 							</vue-draggable-resizable>
-							<vue-draggable-resizable :parent="true" w="auto" h="auto" class="my-2" v-if="tab.showWebCam && !tab.showAltWebCam" :x="tab.tabCamXpos" :y="tab.tabCamYpos" :resizable="false" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastTabCamMovePosition">
-								<v-row>
-									<webcam-panel></webcam-panel>
+							<vue-draggable-resizable :grid="tab.tabGridSize" :parent="true" :key="tab.tabCamWSize" :w="tab.tabCamWSize" :h="tab.tabCamHSize" v-if="tab.showWebCam && !tab.showAltWebCam" :x="tab.tabCamXpos" :y="tab.tabCamYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastTabCamMovePosition" @resizestop="onTabCamResizestop" :handles="['tl','tr','bl','br']" :lock-aspect-ratio="true">
+								<v-row align="center">
+									<v-spacer></v-spacer>
+									<webcam-panel style="width: 90%; height: 90%" align="center"></webcam-panel>
+									<v-spacer></v-spacer>
 								</v-row>
 								<v-row v-if="editMode">
 									<v-spacer></v-spacer>
@@ -211,16 +225,19 @@
 													<v-icon>mdi-drag-variant</v-icon>
 												</v-btn>
 											</template>
-											<span>Move</span>
+											<span>Click to enable resize - Click & Hold to drag</span>
 										</v-tooltip>
 									</div>
+									<v-spacer></v-spacer>
 								</v-row>
 							</vue-draggable-resizable>
-							<vue-draggable-resizable :parent="true" w="auto" h="auto" class="my-2" v-if="tab.showWebCam && tab.showAltWebCam" :x="tab.tabCamXpos" :y="tab.tabCamYpos" :resizable="false" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastTabCamMovePosition">
-								<v-row>
-									<altWebCamPanel :passedObject="altWebCamToPass"></altWebCamPanel>
+							<vue-draggable-resizable :grid="tab.tabGridSize" :key="tab.tabCamWSize" :parent="true" :w="tab.tabCamWSize" :h="tab.tabCamHSize" v-if="tab.showWebCam && tab.showAltWebCam" :x="tab.tabCamXpos" :y="tab.tabCamYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastTabCamMovePosition" @resizestop="onTabCamResizestop" :handles="['tl','tr','bl','br']" :lock-aspect-ratio="true">
+								<v-row align="center">
+									<v-spacer></v-spacer>
+									<altWebCamPanel :passedObject="altWebCamToPass" align="center" style="width: 90%; height: 90%"></altWebCamPanel>
+									<v-spacer></v-spacer>
 								</v-row>
-								<v-row v-if="editMode">
+								<v-row v-if="editMode" >
 									<v-spacer></v-spacer>
 									<div class="drag-handle pa-md-1">
 										<v-tooltip bottom>
@@ -229,9 +246,10 @@
 													<v-icon>mdi-drag-variant</v-icon>
 												</v-btn>
 											</template>
-											<span>Move</span>
+											<span>Click to enable resize - Click & Hold to drag</span>
 										</v-tooltip>
 									</div>
+									<v-spacer></v-spacer>
 								</v-row>
 							</vue-draggable-resizable>
 						</v-card>
@@ -342,8 +360,9 @@ import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
 import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
-import BaseConnector from '../../store/machine/connector/BaseConnector';
+//import BaseConnector from '../../store/machine/connector/BaseConnector';
 import mqtt from 'mqtt';
+import axios from 'axios';
 import deepmerge from 'deepmerge';
 import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
 import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums.js';
@@ -387,6 +406,7 @@ export default {
 			showESEdit: false,
 			objectToPass: null,
 			tabObjectToPass: null,
+			actionDialog: false,
 			currTab: 1,
 			currTabIdx: 0,
 			saveBtnCol: 'primary',
@@ -398,7 +418,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.5',
+			btnCmdVersion: '0.8.6',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -406,7 +426,7 @@ export default {
 			currButtonObj: null,
 			currTabObj: null,
 			btnCmd : {
-				btnCmdVersion: '0.8.5',
+				btnCmdVersion: '0.8.6',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -435,7 +455,10 @@ export default {
 						eventEnabled: false,
 						eventName: 'Example Event',
 						eventTgrmChatID: '',
-						eventTgrmAPIToken: ''
+						eventTgrmAPIToken: '',
+						eventHttpType: 'GET',
+						eventHttpData: null,
+						eventHttpContType: 'text'
 					}
 				],
 				btns: [
@@ -450,11 +473,14 @@ export default {
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
-						btnXpos: 10,
-						btnYpos: 10,
+						btnXpos: 20,
+						btnYpos: 20,
 						autoSize: true,
 						btnHsize: 'auto',
-						btnWsize: 'auto'
+						btnWsize: 'auto',
+						btnHttpType: 'GET',
+						btnHttpData: null,
+						btnHttpContType: 'text'
 					}
 				],
 				tabs: [
@@ -466,8 +492,12 @@ export default {
 						numberOfColumns: 12,
 						showWebCam: false,
 						showAltWebCam : false,
-						tabCamYpos: 10,
-						tabCamXpos: 10,
+						tabCamYpos: 20,
+						tabCamXpos: 20,
+						tabCamHSize: 180,
+						tabCamWSize: 320,
+						tabEnableSnap: false,
+						tabGridSize: [1,1],
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -523,7 +553,10 @@ export default {
 						eventEnabled: false,
 						eventName: 'Example Event',
 						eventTgrmChatID: '',
-						eventTgrmAPIToken: ''
+						eventTgrmAPIToken: '',
+						eventHttpType: 'GET',
+						eventHttpData: null,
+						eventHttpContType: 'text'
 					}
 				],
 				btns: [
@@ -538,11 +571,14 @@ export default {
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
-						btnXpos: 10,
-						btnYpos: 10,
+						btnXpos: 20,
+						btnYpos: 20,
 						autoSize: true,
 						btnHsize: 'auto',
-						btnWsize: 'auto'
+						btnWsize: 'auto',
+						btnHttpType: 'GET',
+						btnHttpData: null,
+						btnHttpContType: 'text'
 					}
 				],
 				tabs: [
@@ -554,8 +590,12 @@ export default {
 						numberOfColumns: 12,
 						showWebCam: false,
 						showAltWebCam : false,
-						tabCamYpos: 10,
-						tabCamXpos: 10,
+						tabCamYpos: 20,
+						tabCamXpos: 20,
+						tabCamHSize: 180,
+						tabCamWSize: 320,
+						tabEnableSnap: false,
+						tabGridSize: [1,1],
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -638,8 +678,8 @@ export default {
 			return true;
 		},
 		saveBtnPosition(xPos, yPos){
-			this.currButtonObj.btnXpos = xPos;
-			this.currButtonObj.btnYpos = yPos;
+			this.currButtonObj.btnXpos = this.checkGridCompat(xPos);
+			this.currButtonObj.btnYpos = this.checkGridCompat(yPos);
 		},
 		lastTabCamMovePosition: function (x, y) {
 			this.dragging = false;
@@ -650,15 +690,46 @@ export default {
 			return true;
 		},
 		saveTabCamPosition(xPos, yPos){
-			this.currTabObj.tabCamXpos = xPos;
-			this.currTabObj.tabCamYpos = yPos;
+			this.currTabObj.tabCamXpos = this.checkGridCompat(xPos);
+			this.currTabObj.tabCamYpos = this.checkGridCompat(yPos);
 		},
 		onBtnResizestop: function (x, y, width, height){
 			this.resizing = false;
-			this.currButtonObj.btnXpos = x;
-			this.currButtonObj.btnYpos = y;
-			this.currButtonObj.btnWsize = width;
-			this.currButtonObj.btnHsize = height;
+			this.currButtonObj.btnXpos = this.checkGridCompat(x);
+			this.currButtonObj.btnYpos = this.checkGridCompat(y);
+			this.currButtonObj.btnWsize = this.checkGridCompat(width);
+			this.currButtonObj.btnHsize = this.checkGridCompat(height);
+		},
+		onTabCamResizestop: function (x, y, width, height){
+			this.resizing = false;
+			this.currTabObj.tabCamXpos = this.checkGridCompat(x);
+			this.currTabObj.tabCamYpos = this.checkGridCompat(y);
+			this.currTabObj.tabCamWSize = this.checkGridCompat(width);
+			this.currTabObj.tabCamHSize = this.checkGridCompat(height);
+		},
+		checkBtnSize(btnObj) {
+				
+			if(btnObj.autoSize){
+				btnObj.btnWsize = 200;
+				btnObj.btnHsize = 100;
+				btnObj.autoSize = false;
+			}else {
+				btnObj.btnWsize = 'auto';
+				btnObj.btnHsize = 'auto';
+				btnObj.autoSize = true;
+			}
+			
+		},
+		checkGridCompat(gridVal){
+			if(this.tabEnableSnap && gridVal >= 0){
+				if(!(gridVal % 20 === 0)){
+					return (Math.round(gridVal / 20) * 20);
+				}else{
+					return gridVal;
+				}
+			}else{
+				return gridVal;
+			}
 		},
 		//plugin UI functions
 		async saveSettingsToFile() {
@@ -816,13 +887,6 @@ export default {
 				this.brBtnCol = 'red';
 			}
 		},
-		getMainCols() {
-			if(this.displayWebCam){
-				return 7;
-			}else{
-				return 12;
-			}
-		},
 		onChangeTab(tmpTabID, tmpTabIndex){
 			this.currTab = tmpTabID;
 			this.currTabIdx = tmpTabIndex;
@@ -883,24 +947,35 @@ export default {
 
 		},
 		//function triggered by custom button click
-		onBtnClick(btnJSONOb){
+		async onBtnClick(btnJSONOb){
 			this.setActionResponse('');
 			var tmpParent = this;
+			const axiosHtpp = axios;
 			if(btnJSONOb.btnType == "Macro"){
 				tmpParent.runFile(btnJSONOb.btnActionData);
 				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 			}else if(btnJSONOb.btnType == "http"){
 				tmpParent.setActionResponse("Last Action :  -- http -- Sending: " + btnJSONOb.btnActionData);
-				BaseConnector.request('GET', `${btnJSONOb.btnActionData}`)
-						.then(function(result) {
-							if (result instanceof Object && result.err === 0) {
-								//it worked
-								tmpParent.setActionResponse("Last Action :  -- http -- Success Result : " + JSON.stringify(result));
-							} else {
-								//it failed
-								tmpParent.setActionResponse("Last Action :  -- http -- Returned Result : " + JSON.stringify(result));
-							}
+				if(btnJSONOb.btnHttpType == "POST") {
+					axiosHtpp.post(btnJSONOb.btnActionData, btnJSONOb.btnHttpData)
+						.then(function (response) {
+							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+						})
+						.catch(function (error) {
+							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
 						});
+				}
+				if(btnJSONOb.btnHttpType == "GET") {
+						axiosHtpp.get(btnJSONOb.btnActionData, { headers: {'Content-Type': `application/${btnJSONOb.btnHttpContType}`}})
+						.then(function (response) {
+							// handle success
+							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+						})
+						.catch(function (error) {
+							// handle error
+							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
+						});
+				}
 			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
 				this.sendMQTTMsg(btnJSONOb.btnActionData, btnJSONOb.btnTopicData);
 			}else if(btnJSONOb.btnType == "gcode"){
@@ -996,29 +1071,44 @@ export default {
 			}
 		},
 		//Event monitoring functions
-		checkEvents(typeStr, val){
+		async checkEvents(typeStr, val){
 			var bi;
+			var tmpParent = this;
+			const axiosHtpp = axios;
 			for (bi in this.btnCmd.monitoredEvents) {
 				//this.setActionResponse("In checkEvents Sending: " + this.btnCmd.monitoredEvents[bi].eventTrigActionCmd);
 				if(this.btnCmd.monitoredEvents[bi].eventType === typeStr && this.btnCmd.monitoredEvents[bi].eventEnabled && this.btnCmd.monitoredEvents[bi].eventTrigValue === val) {
 					if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "http" || this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
 						var tmpURL = null;
 						if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
+							this.btnCmd.monitoredEvents[bi].eventHttpType = "POST";
+							this.btnCmd.monitoredEvents[bi].eventHttpData = {};
+							this.btnCmd.monitoredEvents[bi].eventHttpContType = "json";
 							tmpURL = `https://api.telegram.org/bot${this.btnCmd.monitoredEvents[bi].eventTgrmAPIToken}/sendMessage?chat_id=${this.btnCmd.monitoredEvents[bi].eventTgrmChatID}&text=${this.btnCmd.monitoredEvents[bi].eventTrigActionCmd}`;
 						}else{
 							tmpURL = this.btnCmd.monitoredEvents[bi].eventTrigActionCmd;
 						}
 						this.setActionResponse("Event Action : -- Sending: " + tmpURL);
-						BaseConnector.request('GET', `${tmpURL}`)
-							.then(function(result) {
-								if (result instanceof Object && result.err === 0) {
-									//it worked
-									this.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(result));
-								} else {
-									//it failed
-									this.setActionResponse("Event Action : -- Returned Result : " + JSON.stringify(result));
-								}
-							});
+						if(this.btnCmd.monitoredEvents[bi].eventHttpType == "POST") {
+							axiosHtpp.post(tmpURL, tmpParent.btnCmd.monitoredEvents[bi].eventHttpData)
+								.then(function (response) {
+									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+								})
+								.catch(function (error) {
+									console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
+								});
+						}
+						if(this.btnCmd.monitoredEvents[bi].eventHttpType == "GET") {
+							axiosHtpp.get(tmpURL, { headers: {'Content-Type': `application/${tmpParent.btnCmd.monitoredEvents[bi].eventHttpContType}`}})
+								.then(function (response) {
+									// handle success
+									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+								})
+								.catch(function (error) {
+									// handle error
+									console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
+								});
+						}
 					}else if (this.btnCmd.monitoredEvents[bi].eventTrigActionType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
 						this.sendMQTTMsg(this.btnCmd.monitoredEvents[bi].eventTrigActionCmd, this.btnCmd.monitoredEvents[bi].eventTrigActionTopic);	
 					}
