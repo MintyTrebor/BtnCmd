@@ -1,11 +1,13 @@
 # BtnCmd
 Duet Web Control Custom Buttons Plugin - Run Macros, g-code, Post http GET requests, send MQTT messages, &amp; get status update alerts.
 
-![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_BLTouchTab_Main.png)
+![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_MainSplash1.png)  
 
 Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how to install configure and use.
 
-In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may choose to display a webcam image within the tab ease of use.
+In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may choose to display a webcam image within the tab ease of use.  
+
+![BtnCmd Edit Mode](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_MainSplash2.png)  
 
 The custom buttons can be configured to trigger one of four types of actions:  
 * Send a gcode command to the Duet Board  
