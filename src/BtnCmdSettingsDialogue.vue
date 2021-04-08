@@ -125,7 +125,7 @@
                             <div class="container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
                         </v-col>
                     </v-row>
-                    <small>*indicates required field. You must enter either an icon or a label, or both.</small>
+                    <small>*indicates required field. You must provide an icon and/or label.</small>
                 </v-form>
             </v-card-text>
         </v-card>
