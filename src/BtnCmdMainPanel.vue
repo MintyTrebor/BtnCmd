@@ -42,7 +42,7 @@
 </style>
 <template>
     <v-container fluid ma-0 pa-0 fill-height fill-width overflow-y-hidden overflow-x-hidden class="pa-0 ma-0">
-		<!--<v-row mt-0><v-col><span class="text-caption">{{ btnCmd }}</span></v-col></v-row>-->
+		<!--<v-row mt-0><v-col><span class="text-caption">{{ btnCmd.panels }}</span></v-col></v-row>-->
 		<v-row>
 			<v-col :cols="12">
 				<v-tabs class="elevation-2 mt-0 tabs-default">
@@ -51,8 +51,8 @@
 					</v-tab>
 					<v-tab-item class="v-data-table__wrapper" v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
 						<v-card class="tab-item-wrapper">
-							<vue-draggable-resizable v-for="btn in getTabBtns(tab.tabID)" :key="btn.autoSize" :grid="tab.tabGridSize" @mouseover="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-								<v-card :key="btn.autoSize" style="height: 98%; width: 98%" class="ma-0 pa-0">
+							<vue-draggable-resizable v-for="btn in getTabBtns(tab.tabID)" :z="btn.currZIndex" :key="btn.autoSize && btn.currZIndex" :grid="tab.tabGridSize" @mouseover="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+								<v-card :key="btn.autoSize" style="height: 98%; width: 98%" class="ma-0 pa-0" @mouseover="btn.currZIndex=99999" @mouseleave="btn.currZIndex = btn.zIndex">
 									<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="width: 100%; height: 100%" align="center" justify="center">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
@@ -78,7 +78,7 @@
 									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="ma-0 pa-0" style="width: 100%; height: 100%" align="center" justify="center">
 										<v-tooltip bottom>
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn block v-bind="attrs" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
+												<v-btn block v-bind="attrs" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)" >
 													<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 												</v-btn>
 											</template>
@@ -86,9 +86,9 @@
 										</v-tooltip>
 									</div>
 									<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" :key="btn.autoSize">
-										<v-tooltip bottom>
+										<v-tooltip bottom >
 											<template v-slot:activator="{ on, attrs }">
-												<v-btn :key="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)">
+												<v-btn :key="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @click="onEditBtnClick(btn)" @mouseover="btn.currZIndex=9999">
 													<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 												</v-btn>
 											</template>
@@ -143,97 +143,117 @@
 									</v-card-actions>
 								</v-card>
 							</vue-draggable-resizable>
-							<vue-draggable-resizable v-for="panel in getTabPanels(tab.tabID)" :grid="tab.tabGridSize" :key="panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" h="auto" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" :handles="['ml','mr']">
-								<v-row align="center" width="100%">
-									<v-col v-if="panel.panelType == 'jobinfo'" cols="11" align="center" class="pa-0 ma-2">
-										<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="pa-0 ma-2"></job-info-panel>
-									</v-col>
-									<v-col v-if="panel.panelType == 'layerchart'" cols="11" align="center" class="d-flex pa-0 ma-2">
-										<layer-chart v-if="panel.panelType == 'layerchart'" align="center" class="d-flex chart-height-limit pa-0 ma-2"></layer-chart>
-									</v-col>
-									<v-col v-if="panel.panelType == 'jobestimates'" cols="11" align="center" class="pa-0 ma-2">
-										<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="pa-0 ma-2"></job-estimations-panel>
-									</v-col>
-									<v-col v-if="panel.panelType == 'collectdata'" cols="11" align="center" class="pa-0 ma-2">
-										<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="pa-0 ma-2"></job-data-panel>
-									</v-col>
-									<v-col v-if="panel.panelType == 'fans'" cols="11" align="center" class="pa-0 ma-2">
-										<fans-panel v-if="panel.panelType == 'fans'" align="center" class="pa-0 ma-2"></fans-panel>
-									</v-col>
-									<v-col v-if="panel.panelType == 'speed'" cols="11" align="center" class="pa-0 ma-2">
-										<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="pa-0 ma-2"></speed-factor-panel>
-									</v-col>
-								</v-row>
-								<v-row v-if="editMode" >
-									<v-spacer></v-spacer>
-									<div class="pa-md-1">
-										<v-tooltip bottom>
-											<template v-slot:activator="{ on, attrs }">
-												<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
-													<v-icon>mdi-delete</v-icon>
-												</v-btn>
-											</template>
-											<span>Delete Panel</span>
-										</v-tooltip>
-									</div>
-									<div class="drag-handle pa-md-1">
-										<v-tooltip bottom>
-											<template v-slot:activator="{ on, attrs }">
-												<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @mouseover="onPanelDragClick(panel)">
-													<v-icon>mdi-drag-variant</v-icon>
-												</v-btn>
-											</template>
-											<span>Click & Hold to drag</span>
-										</v-tooltip>
-									</div>
-									<v-spacer></v-spacer>
-								</v-row>
+							<vue-draggable-resizable v-for="panel in getTabPanels(tab.tabID)"  :z="panel.currZIndex" :grid="tab.tabGridSize" :key="panel.currZIndex" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" h="auto" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" :handles="['ml','mr']">
+								<v-div>
+									<v-row align="center" width="100%">
+										<v-col cols="11" align="center" class="pa-0 ma-2">
+											<div>
+												<div width="100%">
+													<v-spacer></v-spacer>
+													<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="pa-0 ma-2"></job-info-panel>
+													<layer-chart v-if="panel.panelType == 'layerchart'" align="center" class="d-flex chart-height-limit pa-0 ma-2"></layer-chart>
+													<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="pa-0 ma-2"></job-estimations-panel>
+													<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="pa-0 ma-2"></job-data-panel>
+													<fans-panel v-if="panel.panelType == 'fans'" align="center" class="pa-0 ma-2"></fans-panel>
+													<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="pa-0 ma-2"></speed-factor-panel>
+													<v-spacer></v-spacer>
+												</div>
+												<div v-if="editMode" width="100%" style="position: relative; z-index:+1; bottom: 50px;">
+													<div>
+														<row>
+															<v-spacer></v-spacer>
+															<td>
+																<div class="pa-md-1">
+																	<v-tooltip bottom>
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
+																				<v-icon>mdi-delete</v-icon>
+																			</v-btn>
+																		</template>
+																		<span>Delete Panel</span>
+																	</v-tooltip>
+																</div>
+															</td>
+															<td>
+																<div class="drag-handle pa-md-1">
+																	<v-tooltip bottom>
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @mouseover="onPanelDragClick(panel)">
+																				<v-icon>mdi-drag-variant</v-icon>
+																			</v-btn>
+																		</template>
+																		<span>Click & Hold to drag</span>
+																	</v-tooltip>
+																</div>
+															</td>
+														</row>
+														<v-spacer></v-spacer>
+													</div>
+												</div>
+											</div>
+										</v-col>
+									</v-row>
+								</v-div>
 							</vue-draggable-resizable>
-							<vue-draggable-resizable v-for="panel in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :key="panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" :handles="['tl','tr','bl','br']">
-								<v-row align="center">
-									<v-spacer></v-spacer>
-									<v-col v-if="panel.panelType == 'altwebcam'" cols="12" align="center" class="pa-0 ma-0">
-										<altWebCamPanel v-if="panel.panelType == 'altwebcam'" :passedObject="panel.altWebCamParams" align="center" style="width: 90%; height: 90%"></altWebCamPanel>
-									</v-col>
-									<v-col v-if="panel.panelType == 'webcam'" cols="12" align="center" class="pa-0 ma-0">
-										<webcam-panel v-if="panel.panelType == 'webcam'" style="width: 90%; height: 90%" align="center"></webcam-panel>
-									</v-col>
-									<v-spacer></v-spacer>
-								</v-row>
-								<v-row v-if="editMode" >
-									<v-spacer></v-spacer>
-									<div class="pa-md-1" v-if="panel.panelType == 'altwebcam'">
-										<v-tooltip bottom>
-											<template v-slot:activator="{ on, attrs }">
-												<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
-													<v-icon>mdi-playlist-edit</v-icon>
-												</v-btn>
-											</template>
-											<span>Edit Alt Webcam Panel</span>
-										</v-tooltip>
-									</div>
-									<div class="pa-md-1">
-										<v-tooltip bottom>
-											<template v-slot:activator="{ on, attrs }">
-												<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
-													<v-icon>mdi-delete</v-icon>
-												</v-btn>
-											</template>
-											<span>Delete Panel</span>
-										</v-tooltip>
-									</div>
-									<div class="drag-handle pa-md-1">
-										<v-tooltip bottom>
-											<template v-slot:activator="{ on, attrs }">
-												<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @mouseover="onPanelDragClick(panel)">
-													<v-icon>mdi-drag-variant</v-icon>
-												</v-btn>
-											</template>
-											<span>Click to enable resize - Click & Hold to drag</span>
-										</v-tooltip>
-									</div>
-									<v-spacer></v-spacer>
-								</v-row>
+							<vue-draggable-resizable v-for="panel in getTabCamPanels(tab.tabID)" :z="panel.currZIndex" :grid="tab.tabGridSize" :key="panel.currZIndex" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" :handles="['tl','tr','bl','br']">
+								<v-div>
+									<v-row align="center" width="100%">
+										<v-col cols="11" align="center" class="pa-0 ma-2">
+											<div>
+												<div width="100%">
+													<v-spacer></v-spacer>
+													<altWebCamPanel v-if="panel.panelType == 'altwebcam'" :passedObject="panel.altWebCamParams" align="center" style="width: 90%; height: 90%"></altWebCamPanel>
+													<webcam-panel v-if="panel.panelType == 'webcam'" style="width: 90%; height: 90%" align="center"></webcam-panel>
+													<v-spacer></v-spacer>
+												</div>
+											</div>
+											<div v-if="editMode" width="100%" style="position: relative; z-index:+1; bottom: 50px;">
+												<div>
+													<row>
+														<v-spacer></v-spacer>
+														<td v-if="panel.panelType == 'altwebcam'">
+															<div class="pa-md-1">
+																<v-tooltip bottom>
+																	<template v-slot:activator="{ on, attrs }">
+																		<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
+																			<v-icon>mdi-playlist-edit</v-icon>
+																		</v-btn>
+																	</template>
+																	<span>Edit Alt Webcam Panel</span>
+																</v-tooltip>
+															</div>
+														</td>
+														<td>
+															<div class="pa-md-1">
+																<v-tooltip bottom>
+																	<template v-slot:activator="{ on, attrs }">
+																		<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
+																			<v-icon>mdi-delete</v-icon>
+																		</v-btn>
+																	</template>
+																	<span>Delete Panel</span>
+																</v-tooltip>
+															</div>
+														</td>
+														<td>
+															<div class="drag-handle pa-md-1">
+																<v-tooltip bottom>
+																	<template v-slot:activator="{ on, attrs }">
+																		<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @mouseover="onPanelDragClick(panel)">
+																			<v-icon>mdi-drag-variant</v-icon>
+																		</v-btn>
+																	</template>
+																	<span>Click to enable resize - Click & Hold to drag</span>
+																</v-tooltip>
+															</div>
+															<v-spacer></v-spacer>
+														</td>
+													</row>
+												</div>
+											</div>
+										</v-col>		
+									</v-row>
+								</v-div>
 							</vue-draggable-resizable>
 						</v-card>
 						<v-card class="pa-0 ma-0">
@@ -292,7 +312,7 @@
 											<div v-if="editMode" class="my-2 ma-2">
 												<v-tooltip top>
 													<template v-slot:activator="{ on, attrs }">
-														<v-btn small color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onAddPanelClick(tab.tabID)">
+														<v-btn small color="blue-grey lighten-2" :elevation="1" v-bind="attrs" v-on="on" @click="onAddPanelClick(tab)">
 															<v-icon class="mr-1">mdi-credit-card-plus</v-icon>
 														</v-btn>
 													</template>
@@ -304,7 +324,7 @@
 											<div v-if="editMode" class="my-2 ma-2">
 												<v-tooltip top>
 													<template v-slot:activator="{ on, attrs }">
-														<v-btn small color="blue-grey lighten-2" v-bind="attrs" v-on="on" :elevation="1" @click="onAddBtnClick(tab.tabID)">
+														<v-btn small color="blue-grey lighten-2" v-bind="attrs" v-on="on" :elevation="1" @click="onAddBtnClick(tab)">
 															<v-icon class="mr-1">mdi-card-plus</v-icon>
 														</v-btn>
 													</template>
@@ -525,6 +545,7 @@ export default {
 			currButtonObj: null,
 			currTabObj: null,
 			currPanelObj: null,
+			editDragging: false,
 			btnCmd : {
 				btnCmdVersion: '0.8.7',
 				systemSettings: {
@@ -581,7 +602,9 @@ export default {
 						btnWsize: 'auto',
 						btnHttpType: 'GET',
 						btnHttpData: null,
-						btnHttpContType: 'text'
+						btnHttpContType: 'text',
+						currZIndex: 1,
+						zIndex: 1
 					}
 				],
 				tabs: [
@@ -595,10 +618,11 @@ export default {
 						showAltWebCam : false,
 						tabCamYpos: 20,
 						tabCamXpos: 20,
-						tabCamHSize: 180,
-						tabCamWSize: 320,
+						tabCamHSize: 'auto',
+						tabCamWSize: 'auto',
 						tabEnableSnap: false,
 						tabGridSize: [1,1],
+						lastZIndex: 2,
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -617,8 +641,10 @@ export default {
 						panelType: 'webcam',
 						panelYpos: 70,
 						panelXpos: 70,
-						panelHSize: 180,
-						panelWSize: 320,
+						panelHSize: 'auto',
+						panelWSize: 'auto',
+						currZIndex: 2,
+						zIndex: 2,
 						altWebCamParams : {
 							altWebCamURL : 'http://',
 							altWebCamRotation : 0,
@@ -700,7 +726,9 @@ export default {
 						btnWsize: 'auto',
 						btnHttpType: 'GET',
 						btnHttpData: null,
-						btnHttpContType: 'text'
+						btnHttpContType: 'text',
+						currZIndex: 1,
+						zIndex: 1
 					}
 				],
 				tabs: [
@@ -714,10 +742,11 @@ export default {
 						showAltWebCam : false,
 						tabCamYpos: 20,
 						tabCamXpos: 20,
-						tabCamHSize: 180,
-						tabCamWSize: 320,
+						tabCamHSize: 'auto',
+						tabCamWSize: 'auto',
 						tabEnableSnap: false,
 						tabGridSize: [1,1],
+						lastZIndex: 2,
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -736,8 +765,10 @@ export default {
 						panelType: 'webcam',
 						panelYpos: 70,
 						panelXpos: 70,
-						panelHSize: 180,
-						panelWSize: 320,
+						panelHSize: 'auto',
+						panelWSize: 'auto',
+						currZIndex: 2,
+						zIndex: 2,
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -826,10 +857,12 @@ export default {
 		},
 		//dragging functions
 		lastBtnMovePosition: function (x, y) {
+			this.editDragging = false;
 			this.dragging = false;
 			this.saveBtnPosition(x, y);
 		},
 		onDragClick(btnObj){
+			this.editDragging = true;
 			this.currButtonObj = btnObj;
 			return true;
 		},
@@ -869,10 +902,12 @@ export default {
 			}
 		},
 		lastPanelMovePosition: function (x, y) {
+			this.editDragging = false;
 			this.dragging = false;
 			this.savePanelPosition(x, y);
 		},
 		onPanelDragClick(panelObj){
+			this.editDragging = true;
 			this.currPanelObj = panelObj;
 			return true;
 		},
@@ -1010,13 +1045,17 @@ export default {
 			}
 
 		},
-		onAddPanelClick(tmpTabID){					
+		onAddPanelClick(tmpTab){					
 			this.setActionResponse('');
 			var tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1
 			this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
+			var newZIndex = tmpTab.lastZIndex + 1;
+			tmpTab.lastZIndex = newZIndex;
 			var newPanel_object = this.getRefData().panels[0];
 			newPanel_object.panelID = tmpPanelID;
-			newPanel_object.tabID = tmpTabID;
+			newPanel_object.tabID = tmpTab.tabID;
+			newPanel_object.zIndex = newZIndex;
+			newPanel_object.currZIndex = newZIndex;
 			this.btnCmd.panels.push(newPanel_object);
 			this.panelObjectToPass = this.btnCmd.panels.filter(itemPanel => itemPanel.panelID == tmpPanelID);
 			this.showPanelEdit = true;
@@ -1025,21 +1064,28 @@ export default {
 			this.panelObjectToPass = this.btnCmd.panels.filter(itemPanel => itemPanel.panelID == panelID);
 			this.showPanelEdit = true;
 		},
-		onAddBtnClick(tmpTabID){					
+		onAddBtnClick(tmpTab){					
 			this.setActionResponse('');
 			var tmpBtnID = this.btnCmd.systemSettings.lastID + 1
+			var newZIndex = tmpTab.lastZIndex + 1;
+			tmpTab.lastZIndex = newZIndex;
 			this.btnCmd.systemSettings.lastID = tmpBtnID;
 			var newBtn_object = this.getRefData().btns[0];
 			newBtn_object.btnID = tmpBtnID;
 			newBtn_object.btnLabel = 'New';
 			newBtn_object.btnColour = '#0077FFFF';
 			newBtn_object.btnActionData = '';
-			newBtn_object.btnGroupIdx = tmpTabID;
+			newBtn_object.btnGroupIdx = tmpTab.tabID;
 			newBtn_object.btnHoverText = '';
+			newBtn_object.zIndex = newZIndex;
+			newBtn_object.currZIndex = newZIndex;
 			this.btnCmd.btns.push(newBtn_object);
 		},
 		btnClone(srcBtn){
 			this.setActionResponse('');
+			var tmpTab = this.btnCmd.tabs.filter(item => item.tabID == srcBtn.btnGroupIdx);
+			var newZIndex = tmpTab.lastZIndex + 1;
+			tmpTab.lastZIndex = newZIndex;
 			const merge = deepmerge;
 			var tmpBtnID = this.btnCmd.systemSettings.lastID + 1
 			this.btnCmd.systemSettings.lastID = tmpBtnID;
@@ -1047,6 +1093,8 @@ export default {
 			newBtn_object.btnID = tmpBtnID;
 			newBtn_object.btnXpos = srcBtn.btnXpos + 20;
 			newBtn_object.btnYpos = srcBtn.btnYpos + 20;
+			newBtn_object.zIndex = newZIndex;
+			newBtn_object.currZIndex = newZIndex;
 			this.btnCmd.btns.push(newBtn_object);
 		},
 		btnDelete(idx){
