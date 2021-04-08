@@ -27,7 +27,7 @@
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-select v-bind="attrs" v-on="on" :items="panelItems" item-text="text" item-value="value" label="Webcam Rotation" required v-model="passedObject.panelType"></v-select>
+                                    <v-select v-bind="attrs" v-on="on" :items="panelItems" item-text="text" item-value="value" label="Panel Type" required v-model="passedObject.panelType"></v-select>
                                 </template>
                                 <span>Select Panel</span>
                             </v-tooltip>
@@ -37,7 +37,7 @@
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Flip Webcam Img:" v-model="passedObject.panelType" row required>
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Panel Type:" v-model="passedObject.panelType" row required>
                                         <v-radio v-for="type in panelItems" :key="type" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
                                 </template>
