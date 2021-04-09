@@ -1,4 +1,4 @@
-<style>
+<style> 
 	.tab-item-wrapper {
 		height: calc(100vh - 420px);
 		width: 100%;
