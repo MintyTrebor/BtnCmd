@@ -1,7 +1,7 @@
 # BtnCmd
 Duet Web Control Custom Buttons Plugin - Run Macros, g-code, Post http GET requests, send MQTT messages, &amp; get status update alerts.
 
-![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_MainSplash1_0.8.8.png)  
+![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/BtnCmd_MainSplash2_0.8.8.png)  
 
 Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how to install configure and use.
 
