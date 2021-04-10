@@ -23,4 +23,4 @@ BtnCmd also offers the ability to monitor the status of the Duet Board and trigg
 
 BtnCmd runs in the browser.
 
-<iframe width="640" height="380" src="https://www.youtube.com/embed/78C4ykYV9ew" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[BtnCmd Overview Video](https://youtu.be/78C4ykYV9ew)
