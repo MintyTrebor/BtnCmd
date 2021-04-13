@@ -44,7 +44,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row dense v-if="!mobileActive">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -109,7 +109,8 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            }
+            },
+            mobileActive: Boolean
         },
         computed: {
             show: {
