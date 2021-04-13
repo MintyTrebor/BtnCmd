@@ -27,7 +27,7 @@
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-select v-bind="attrs" v-on="on" :items="panelItems" item-text="text" item-value="value" label="Panel Type" required v-model="passedObject.panelType"></v-select>
+                                    <v-select v-bind="attrs" v-on="on" :items="panelItems" item-text="text" item-value="value" label="Panel Type" required v-model="passedObject.panelType" ></v-select>
                                 </template>
                                 <span>Select Panel</span>
                             </v-tooltip>
@@ -157,9 +157,7 @@
                 <tbody style="position: absolute; z-index:99999; bottom: 10%; left: 10%;">
                     <v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo">
                         Choose from a selection of DWC panels to include<br>
-                        in your tab layout. Webcam panels can be fully<br>
-                        resized. Other DWC panels are restricted to<br>
-                        resizing by width only.
+                        in your tab layout.
                     </v-alert>
                 </tbody>
             </v-card-text>
@@ -185,19 +183,22 @@
                 set (value) {
                     this.$emit('input', value)
                 }
+            },
+            currPanel: {
+                get() {return this.passedObject.panelType;}
             }
         },
         data: function () {
             return {
                 panelItems: [
-                    {text: 'DWC Webcam', value: 'webcam'},
-                    {text: 'Alt Webcam', value: 'altwebcam'},
-                    {text: 'Job Info', value: 'jobinfo'},
-                    {text: 'Layer Chart', value: 'layerchart'},
-                    {text: 'Collected Data', value: 'collectdata'},
-                    {text: 'Job Estimations', value: 'jobestimates'},
-                    {text: 'Speed', value: 'speed'},
-                    {text: 'Fans', value: 'fans'}
+                    {text: 'DWC Webcam', value: 'webcam', hSize: 240, wSize: 320},
+                    {text: 'Alt Webcam', value: 'altwebcam', hSize: 240, wSize: 320},
+                    {text: 'Job Info', value: 'jobinfo', hSize: 200, wSize: 200},
+                    {text: 'Layer Chart', value: 'layerchart', hSize: 240, wSize: 280},
+                    {text: 'Collected Data', value: 'collectdata', hSize: 110, wSize: 600},
+                    {text: 'Job Estimations', value: 'jobestimates', hSize: 110, wSize: 280},
+                    {text: 'Speed', value: 'speed', hSize: 200, wSize: 300},
+                    {text: 'Fans', value: 'fans', hSize: 200, wSize: 300}
                 ],
                 rotateItems: [
                     {text: '0°', value: 0},
@@ -235,6 +236,13 @@
                 this.alertReqVal = true;
                 await this.sleep(2000);
                 this.alertReqVal = false;
+            }
+        },
+        watch: {
+            currPanel: function (newVal) {
+                var result = this.panelItems.filter(item => item.value === newVal);
+                this.passedObject.panelHSize = result[0].hSize;
+                this.passedObject.panelWSize = result[0].wSize;
             }
         }
     }
