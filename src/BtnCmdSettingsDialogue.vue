@@ -10,7 +10,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card style="overflow-x: hidden;">
+        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
 			<v-card-title class="container">
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Button</v-toolbar-title>
@@ -27,7 +27,7 @@
                         <v-col cols="12">
                             <v-radio-group v-model="passedObject.btnType" row required>
                                 <v-subheader>Type:</v-subheader>
-                                <v-radio v-for="type in radioItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                <v-radio v-for="type in radioItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
                         </v-col>
                     </v-row>
@@ -60,7 +60,7 @@
                         <v-col cols="12">
                             <v-radio-group v-model="passedObject.btnHttpType" row required>
                                 <v-subheader>Http Type:</v-subheader>
-                                <v-radio v-for="type in radioHttpItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                <v-radio v-for="type in radioHttpItems" :key="'BtnHTTP'+type.value" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
                         </v-col>
                     </v-row>
@@ -73,7 +73,7 @@
                         <v-col cols="12">
                             <v-radio-group v-model="passedObject.btnHttpContType" row required>
                                 <v-subheader>Get Type:</v-subheader>
-                                <v-radio v-for="type in radioGetItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                <v-radio v-for="type in radioGetItems" :key="'BtnGT'+type.value" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
                         </v-col>
                     </v-row>
@@ -114,7 +114,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-switch></span>
                                 </template>
                                 <span>Allow button to operate while a Job is active.</span>
                             </v-tooltip>
