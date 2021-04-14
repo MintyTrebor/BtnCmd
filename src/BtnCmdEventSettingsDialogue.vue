@@ -10,7 +10,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="1200px">
-        <v-card style="overflow-x: hidden;">
+        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
             <v-card-text>
                 <v-data-table :headers="headers" :items="passedObject.monitoredEvents" :options="eventTableOptions" item-key="eventID" sort-by="eventID" class="elevation-1">
                     <template v-slot:top>
@@ -37,7 +37,7 @@
                                                     <template v-slot:activator="{ on, attrs }">
                                                         <v-radio-group  v-bind="attrs" v-on="on" v-model="editItem.eventTrigActionType" row required>
                                                             <v-subheader class="custom-label-color" v-bind="attrs" v-on="on">Event Type:</v-subheader>
-                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in radioItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in radioItems" :key="'EV'+type.value" :label="type.text" :value="type.value"></v-radio>
                                                         </v-radio-group>
                                                     </template>
                                                     <span>Select the event on action type</span>
@@ -65,7 +65,7 @@
                                                     <template v-slot:activator="{ on, attrs }">
                                                         <v-radio-group v-bind="attrs" v-on="on" v-model="editItem.eventTrigValue" row required>
                                                             <v-subheader class="custom-label-color" v-bind="attrs" v-on="on" >Status:</v-subheader>
-                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in trigValueItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in trigValueItems" :key="'EVT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                                         </v-radio-group>
                                                     </template>
                                                     <span>Status value to trigger the event</span>
@@ -86,7 +86,7 @@
                                             <v-col cols="12">
                                                 <v-radio-group v-model="editItem.eventHttpType" row required>
                                                     <v-subheader>Http Type:</v-subheader>
-                                                    <v-radio v-for="type in radioHttpItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                    <v-radio v-for="type in radioHttpItems" :key="'EVHTTP'+type.value" :label="type.text" :value="type.value"></v-radio>
                                                 </v-radio-group>
                                             </v-col>
                                         </v-row>
@@ -99,7 +99,7 @@
                                             <v-col cols="12">
                                                 <v-radio-group v-model="editItem.eventHttpContType" row required>
                                                     <v-subheader>Get Type:</v-subheader>
-                                                    <v-radio v-for="type in radioGetItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                                    <v-radio v-for="type in radioGetItems" :key="'EVGT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                                 </v-radio-group>
                                             </v-col>
                                         </v-row>
@@ -164,7 +164,7 @@
                                             <v-col cols="12">
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on, attrs }">
-                                                        <span v-bind="attrs" v-on="on"><v-checkbox label="Enable" v-model="editItem.eventEnabled"></v-checkbox></span>
+                                                        <span v-bind="attrs" v-on="on"><v-switch label="Enabled" v-model="editItem.eventEnabled"></v-switch></span>
                                                     </template>
                                                     <span>Enable this event</span>
                                                 </v-tooltip>
