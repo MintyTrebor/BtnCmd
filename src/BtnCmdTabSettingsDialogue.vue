@@ -10,7 +10,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card style="overflow-x: hidden;">
+        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
 			<v-card-title class="container">
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Tab</v-toolbar-title>
@@ -42,7 +42,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Snap Buttons to Grid" v-model="passedObject.tabEnableSnap" @click="setGridSize()"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Snap Buttons to Grid" v-model="passedObject.tabEnableSnap" @change="setGridSize()"></v-switch></span>
                                 </template>
                                 <span>Snap items to a grid when dragging</span>
                             </v-tooltip>
