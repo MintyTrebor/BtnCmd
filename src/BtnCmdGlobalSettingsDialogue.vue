@@ -11,7 +11,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card class="pa-2" max-width="600">
+        <v-card class="pa-2" max-width="600" style="overflow-x: hidden; position: relative; z-index: 99900">
 			<v-card-title class="container">
                 <v-toolbar dark dense>
                     <v-toolbar-title>BtnCmd Settings</v-toolbar-title>
@@ -28,7 +28,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Show Action Messages in Footer" v-model="passedObject.enableActionMsg"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Show Action Messages in Footer" v-model="passedObject.enableActionMsg"></v-switch></span>
                                 </template>
                                 <span>Enable to see any relevant information in the page footer following a button click.</span>
                             </v-tooltip>
@@ -38,9 +38,9 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable Selections" v-model="passedObject.enableSelects"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Use Selections" v-model="passedObject.enableSelects"></v-switch></span>
                                 </template>
-                                <span>Enable dropdown selections instead of radio buttons in settings windows</span>
+                                <span>Use dropdown selections instead of radio buttons in settings windows</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -48,18 +48,28 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable Events" v-model="passedObject.enableEvents" @click="cnfrmEnableEvents()"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Events" v-model="passedObject.enableEvents" @change="cnfrmEnableEvents()"></v-switch></span>
                                 </template>
                                 <span>Enable plugin Event based monitoring</span>
                             </v-tooltip>
                             <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
                         </v-col>
                     </v-row>
+                    <v-row>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-col cols="12" v-bind="attrs" v-on="on">
+                                    <v-slider  min="-100" max="100" label="% Height Mod" step="1" thumb-label="always" v-model="tmpPluginMinimumHeight"></v-slider>
+                                </v-col>
+                            </template>
+                            <span>Modify the available vertical layout size</span>
+                        </v-tooltip>
+                    </v-row>
                     <v-row dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Enable MQTT" v-model="passedObject.enableMQTT"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable MQTT" v-model="passedObject.enableMQTT"></v-switch></span>
                                 </template>
                                 <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
                             </v-tooltip>
@@ -126,6 +136,7 @@
             return {
                 alertReqVal: false,
                 confirmEnableEvents: false,
+                tmpPluginMinimumHeight: 0,
                 eventText: "Event based monitoring relies on your browsers settings and the plugin being loaded in the window. If you run DWC in a browser tab, and DWC does not remain as the active tab then Event monitoring may fail. You sould not use event monitoring as part of any critical function. By clicking yes you are confirming that you understand and agree with the above statement.",
             }
         },
@@ -135,11 +146,13 @@
             },
             async validateData() {
                 if(!this.passedObject.enableMQTT){
-                    this.$emit('exit', true)
+                    this.passedObject.pluginMinimumHeight = this.tmpPluginMinimumHeight;
+                    this.$emit('exit', true);
                     this.show = false;
                     return;
                 }else if (this.passedObject.enableMQTT && this.passedObject.MQTTServer && this.passedObject.MQTTClientID) {
-                    this.$emit('exit', true)
+                    this.passedObject.pluginMinimumHeight = this.tmpPluginMinimumHeight;
+                    this.$emit('exit', true);
                     this.show = false;
                     return;
                 }
@@ -151,7 +164,7 @@
                 if(this.passedObject.enableEvents) {
                     this.confirmEnableEvents = true;
                 }
-            }
+            },
             //Browser Notifications cannot work on non https sites - left here incase this changes
             /*requestAndShowPermission() {
                 Notification.requestPermission(function (permission) {
@@ -169,6 +182,9 @@
                         notification.close();
                 }
             },*/
+        },
+        mounted() {
+            this.tmpPluginMinimumHeight = this.passedObject.pluginMinimumHeight;
         }
     }
 </script>
