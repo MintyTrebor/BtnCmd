@@ -2,6 +2,10 @@
 	.tab-item-wrapper {
 		width: 100%;
 	}
+	.div-main-wrapper {
+		width: 100%;
+		/* overflow-y: auto; */
+	}
 	.edit-mode-buttons {
 		position: absolute; 
 		bottom: -3px; 
@@ -49,29 +53,29 @@
 	.drag-handle:hover {cursor: move important}
 </style>
 <template>
-    <div class="tabs-default pa-0 ma-0">
+    <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0" :key="'maindiv' + tabCardHeight + window.width">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ tmpDebgug }}</span></v-col></v-row> -->
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ btnCmd.panels }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">{{ tabCardHeight }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">{{ window.width }} - {{ window.height }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" >
 						<v-tabs-slider></v-tabs-slider>
-						<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="tab.tabID" :href="`#general-tab-${index2}`" @click="onChangeTab(tab.tabID, index2)" >
+						<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="'tab'+tab.tabID" :href="`#general-tab-${index2}`" @click="onChangeTab(tab.tabID, index2)" >
 							<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
 						</v-tab>
-						<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="index" :value="`general-tab-${index}`">
-							<v-card class="tab-item-wrapper" :height="tabCardHeight">
+						<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="'tabitem'+index" :value="`general-tab-${index}`">
+							<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width">
 								<v-container fluid class="pa-0 ma-0 tabs-default">
 									<v-row class="pa-0 ma-0 tabs-default">
 										<v-col cols="12">
 											<!--this div is here to constrain draggle items within the window-->
-											<div class="tabs-card">
-												<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="editMode && btn.autoSize && currTabObj" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-													<v-card :key="btn.autoSize" style="height: 98%; width: 98%" class="ma-0 pa-0">
+											<div class="tabs-card" v-if="tab.lastZIndex">
+												<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+													<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
 														<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
 																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
@@ -81,10 +85,10 @@
 																	<span >{{ btn.btnHoverText }}</span>
 																</v-tooltip>
 															</div>
-															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize" :key="btn.autoSize">
-																<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
+																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn :key="btn.autoSize" v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
+																		<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -93,7 +97,7 @@
 																</v-tooltip>
 															</div>
 															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
 																		<v-btn block v-bind="attrs" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
 																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
@@ -102,10 +106,10 @@
 																	<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
 																</v-tooltip>
 															</div>
-															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" :key="btn.autoSize" class="drag-handle">
-																<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
+																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn :key="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																		<v-btn v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
 																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 																		</v-btn>
 																	</template>
@@ -115,7 +119,7 @@
 														</v-row>
 													</v-card>
 												</vue-draggable-resizable>
-												<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="panel.panelID && editMode && currTabObj" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
+												<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
 													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
@@ -127,11 +131,11 @@
 																<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
 																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
-																		<row align="center" justify="center">
+																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
 																			<td>
 																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
 																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
 																								<v-icon>mdi-delete</v-icon>
@@ -143,7 +147,7 @@
 																			</td>
 																			<td>
 																				<div class="drag-handle pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
 																							<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
 																								<v-icon>mdi-drag-variant</v-icon>
@@ -153,15 +157,27 @@
 																					</v-tooltip>
 																				</div>
 																			</td>
+																			<td>
+																				<div class="pa-md-1">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<template v-slot:activator="{ on, attrs }">
+																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
+																								<v-icon>mdi-arrange-bring-to-front</v-icon>
+																							</v-btn>
+																						</template>
+																						<span>Bring the Panel to the top layer</span>
+																					</v-tooltip>
+																				</div>
+																			</td>
 																			<v-spacer></v-spacer>
-																		</row>
+																		</tr>
 																	</tbody>
 																</v-overlay>
 															</td>
 														</v-row>
 													</v-card>
 												</vue-draggable-resizable>
-												<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="panel.panelID && editMode && currTabObj" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+												<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
 													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
@@ -169,11 +185,11 @@
 																<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
 																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
-																		<row align="center" justify="center">
+																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
 																			<td v-if="panel.panelType == 'altwebcam'">
 																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
 																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
 																								<v-icon>mdi-playlist-edit</v-icon>
@@ -185,7 +201,7 @@
 																			</td>
 																			<td>
 																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
 																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
 																								<v-icon>mdi-delete</v-icon>
@@ -197,7 +213,7 @@
 																			</td>
 																			<td>
 																				<div class="drag-handle pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${currTabObj.lastZIndex+1}`">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
 																							<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
 																								<v-icon>mdi-drag-variant</v-icon>
@@ -207,8 +223,20 @@
 																					</v-tooltip>
 																				</div>
 																			</td>
+																			<td>
+																				<div class="pa-md-1">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<template v-slot:activator="{ on, attrs }">
+																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
+																								<v-icon>mdi-arrange-bring-to-front</v-icon>
+																							</v-btn>
+																						</template>
+																						<span>Bring the Panel to the top layer</span>
+																					</v-tooltip>
+																				</div>
+																			</td>
 																			<v-spacer></v-spacer>
-																		</row>
+																		</tr>
 																	</tbody>
 																</v-overlay>
 															</td>
@@ -222,7 +250,7 @@
 							</v-card>
 						</v-tab-item>
 					</v-tabs>
-					<v-menu v-model="showMenu" :position-x="menuX" :position-y="menuY" absolute offset-y :style="`z-index:${currTabObj.lastZIndex+1}`">
+					<v-menu v-if="currTabObj" v-model="showMenu" :position-x="menuX" :position-y="menuY" absolute offset-y :style="`z-index:${currTabObj.lastZIndex+1}`">
 						<v-card>
 							<tbody>
 								<tr>
@@ -267,6 +295,18 @@
 											<div class="pa-md-1">
 												<v-tooltip bottom>
 													<template v-slot:activator="{ on, attrs }">
+														<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringBtnToFront(currButtonObj)">
+															<v-icon>mdi-arrange-bring-to-front</v-icon>
+														</v-btn>
+													</template>
+													<span>Bring the Button to the top layer</span>
+												</v-tooltip>
+											</div>
+										</td>
+										<td>
+											<div class="pa-md-1">
+												<v-tooltip bottom>
+													<template v-slot:activator="{ on, attrs }">
 														<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onEditBtnClick(currButtonObj)">
 															<v-icon>mdi-playlist-edit</v-icon>
 														</v-btn>
@@ -302,7 +342,7 @@
 			</v-col>
 		</v-row>
 		<!-- Normal Footer -->
-		<v-footer v-if="!editMode" height="37" absolute width="100%" style="bottom: 12px;" class="pa-0 ma-0">
+		<v-footer v-if="!editMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
@@ -393,7 +433,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Edit Mode Footer Mobile -->
-		<v-footer v-if="editMode && mobileActive" height="37" absolute width="100%" style="bottom: 12px;" class="pa-0 ma-0">
+		<v-footer v-if="editMode && mobileActive" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`" class="pa-0 ma-0">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-1">
@@ -480,7 +520,7 @@
 			</v-row>
 		</v-footer>	
 		<!-- Edit Mode Footer -->
-		<v-footer v-if="editMode && !mobileActive" height="37" absolute width="100%" style="bottom: 12px;" class="pa-0 ma-0">
+		<v-footer v-if="editMode && !mobileActive" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`" class="pa-0 ma-0">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-2">
@@ -637,13 +677,31 @@ export default {
 		isPaused() { return isPaused(this.status); },
 		eventStatusText() { return this.status; },
 		tabCardHeight () {
-			var tmpHeight = null;
-			if(this.window.width <= 720){
-				tmpHeight = 601;
-			}else{
-				tmpHeight = this.window.height - 420;
-				if(tmpHeight <= 600){
-					tmpHeight = 601;
+			//First set the height modifers
+			var tmpUsrHeightMod = 0;
+			var tmpHeight = 0;
+			var currHeight = parseInt(this.window.height);
+			var tmpPlgH = parseInt(this.btnCmd.globalSettings.pluginMinimumHeight)
+
+			if(tmpPlgH < 0){
+				//Negative Modifier
+				tmpUsrHeightMod = -Math.abs(Math.floor((currHeight / 100)*tmpPlgH));
+			}else if(tmpPlgH > 0){
+				//Positve Modifier
+				tmpUsrHeightMod = Math.floor((currHeight/ 100)*tmpPlgH);
+			}	
+
+			if(parseInt(this.window.width) <= 720){
+				//Mobile Height modifiers
+				tmpHeight = tmpUsrHeightMod + 601;
+				if(tmpHeight > (currHeight - 110)) {
+					tmpHeight = currHeight - 110;
+				}
+			}else {
+				//Normal Heigh modifiers
+				tmpHeight = (tmpUsrHeightMod + currHeight -420);
+				if(tmpHeight > (currHeight - 110)) {
+					tmpHeight = currHeight - 110;
 				}
 			}
 			return tmpHeight;
@@ -680,14 +738,14 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.11',
+			btnCmdVersion: '0.8.12',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
 			newData: null,
-			currButtonObj: null,
-			currTabObj: null,
-			currPanelObj: null,
+			currButtonObj: {},
+			currTabObj: {},
+			currPanelObj: {},
 			editDragging: false,
 			showMenu: false,
 			menuX: 0,
@@ -701,7 +759,7 @@ export default {
 			alertReqVal: false,
 			alertFileChanged: false,
 			btnCmd : {
-				btnCmdVersion: '0.8.11',
+				btnCmdVersion: '0.8.12',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -718,7 +776,8 @@ export default {
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
 					enableSelects: true,
-					lastBackupFileName: 'BtnCmdSettings'
+					lastBackupFileName: 'BtnCmdSettings',
+					pluginMinimumHeight: 0
 				},
 				monitoredEvents: [
 					{
@@ -843,7 +902,8 @@ export default {
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
 					enableSelects: true,
-					lastBackupFileName: 'BtnCmdSettings'
+					lastBackupFileName: 'BtnCmdSettings',
+					pluginMinimumHeight: 0
 				},
 				monitoredEvents: [
 					{
@@ -1093,8 +1153,8 @@ export default {
 		},
 		onDragClick(btnObj){
 			this.editDragging = true;
-			btnObj.btnZIndex = this.currTabObj.lastZIndex + 1;
-			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
+			// btnObj.btnZIndex = this.currTabObj.lastZIndex + 1;
+			// this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			this.currButtonObj = btnObj;
 			return true;
 		},
@@ -1148,8 +1208,8 @@ export default {
 		},
 		onPanelDragClick(panelObj){
 			this.editDragging = true;
-			panelObj.panelZIndex = this.currTabObj.lastZIndex + 1;
-			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
+			// panelObj.panelZIndex = this.currTabObj.lastZIndex + 1;
+			// this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			this.currPanelObj = panelObj;
 			return true;
 		},
@@ -1163,6 +1223,14 @@ export default {
 			this.currPanelObj.panelYpos = y; //this.checkGridCompat(y);
 			this.currPanelObj.panelWSize = this.checkGridCompat(width);
 			this.currPanelObj.panelHSize = this.checkGridCompat(height);
+		},
+		bringBtnToFront(tmpBtnObj){
+			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
+			tmpBtnObj.btnZIndex = this.currTabObj.lastZIndex;
+		},
+		bringPanelToFront(tmpPanelObj){
+			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
+			tmpPanelObj.panelZIndex = this.currTabObj.lastZIndex;
 		},
 		//plugin UI functions
 		chkJobEnabled(item){
@@ -1300,6 +1368,19 @@ export default {
 			newBtn_object.btnHoverText = '';
 			newBtn_object.btnZIndex = this.currTabObj.lastZIndex;
 			this.btnCmd.btns.push(newBtn_object);
+			this.flashBtn(tmpBtnID);
+			
+		},
+		async flashBtn(btnID){
+			var tmpNewBtn = this.btnCmd.btns.filter(item => item.btnID == btnID);
+			var i = 0;
+			for (i = 0; i < 5; i++) {
+				tmpNewBtn[0].btnColour = 'red';
+				await this.sleep(150);
+				tmpNewBtn[0].btnColour = 'green';
+				await this.sleep(150);
+			}
+			tmpNewBtn[0].btnColour = '#0077FFFF';
 		},
 		btnClone(srcBtn){
 			this.setActionResponse('');
@@ -1313,6 +1394,7 @@ export default {
 			newBtn_object.btnYpos = srcBtn.btnYpos + 20;
 			newBtn_object.btnZIndex = this.currTabObj.lastZIndex;
 			this.btnCmd.btns.push(newBtn_object);
+			//this.flashBtn(tmpBtnID);
 		},
 		btnDelete(idx){
 			this.setActionResponse('');
