@@ -10,7 +10,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card style="overflow-x: hidden;">
+        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
 			<v-card-title class="container">
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Panel</v-toolbar-title>
@@ -38,7 +38,7 @@
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-radio-group v-bind="attrs" v-on="on" label="Panel Type:" v-model="passedObject.panelType" row required>
-                                        <v-radio v-for="type in panelItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                        <v-radio v-for="type in panelItems" :key="'PT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
                                 </template>
                                 <span>Select Panel</span>
@@ -70,7 +70,7 @@
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-radio-group v-bind="attrs" v-on="on" label="Webcam Rotation:" v-model="passedObject.altWebCamParams.altWebCamRotation" row required>
-                                        <v-radio v-for="type in rotateItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                        <v-radio v-for="type in rotateItems" :key="'WR'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
                                 </template>
                                 <span>Rotation Angle</span>
@@ -92,7 +92,7 @@
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-radio-group v-bind="attrs" v-on="on" label="Flip Webcam Img:" v-model="passedObject.altWebCamParams.altWebCamFlip" row required>
-                                        <v-radio v-for="type in flipItems" :key="type" :label="type.text" :value="type.value"></v-radio>
+                                        <v-radio v-for="type in flipItems" :key="'FW'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
                                 </template>
                                 <span>Flip Webcam Image</span>
@@ -123,7 +123,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamAppndHTTP"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamAppndHTTP"></v-switch></span>
                                 </template>
                                 <span>Do not append extra HTTP qualifier when reloading images</span>
                             </v-tooltip>
@@ -133,7 +133,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-checkbox label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamiFrame"></v-checkbox></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamiFrame"></v-switch></span>
                                 </template>
                                 <span>Embedd Webcam image in iFrame</span>
                             </v-tooltip>
@@ -145,7 +145,7 @@
                     <div class="mx-2">
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
-                                <v-btn x-small fab color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showInfo = !showInfo">
+                                <v-btn x-small fab color="primary" v-bind="attrs" v-on="on" :elevation="1" @click="showInfo = !showInfo">
                                     <v-icon>mdi-information</v-icon>
                                 </v-btn>
                             </template>
