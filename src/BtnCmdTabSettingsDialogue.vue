@@ -1,8 +1,4 @@
 <style>
-    .container {
-        display: flex;
-        justify-content: center;
-    }
     .custom-label-color .v-label {
         color: red;
         opacity: 1;
@@ -10,8 +6,8 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
-			<v-card-title class="container">
+        <v-card style="overflow-x: hidden;">
+			<v-card-title>
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Tab</v-toolbar-title>
                     <v-spacer></v-spacer>
