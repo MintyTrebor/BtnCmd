@@ -1,8 +1,4 @@
 <style>
-    .container {
-        display: flex;
-        justify-content: center;
-    }
     .custom-label-color .v-label {
         color: red;
         opacity: 1;
@@ -10,7 +6,7 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="1200px">
-        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
+        <v-card style="overflow-x: hidden;">
             <v-card-text>
                 <v-data-table :headers="headers" :items="passedObject.monitoredEvents" :options="eventTableOptions" item-key="eventID" sort-by="eventID" class="elevation-1">
                     <template v-slot:top>
@@ -22,7 +18,7 @@
                             <v-btn color="blue darken-1" text @click="show = false;">Close</v-btn>
                             <v-dialog v-model="dialog" persistent max-width="700px">
                                 <v-card>
-                                    <v-card-title class="container">
+                                    <v-card-title>
                                         <v-toolbar dark dense>
                                             <v-toolbar-title>Edit Event</v-toolbar-title>
                                             <v-spacer></v-spacer>
@@ -32,7 +28,7 @@
                                     </v-card-title>
                                     <v-card-text>
                                         <v-row dense class="mx-2 my-n4" v-if="!enableSelects">
-                                            <v-col cols="12">
+                                            <v-col cols="12" class="ma-0 pa-0">
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on, attrs }">
                                                         <v-radio-group  v-bind="attrs" v-on="on" v-model="editItem.eventTrigActionType" row required>
