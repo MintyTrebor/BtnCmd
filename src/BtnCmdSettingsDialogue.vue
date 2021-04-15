@@ -1,5 +1,5 @@
 <style>
-    .container {
+    .btnCmd-container {
         display: flex;
         justify-content: center;
     }
@@ -10,8 +10,8 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card style="overflow-x: hidden; position: relative; z-index: 99900">
-			<v-card-title class="container">
+        <v-card style="overflow-x: hidden;">
+			<v-card-title>
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Button</v-toolbar-title>
                     <v-spacer></v-spacer>
@@ -122,7 +122,7 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
-                            <div class="container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
+                            <div class="btnCmd-container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
                         </v-col>
                     </v-row>
                     <small>*indicates required field. You must provide an icon and/or label.</small>
