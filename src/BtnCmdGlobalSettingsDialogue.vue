@@ -1,9 +1,4 @@
 <style>
-    .container {
-        display: flex;
-        justify-content: center;
-        overflow-x: hidden;
-    }
     .custom-label-color .v-label {
         color: red;
         opacity: 1;
@@ -11,8 +6,8 @@
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="600">
-        <v-card class="pa-2" max-width="600" style="overflow-x: hidden; position: relative; z-index: 99900">
-			<v-card-title class="container">
+        <v-card class="pa-2" max-width="600" style="overflow-x: hidden;">
+			<v-card-title>
                 <v-toolbar dark dense>
                     <v-toolbar-title>BtnCmd Settings</v-toolbar-title>
                     <v-spacer></v-spacer>
