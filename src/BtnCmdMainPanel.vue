@@ -6,11 +6,6 @@
 		width: 100%;
 		/* overflow-y: auto; */
 	}
-	.edit-mode-buttons {
-		position: absolute; 
-		bottom: -3px; 
-		right: 10px;
-	}
 	.tabs-default {
 		height: 100%;
 		width: 100%;
@@ -18,23 +13,6 @@
 	.tabs-card {
 		height: 100%;
 		width: 100%;
-	}
-	.butheight {
-		height: calc(100% - 60px);
-	}
-	.v-btnCustom {
-		height: 100%;
-		min-height: 36px;
-	}
-	#table .v-data-footer {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		background: white;
-	}
-	#table .v-data-table__wrapper {
-		margin-bottom: 60px;
-		background: lightslategray;
 	}
 	.vdr{touch-action:none;border:0px #000}
 	.handle,
@@ -50,14 +28,16 @@
 	.handle-bm{bottom:-15px;left:50%;margin-left:-5px;cursor:s-resize}
 	.handle-br{bottom:-15px;right:-15px;cursor:se-resize}@media only screen and (max-width:768px){[class*=handle-]:before{content:"";left:-10px;right:-10px;bottom:-10px;top:-10px;position:absolute}}
 	.drag-handle,
-	.drag-handle:hover {cursor: move important}
+	.drag-handle:hover {cursor: move !important}
+	.drag-button,
+	.drag-button:hover {cursor: move !important}
 </style>
 <template>
     <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0" :key="'maindiv' + tabCardHeight + window.width">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ tabCardHeight }}</span></v-col></v-row> -->
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ window.width }} - {{ window.height }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">{{ btnCmd.btns }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">{{ btnCmd.panels }} - {{ window.height }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" >
 						<v-tabs-slider></v-tabs-slider>
@@ -99,7 +79,7 @@
 															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn block v-bind="attrs" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
+																		<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
 																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 																		</v-btn>
 																	</template>
@@ -109,7 +89,7 @@
 															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
 																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																		<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
 																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
 																		</v-btn>
 																	</template>
@@ -338,7 +318,8 @@
 				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
-				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>	
+				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
+				<confirm-dialog :shown.sync="confirmDelTab" title="Delete Tab" prompt="Delete this Tab plus all buttons and panels?" @confirmed="doTabDelete()"></confirm-dialog>	
 			</v-col>
 		</v-row>
 		<!-- Normal Footer -->
@@ -440,17 +421,17 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn x-small fab v-bind="attrs" v-on="on" @click="onTabEditBtnClick(currTabObj.tabID)">
-								<v-icon>mdi-tab</v-icon>
+								<v-icon color="indigo">mdi-tab</v-icon>
 							</v-btn>
 						</template>
-						<span>Edit this tab's properties</span>
+						<span>Edit current tab properties</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn x-small fab v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(currTabObj.tabID)">
-								<v-icon >mdi-table-multiple</v-icon>
+								<v-icon color="indigo">mdi-table-multiple</v-icon>
 							</v-btn>
 						</template>
 						<span>Clone Current Tab</span>
@@ -460,17 +441,17 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
-								<v-icon >mdi-tab-plus</v-icon>
+								<v-icon color="indigo">mdi-tab-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new tab</span>
+						<span>Add Tab</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab :disabled="hasBtns()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
-								<v-icon>mdi-tab-remove</v-icon>
+							<v-btn  x-small fab :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
+								<v-icon color="red">mdi-tab-remove</v-icon>
 							</v-btn>
 						</template>
 						<span>Delete current Tab</span>
@@ -480,27 +461,37 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onAddPanelClick(currTabObj)">
-								<v-icon>mdi-credit-card-plus</v-icon>
+								<v-icon color="blue">mdi-credit-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new panel to the tab</span>
+						<span>Add Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onAddBtnClick(currTabObj)">
-								<v-icon>mdi-card-plus</v-icon>
+								<v-icon color="blue">mdi-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new Button</span>
+						<span>Add Button</span>
+					</v-tooltip>
+				</div>
+				<div class="mx-1">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn  x-small fab v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveSettings()">
+								<v-icon color="green">mdi-content-save-all</v-icon>
+							</v-btn>
+						</template>
+						<span>Save Changes</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn  x-small fab v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
-								<v-icon color="green">mdi-content-save-all</v-icon>
+								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
 						<span>Save Changes & Close</span>
@@ -527,17 +518,17 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" @click="onTabEditBtnClick(currTabObj.tabID)">
-								<v-icon>mdi-tab</v-icon>
+								<v-icon dense color="indigo">mdi-tab</v-icon>
 							</v-btn>
 						</template>
-						<span>Edit this tab's properties</span>
+						<span>Edit current tab properties</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(currTabObj.tabID)">
-								<v-icon >mdi-table-multiple</v-icon>
+								<v-icon color="indigo">mdi-table-multiple</v-icon>
 							</v-btn>
 						</template>
 						<span>Clone Current Tab</span>
@@ -547,17 +538,17 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
-								<v-icon >mdi-tab-plus</v-icon>
+								<v-icon color="indigo">mdi-tab-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new tab</span>
+						<span>Add Tab</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small :disabled="hasBtns()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
-								<v-icon>mdi-tab-remove</v-icon>
+							<v-btn small :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
+								<v-icon color="red">mdi-tab-remove</v-icon>
 							</v-btn>
 						</template>
 						<span>Delete current Tab</span>
@@ -567,27 +558,37 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" @click="onAddPanelClick(currTabObj)">
-								<v-icon>mdi-credit-card-plus</v-icon>
+								<v-icon color="blue">mdi-credit-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new panel to the tab</span>
+						<span>Add Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" @click="onAddBtnClick(currTabObj)">
-								<v-icon>mdi-card-plus</v-icon>
+								<v-icon color="blue">mdi-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add new Button</span>
+						<span>Add Button</span>
+					</v-tooltip>
+				</div>
+				<div class="mx-2">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveSettings()">
+								<v-icon color="green">mdi-content-save-all</v-icon>
+							</v-btn>
+						</template>
+						<span>Save Changes</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn small v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
-								<v-icon color="green">mdi-content-save-all</v-icon>
+								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
 						<span>Save Changes & Close</span>
@@ -738,7 +739,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.12',
+			btnCmdVersion: '0.8.13',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -758,8 +759,9 @@ export default {
 			fileAction: 'load',
 			alertReqVal: false,
 			alertFileChanged: false,
+			confirmDelTab: false,
 			btnCmd : {
-				btnCmdVersion: '0.8.12',
+				btnCmdVersion: '0.8.13',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -1153,19 +1155,17 @@ export default {
 		},
 		onDragClick(btnObj){
 			this.editDragging = true;
-			// btnObj.btnZIndex = this.currTabObj.lastZIndex + 1;
-			// this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			this.currButtonObj = btnObj;
 			return true;
 		},
 		saveBtnPosition(xPos, yPos){
-			this.currButtonObj.btnXpos = xPos; //this.checkGridCompat(xPos);
-			this.currButtonObj.btnYpos = yPos; //this.checkGridCompat(yPos);
+			this.currButtonObj.btnXpos = xPos;
+			this.currButtonObj.btnYpos = yPos;
 		},
 		onBtnResizestop: function (x, y, width, height){
 			this.resizing = false;
-			this.currButtonObj.btnXpos = x; //this.checkGridCompat(x);
-			this.currButtonObj.btnYpos = y; //this.checkGridCompat(y);
+			this.currButtonObj.btnXpos = x;
+			this.currButtonObj.btnYpos = y;
 			this.currButtonObj.btnWsize = this.checkGridCompat(width);
 			this.currButtonObj.btnHsize = this.checkGridCompat(height);
 		},
@@ -1208,19 +1208,17 @@ export default {
 		},
 		onPanelDragClick(panelObj){
 			this.editDragging = true;
-			// panelObj.panelZIndex = this.currTabObj.lastZIndex + 1;
-			// this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			this.currPanelObj = panelObj;
 			return true;
 		},
 		savePanelPosition(xPos, yPos){
-			this.currPanelObj.panelXpos = xPos; //this.checkGridCompat(xPos);
-			this.currPanelObj.panelYpos = yPos; //this.checkGridCompat(yPos);
+			this.currPanelObj.panelXpos = xPos;
+			this.currPanelObj.panelYpos = yPos;
 		},
 		onPanelResizestop: function (x, y, width, height){
 			this.resizing = false;
-			this.currPanelObj.panelXpos = x; //this.checkGridCompat(x);
-			this.currPanelObj.panelYpos = y; //this.checkGridCompat(y);
+			this.currPanelObj.panelXpos = x;
+			this.currPanelObj.panelYpos = y;
 			this.currPanelObj.panelWSize = this.checkGridCompat(width);
 			this.currPanelObj.panelHSize = this.checkGridCompat(height);
 		},
@@ -1272,13 +1270,38 @@ export default {
 				return false;
 			}
 		},
+		isLastTab(){
+			if(this.btnCmd.tabs.length > 1){
+				return false;
+			}else{
+				return true;
+			}
+		},
 		onTabDelBtnClick(tabIndex) {
 			this.setActionResponse('');
 			var tmpTabInx = tabIndex;
 			if(this.btnCmd.tabs.length > 1){
+				if(this.hasBtns()){
+					this.confirmDelTab = true;
+					return;
+				}
 				this.btnCmd.tabs.splice(tmpTabInx, 1);
 			}
 			this.onChangeTab(this.btnCmd.tabs[tmpTabInx - 1].tabID, tmpTabInx - 1);
+		},
+		doTabDelete(){
+			var tmpBtns = this.btnCmd.btns.filter(item => item.btnGroupIdx === this.currTab);
+			var tmpPanels = this.btnCmd.panels.filter(item => item.tabID === this.currTab);
+			if(tmpBtns.length >= 1){
+				var newBtnsArray = this.btnCmd.btns.filter(item => item.btnGroupIdx !== this.currTab);
+				this.btnCmd.btns = newBtnsArray;
+			}
+			if(tmpPanels.length >= 1){
+				var newPanelsArray = this.btnCmd.panels.filter(item => item.tabID !== this.currTab);
+				this.btnCmd.panels = newPanelsArray;
+			}
+			this.btnCmd.tabs.splice(this.currTabIdx, 1);
+			this.onChangeTab(this.btnCmd.tabs[this.currTabIdx - 1].tabID, this.currTabIdx - 1);
 		},
 		onTabAddBtnClick() {
 			this.setActionResponse('');
@@ -1670,12 +1693,12 @@ export default {
 	},
 	watch: {
 		status: function (val) {
-					//console.log("Checking Conditions Status change to :" + val);
-					if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
-						//console.log("Conditions Met lauching checkEvents");
-						this.checkEvents('status', val);
-					}
-				}	
+			//console.log("Checking Conditions Status change to :" + val);
+			if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
+				//console.log("Conditions Met lauching checkEvents");
+				this.checkEvents('status', val);
+			}
+		}	
 	}
 }
 </script>
