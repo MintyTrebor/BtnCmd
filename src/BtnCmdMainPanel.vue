@@ -100,7 +100,7 @@
 													</v-card>
 												</vue-draggable-resizable>
 												<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
-													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+													<v-card v-if="isTabPanel(panel.panelType)" align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
 																<job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
@@ -109,7 +109,7 @@
 																<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
 																<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
 																<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																<v-overlay v-if="isTabPanel(panel.panelType)" :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
 																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
@@ -158,12 +158,13 @@
 													</v-card>
 												</vue-draggable-resizable>
 												<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+													<v-card v-if="isTabWebPanel(panel.panelType)" align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
 																<altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
+																<BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
 																<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
-																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																<v-overlay v-if="isTabWebPanel(panel.panelType)" :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
 																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
@@ -175,7 +176,19 @@
 																								<v-icon>mdi-playlist-edit</v-icon>
 																							</v-btn>
 																						</template>
-																						<span>Edit Alt Webcam Panel</span>
+																						<span>Edit Panel</span>
+																					</v-tooltip>
+																				</div>
+																			</td>
+																			<td v-if="panel.panelType == 'remSrc'">
+																				<div class="pa-md-1">
+																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<template v-slot:activator="{ on, attrs }">
+																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
+																								<v-icon>mdi-playlist-edit</v-icon>
+																							</v-btn>
+																						</template>
+																						<span>Edit Panel</span>
 																					</v-tooltip>
 																				</div>
 																			</td>
@@ -494,7 +507,7 @@
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
-						<span>Save Changes & Close</span>
+						<span>Save Changes & Exit Edit Mode</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -504,7 +517,7 @@
 								<v-icon color="red">mdi-progress-close</v-icon>
 							</v-btn>
 						</template>
-						<span>Close & Undo All Changes Since Last Save</span>
+						<span>Exit Edit Mode & Undo All Changes Since Last Save</span>
 					</v-tooltip>
 				</div>
 				<v-spacer></v-spacer>
@@ -591,7 +604,7 @@
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
-						<span>Save Changes & Close</span>
+						<span>Save Changes & Exit Edit Mode</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
@@ -601,13 +614,13 @@
 								<v-icon color="red">mdi-progress-close</v-icon>
 							</v-btn>
 						</template>
-						<span>Close & Undo All Changes Since Last Save</span>
+						<span>Exit Edit Mode & Undo All Changes Since Last Save</span>
 					</v-tooltip>
 				</div>
 				<v-spacer></v-spacer>
 			</v-row>
 		</v-footer>	
-		<v-dialog v-model="showFileDialog" persistent max-width="700px">
+		<v-dialog v-model="showFileDialog" max-width="700px">
 			<v-card>
 				<v-card-title class="container">
 					<v-toolbar dark dense>
@@ -652,6 +665,7 @@ import { DisconnectedError, OperationCancelledError } from '../../utils/errors.j
 import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
+import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
 
 //needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
@@ -664,7 +678,8 @@ export default {
 		altWebCamPanel,
 		BtnCmdEventSettingsDialogue,
 		VueDraggableResizable,
-		BtnCmdPanelSettingsDialogue
+		BtnCmdPanelSettingsDialogue,
+		BtnCmdWebPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -739,7 +754,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.13',
+			btnCmdVersion: '0.8.14',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -761,7 +776,7 @@ export default {
 			alertFileChanged: false,
 			confirmDelTab: false,
 			btnCmd : {
-				btnCmdVersion: '0.8.13',
+				btnCmdVersion: '0.8.14',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -1230,6 +1245,20 @@ export default {
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			tmpPanelObj.panelZIndex = this.currTabObj.lastZIndex;
 		},
+		isTabPanel(panelType){
+			if(panelType !== 'remSrc' && panelType !== 'webcam' && panelType !== 'altwebcam'){
+				return true;
+			}else{
+				return false;
+			}
+		},
+		isTabWebPanel(panelType){
+			if(panelType == 'remSrc' || panelType == 'webcam' || panelType == 'altwebcam'){
+				return true;
+			}else{
+				return false;
+			}
+		},
 		//plugin UI functions
 		chkJobEnabled(item){
 			if(!item.btnEnableWhileJob && this.isPrinting){
@@ -1247,7 +1276,7 @@ export default {
 			return result;
 		},
 		getTabCamPanels(tabIndex){
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabIndex) && (item.panelType == "webcam" || item.panelType == "altwebcam"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabIndex) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc"));
 			return result;
 		},
 		onEditBtnClick(item) {
