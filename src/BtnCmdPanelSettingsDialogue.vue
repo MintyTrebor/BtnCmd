@@ -41,13 +41,14 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
+                    <v-row dense v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'remSrc'">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="Webcam URL*" v-model="passedObject.altWebCamParams.altWebCamURL" placeholder="http://"></v-text-field>
+                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="URL*" v-model="tmpURL" placeholder="http://"></v-text-field>
                                 </template>
-                                <span>URL of the Alt Webcam</span>
+                                <span v-if="passedObject.panelType == 'altwebcam'">URL of the Alt Webcam</span>
+                                <span v-if="passedObject.panelType == 'remSrc'">URL of the remote source</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -194,7 +195,8 @@
                     {text: 'Collected Data', value: 'collectdata', hSize: 110, wSize: 600},
                     {text: 'Job Estimations', value: 'jobestimates', hSize: 110, wSize: 280},
                     {text: 'Speed', value: 'speed', hSize: 200, wSize: 300},
-                    {text: 'Fans', value: 'fans', hSize: 200, wSize: 300}
+                    {text: 'Fans', value: 'fans', hSize: 200, wSize: 300},
+                    {text: 'Remote Source', value: 'remSrc', hSize: 240, wSize: 320}
                 ],
                 rotateItems: [
                     {text: '0°', value: 0},
@@ -209,7 +211,8 @@
                     {text: 'Flip Both', value: 'both'}
                 ],
                 alertReqVal: false,
-                showInfo: false
+                showInfo: false,
+                tmpURL: ''
             }
         },
         methods: {
@@ -217,9 +220,17 @@
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
             async validateData() {
+                this.passedObject.altWebCamParams.altWebCamURL = this.tmpURL;
                 if (this.passedObject.panelType == 'altwebcam') {
                    //Alt Webcam Selected
                     if(this.passedObject.altWebCamParams.altWebCamURL && this.passedObject.altWebCamParams.altWebCamUpdateTimer >= 5000) {
+                        //req fields met so exit
+                        this.show = false;
+                        return;
+                    }
+                }else if (this.passedObject.panelType == 'remSrc') {
+                   //Alt Webcam Selected
+                    if(this.passedObject.altWebCamParams.altWebCamURL) {
                         //req fields met so exit
                         this.show = false;
                         return;
@@ -240,6 +251,9 @@
                 this.passedObject.panelHSize = result[0].hSize;
                 this.passedObject.panelWSize = result[0].wSize;
             }
+        },
+        mounted() {
+            this.tmpURL = this.passedObject.altWebCamParams.altWebCamURL;
         }
     }
 </script>
