@@ -24,4 +24,11 @@ BtnCmd also offers the ability to monitor the status of the Duet Board and trigg
 BtnCmd runs in the browser.
   
 Short Overview Video Below:  
-[![BtnCmd](http://img.youtube.com/vi/q5bTl3c3n_k/0.jpg)](https://www.youtube.com/watch?v=q5bTl3c3n_k "BtnCmd")
+[![BtnCmd](http://img.youtube.com/vi/q5bTl3c3n_k/0.jpg)](https://www.youtube.com/watch?v=q5bTl3c3n_k "BtnCmd")  
+
+BtnCmd uses the following libraries/modules:  
+
+ - [DeepMerge](https://www.npmjs.com/package/deepmerge)
+ - [vue-draggable-resizable](https://www.npmjs.com/package/vue-draggable-resizable)
+ - [MQTT.js](https://www.npmjs.com/package/mqtt)
+ - [axios](https://www.npmjs.com/package/axios)
