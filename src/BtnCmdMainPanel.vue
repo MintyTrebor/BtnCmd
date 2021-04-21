@@ -33,15 +33,15 @@
 	.drag-button:hover {cursor: move !important}
 </style>
 <template>
-    <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0" :key="'maindiv' + tabCardHeight + window.width">
+    <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ btnCmd.btns }}</span></v-col></v-row> -->
-				<!-- <v-row mt-0><v-col><span class="text-caption">{{ btnCmd.panels }} - {{ window.height }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">cuur tab index = {{ currTabIdx }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ getCurrTabIndex }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" >
 						<v-tabs-slider></v-tabs-slider>
-						<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="'tab'+tab.tabID" :href="`#general-tab-${index2}`" @click="onChangeTab(tab.tabID, index2)" >
+						<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="'tab'+tab.tabID" :href="`#general-tab-${index2}`" @click="onChangeTab(tab.tabID, index2)" v-model="getCurrTabIndex">
 							<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
 						</v-tab>
 						<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="'tabitem'+index" :value="`general-tab-${index}`">
@@ -57,7 +57,7 @@
 															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
+																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -68,7 +68,7 @@
 															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
 																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick(btn)">
+																		<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
@@ -168,19 +168,7 @@
 																	<tbody>
 																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
-																			<td v-if="panel.panelType == 'altwebcam'">
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
-																								<v-icon>mdi-playlist-edit</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Edit Panel</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td v-if="panel.panelType == 'remSrc'">
+																			<td v-if="panel.panelType != 'webcam'">
 																				<div class="pa-md-1">
 																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																						<template v-slot:activator="{ on, attrs }">
@@ -709,9 +697,13 @@ export default {
 
 			if(parseInt(this.window.width) <= 720){
 				//Mobile Height modifiers
-				tmpHeight = tmpUsrHeightMod + 601;
-				if(tmpHeight > (currHeight - 110)) {
-					tmpHeight = currHeight - 110;
+				if(!this.dialogDisplayed()){
+					tmpHeight = tmpUsrHeightMod + 601;
+					if(tmpHeight > (currHeight - 110)) {
+						tmpHeight = currHeight - 110;
+					}
+				}else{
+					return;
 				}
 			}else {
 				//Normal Heigh modifiers
@@ -744,7 +736,6 @@ export default {
 			objectToPass: null,
 			tabObjectToPass: null,
 			panelObjectToPass: null,
-			actionDialog: false,
 			currTab: 1,
 			currTabIdx: 0,
 			saveBtnCol: 'primary',
@@ -754,7 +745,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.14',
+			btnCmdVersion: '0.8.15',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -775,8 +766,10 @@ export default {
 			alertReqVal: false,
 			alertFileChanged: false,
 			confirmDelTab: false,
+			lastTabHeight: 0,
+			getCurrTabIndex: "general-tab-0",
 			btnCmd : {
-				btnCmdVersion: '0.8.14',
+				btnCmdVersion: '0.8.15',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -834,7 +827,9 @@ export default {
 						btnHttpType: 'GET',
 						btnHttpData: null,
 						btnHttpContType: 'text',
-						btnZIndex: 1
+						btnZIndex: 1,
+						btnWinHSize: 200,
+						btnWinWSize: 200
 					}
 				],
 				tabs: [
@@ -960,7 +955,9 @@ export default {
 						btnHttpType: 'GET',
 						btnHttpData: null,
 						btnHttpContType: 'text',
-						btnZIndex: 1
+						btnZIndex: 1,
+						btnWinHSize: 200,
+						btnWinWSize: 200
 					}
 				],
 				tabs: [
@@ -1266,13 +1263,20 @@ export default {
 			}else {
 				return false;
 			}
+		},
+		dialogDisplayed(){
+			if(this.dialog || this.showEdit || this.showTabEdit || this.showGSEdit || this.showESEdit || this.showInfo || this.showPanelEdit || this.showFileDialog){
+				return true;
+			}else {
+				return false;
+			}
 		},		
 		getTabBtns(tabIndex){
 			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === tabIndex);
 			return result;
 		},
 		getTabPanels(tabIndex){
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabIndex && item.panelType != "webcam" && item.panelType != "altwebcam");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabIndex && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc");
 			return result;
 		},
 		getTabCamPanels(tabIndex){
@@ -1492,6 +1496,7 @@ export default {
 		onChangeTab(tmpTabID, tmpTabIndex){
 			this.currTab = tmpTabID;
 			this.currTabIdx = tmpTabIndex;
+			this.getCurrTabIndex = `general-tab-${tmpTabIndex}`;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
 		},
@@ -1543,7 +1548,7 @@ export default {
 
 		},
 		//function triggered by custom button click
-		async onBtnClick(btnJSONOb){
+		async onBtnClick(e, btnJSONOb){
 			this.setActionResponse('');
 			var tmpParent = this;
 			const axiosHtpp = axios;
@@ -1581,6 +1586,9 @@ export default {
 
 			}else if(btnJSONOb.btnType == "MQTT" && !this.btnCmd.globalSettings.enableMQTT){
 				tmpParent.setActionResponse("This button has been configured as MQTT, but MQTT is disabled. No Action Taken. Please re-enable MQTT.");
+			}else if(btnJSONOb.btnType == "window"){
+				var btnWindow = window.open(btnJSONOb.btnActionData, "BtnCmd", `menubar=0, resizable=0, status=0, toolbar=0, location=0, directories=0, scrollbars=1, width=${btnJSONOb.btnWinWSize}, height=${btnJSONOb.btnWinHSize}`);
+				btnWindow.moveTo(e.clientX, e.clientY-210);
 			}
 		},
 		//set the value of the action footer msg
