@@ -98,11 +98,16 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" :label="actionLabel()" v-model="passedObject.btnActionData"></v-text-field>
                                 </template>
-                                <span v-if="passedObject.btnType=='http'">Enter GET url. e.g http://[address]/params . </span>
-                                <span v-if="passedObject.btnType=='Macro'">Enter the full macro filename [name.g].</span>
-                                <span v-if="passedObject.btnType=='MQTT'">Enter the message text to send</span>
-                                <span v-if="passedObject.btnType=='gcode'">Enter the gcode command to send</span>
+                                <span>{{ actionHover() }}</span>
                             </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType == 'window'">
+                        <v-col cols="6">
+                            <v-text-field class="custom-label-color" label="Window Height*" v-model="passedObject.btnWinHSize" required placeholder="200"></v-text-field>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-text-field class="custom-label-color" label="Window Width*" v-model="passedObject.btnWinWSize" required placeholder="200"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType == 'MQTT'">
@@ -157,7 +162,8 @@
                     {text: 'Macro', value: 'Macro', disabled: false},
                     {text: 'http', value: 'http', disabled: false},
                     {text: 'gcode', value: 'gcode', disabled: false},
-                    {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT}
+                    {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT},
+                    {text: 'Window', value: 'window', disabled: false}
                 ]
             },
             radioItems() {
@@ -190,6 +196,14 @@
                 if (this.passedObject.btnType == "http") {return "URL*";}
                 if (this.passedObject.btnType == "MQTT") {return "MQTT MSG*";}
                 if (this.passedObject.btnType == "gcode") {return "gcode Command*";}
+                if (this.passedObject.btnType == "window") {return "PopUp URL*";}
+            },
+            actionHover() {
+                if (this.passedObject.btnType == "Macro") {return "Enter the full macro filename [name.g]";}
+                if (this.passedObject.btnType == "http") {return "Enter GET url. e.g http://[address]/params";}
+                if (this.passedObject.btnType == "MQTT") {return "Enter the message text to send";}
+                if (this.passedObject.btnType == "gcode") {return "Enter the gcode command to send";}
+                if (this.passedObject.btnType == "window") {return "Enter the Window PopUp URL*";}
             },
             async validateData() {
                 if (this.passedObject.btnActionData) {
@@ -198,7 +212,14 @@
                         await this.sleep(2000);
                         this.alertReqVal = false;
                         return;
-                    }else if(!this.passedObject.btnLabel && !this.passedObject.btnIcon){
+                    }else if(this.passedObject.btnType == "window"){
+                        if(!this.passedObject.btnWinHSize || !this.passedObject.btnWinWSize){
+                            this.alertReqVal = true;
+                            await this.sleep(2000);
+                            this.alertReqVal = false;
+                            return;
+                        }
+                    } else if(!this.passedObject.btnLabel && !this.passedObject.btnIcon){
                         this.alertReqVal = true;
                         await this.sleep(2000);
                         this.alertReqVal = false;
