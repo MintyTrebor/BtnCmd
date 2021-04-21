@@ -154,7 +154,10 @@
                 <tbody style="position: absolute; z-index:99999; bottom: 10%; left: 10%;">
                     <v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo">
                         Choose from a selection of DWC panels to include<br>
-                        in your tab layout.
+                        in your tab layout. The Remote Source panel is <br>
+                        intended to display internal LAN web services - <br>
+                        for example: an rpi webcam control panel, or NodeDSF.<br>
+                        Compatability will vary depending on the remote service.
                     </v-alert>
                 </tbody>
             </v-card-text>
