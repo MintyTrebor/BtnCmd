@@ -9,7 +9,7 @@ In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may
 
 ![BtnCmd Edit Mode](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
 
-The custom buttons can be configured to trigger one of four types of actions:  
+The custom buttons can be configured to trigger one of five types of actions:  
 * Send a gcode command to the Duet Board  
 * Run a Macro  
 * Send a simple HTTP request.
