@@ -13,7 +13,8 @@ The custom buttons can be configured to trigger one of four types of actions:
 * Send a gcode command to the Duet Board  
 * Run a Macro  
 * Send a simple HTTP request.
-* Send a MQTT Message
+* Send a MQTT Message  
+* Open a URL in a pop-up window
 
 BtnCmd also offers the ability to monitor the status of the Duet Board and trigger an event when the status matches the event parameters. An event can perform the following actions:  
 * Send a Telegram Message (via a telegram bot) useful to get alerted to a status change via your smartphone.
