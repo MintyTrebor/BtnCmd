@@ -136,6 +136,26 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense v-if="passedObject.panelType == 'mmValue'">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
+                                </template>
+                                <span>Text to display prefixing the model value</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="passedObject.panelType == 'mmValue'">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Model Path" v-model="tmpModelPath" placeholder="heat.heaters[0].current"></v-text-field>
+                                </template>
+                                <span>Use the Object Model Browser Plugin to get Model Paths</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row>
                     <small>*indicates required field</small>
                     <v-spacer></v-spacer>
@@ -153,11 +173,13 @@
                 </v-form>
                 <tbody style="position: absolute; z-index:99999; bottom: 10%; left: 10%;">
                     <v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo">
-                        Choose from a selection of DWC panels to include<br>
+                        <span v-if="passedObject.panelType != 'mmValue'">Choose from a selection of DWC panels to include<br>
                         in your tab layout. The Remote Source panel is <br>
                         intended to display internal LAN web services - <br>
                         for example: an rpi webcam control panel, or NodeDSF.<br>
-                        Compatability will vary depending on the remote service.
+                        Compatability will vary depending on the remote service.</span>
+                        <span v-if="passedObject.panelType == 'mmValue'">Use the Object Model Browser<br>
+                        plugin to lookup Model Paths.</span>
                     </v-alert>
                 </tbody>
             </v-card-text>
@@ -199,7 +221,8 @@
                     {text: 'Job Estimations', value: 'jobestimates', hSize: 110, wSize: 280},
                     {text: 'Speed', value: 'speed', hSize: 200, wSize: 300},
                     {text: 'Fans', value: 'fans', hSize: 200, wSize: 300},
-                    {text: 'Remote Source', value: 'remSrc', hSize: 240, wSize: 320}
+                    {text: 'Remote Source', value: 'remSrc', hSize: 240, wSize: 320},
+                    {text: 'Object Model Value', value: 'mmValue', hSize: 100, wSize: 300}
                 ],
                 rotateItems: [
                     {text: '0°', value: 0},
@@ -215,6 +238,7 @@
                 ],
                 alertReqVal: false,
                 showInfo: false,
+                tmpModelPath:'',
                 tmpURL: ''
             }
         },
@@ -238,6 +262,14 @@
                         this.show = false;
                         return;
                     }
+                }else if (this.passedObject.panelType == 'mmValue') {
+                   //Alt Webcam Selected
+                    if(this.passedObject.panelMMPrefix && this.tmpModelPath) {
+                        //req fields met so exit
+                        this.passedObject.panelMMPath = this.tmpModelPath;
+                        this.show = false;
+                        return;
+                    }
                 }else if (this.passedObject.panelType) {
                     //Not alt webcam and req fields met so exit
                     this.show = false;
@@ -257,6 +289,7 @@
         },
         mounted() {
             this.tmpURL = this.passedObject.altWebCamParams.altWebCamURL;
+            this.tmpModelPath = this.passedObject.panelMMPath;
         }
     }
 </script>
