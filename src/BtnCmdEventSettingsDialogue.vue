@@ -27,20 +27,7 @@
                                         <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
                                     </v-card-title>
                                     <v-card-text>
-                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects">
-                                            <v-col cols="12" class="ma-0 pa-0">
-                                                <v-tooltip bottom>
-                                                    <template v-slot:activator="{ on, attrs }">
-                                                        <v-radio-group  v-bind="attrs" v-on="on" v-model="editItem.eventTrigActionType" row required>
-                                                            <v-subheader class="custom-label-color" v-bind="attrs" v-on="on">Event Type:</v-subheader>
-                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in radioItems" :key="'EV'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                                        </v-radio-group>
-                                                    </template>
-                                                    <span>Select the event on action type</span>
-                                                </v-tooltip>    
-                                            </v-col>
-                                        </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects">
+                                        <v-row dense class="mx-2 my-n4">
                                             <v-col cols="12">
                                                 <v-select :items="radioItems" class="custom-label-color" item-text="text" item-value="value" label="Event Type" required v-model="editItem.eventTrigActionType"></v-select>
                                             </v-col>
@@ -55,20 +42,7 @@
                                                 </v-tooltip>
                                             </v-col>
                                         </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects">
-                                            <v-col cols="12">
-                                                <v-tooltip bottom>
-                                                    <template v-slot:activator="{ on, attrs }">
-                                                        <v-radio-group v-bind="attrs" v-on="on" v-model="editItem.eventTrigValue" row required>
-                                                            <v-subheader class="custom-label-color" v-bind="attrs" v-on="on" >Status:</v-subheader>
-                                                            <v-radio v-bind="attrs" v-on="on" v-for="type in trigValueItems" :key="'EVT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                                        </v-radio-group>
-                                                    </template>
-                                                    <span>Status value to trigger the event</span>
-                                                </v-tooltip>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects">
+                                        <v-row dense class="mx-2 my-n4">
                                             <v-col cols="12">
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on, attrs }">
@@ -78,28 +52,12 @@
                                                 </v-tooltip>
                                             </v-col>
                                         </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects && editItem.eventTrigActionType=='http'">
-                                            <v-col cols="12">
-                                                <v-radio-group v-model="editItem.eventHttpType" row required>
-                                                    <v-subheader>Http Type:</v-subheader>
-                                                    <v-radio v-for="type in radioHttpItems" :key="'EVHTTP'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                                </v-radio-group>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects && editItem.eventTrigActionType=='http'">
+                                        <v-row dense class="mx-2 my-n4" v-if="editItem.eventTrigActionType=='http'">
                                             <v-col cols="12">
                                                 <v-select :items="radioHttpItems" class="custom-label-color" item-text="text" item-value="value" label="Http Type" required v-model="editItem.eventHttpType"></v-select>
                                             </v-col>
                                         </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="!enableSelects && editItem.eventTrigActionType=='http' && editItem.eventHttpType=='GET'">
-                                            <v-col cols="12">
-                                                <v-radio-group v-model="editItem.eventHttpContType" row required>
-                                                    <v-subheader>Get Type:</v-subheader>
-                                                    <v-radio v-for="type in radioGetItems" :key="'EVGT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                                </v-radio-group>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row dense class="mx-2 my-n4" v-if="enableSelects && editItem.eventTrigActionType=='http' && editItem.eventHttpType=='GET'">
+                                        <v-row dense class="mx-2 my-n4" v-if="editItem.eventTrigActionType=='http' && editItem.eventHttpType=='GET'">
                                             <v-col cols="12">
                                                 <v-select :items="radioGetItems" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="editItem.eventHttpContType"></v-select>
                                             </v-col>
@@ -200,8 +158,7 @@
             passedObject: {
                 type: Object
             },
-            bMQTT: Boolean,
-            enableSelects: Boolean
+            bMQTT: Boolean
         },
         computed: {
             show: {
