@@ -315,11 +315,11 @@
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
-				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT"></BtnCmdSettingsDialogue>
-				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
-				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
+				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
+				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
-				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd"></BtnCmdEventSettingsDialogue>
+				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete Tab" prompt="Delete this Tab plus all buttons and panels?" @confirmed="doTabDelete()"></confirm-dialog>	
 			</v-col>
@@ -748,7 +748,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.16',
+			btnCmdVersion: '0.8.17',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -772,7 +772,7 @@ export default {
 			lastTabHeight: 0,
 			getCurrTabIndex: "general-tab-0",
 			btnCmd : {
-				btnCmdVersion: '0.8.16',
+				btnCmdVersion: '0.8.17',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -788,6 +788,7 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
+					enableSelects: true,
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0
 				},
