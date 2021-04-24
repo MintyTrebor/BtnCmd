@@ -163,6 +163,7 @@
 															<td class="tabs-card">
 																<altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
 																<BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
+																<BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
 																<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
 																<v-overlay v-if="isTabWebPanel(panel.panelType)" :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
@@ -654,6 +655,7 @@ import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums
 import altWebCamPanel from './altWebCamPanel.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
+import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
 
 //needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
@@ -667,7 +669,8 @@ export default {
 		BtnCmdEventSettingsDialogue,
 		VueDraggableResizable,
 		BtnCmdPanelSettingsDialogue,
-		BtnCmdWebPanel
+		BtnCmdWebPanel,
+		BtnCmdMMPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -745,7 +748,7 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.15',
+			btnCmdVersion: '0.8.16',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
@@ -769,7 +772,7 @@ export default {
 			lastTabHeight: 0,
 			getCurrTabIndex: "general-tab-0",
 			btnCmd : {
-				btnCmdVersion: '0.8.15',
+				btnCmdVersion: '0.8.16',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -860,6 +863,8 @@ export default {
 						panelHSize: 200,
 						panelWSize: 200,
 						panelZIndex: 2,
+						panelMMPrefix: '',
+						panelMMPath: '',
 						altWebCamParams : {
 							altWebCamURL : 'http://',
 							altWebCamRotation : 0,
@@ -988,6 +993,8 @@ export default {
 						panelHSize: 200,
 						panelWSize: 200,
 						panelZIndex: 2,
+						panelMMPrefix: '',
+						panelMMPath: '',
 						altWebCamParams : {
 							altWebCamURL : '',
 							altWebCamRotation : 0,
@@ -1243,14 +1250,14 @@ export default {
 			tmpPanelObj.panelZIndex = this.currTabObj.lastZIndex;
 		},
 		isTabPanel(panelType){
-			if(panelType !== 'remSrc' && panelType !== 'webcam' && panelType !== 'altwebcam'){
+			if(panelType !== 'remSrc' && panelType !== 'webcam' && panelType !== 'altwebcam' && panelType != "mmValue"){
 				return true;
 			}else{
 				return false;
 			}
 		},
 		isTabWebPanel(panelType){
-			if(panelType == 'remSrc' || panelType == 'webcam' || panelType == 'altwebcam'){
+			if(panelType == 'remSrc' || panelType == 'webcam' || panelType == 'altwebcam' || panelType == "mmValue"){
 				return true;
 			}else{
 				return false;
@@ -1276,11 +1283,13 @@ export default {
 			return result;
 		},
 		getTabPanels(tabIndex){
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabIndex && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc");
+			//need to change this to a case
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabIndex && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue");
 			return result;
 		},
 		getTabCamPanels(tabIndex){
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabIndex) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc"));
+			//need to change this to a case
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabIndex) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue"));
 			return result;
 		},
 		onEditBtnClick(item) {
