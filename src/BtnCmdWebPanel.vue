@@ -16,7 +16,9 @@
 
 <template>
 	<div class="iframe-container">
-		<iframe :src="passedObject.altWebCamURL" ></iframe>
+		<iframe :src="passedObject.altWebCamURL" width="100%" height="100%" frameborder="0">
+			<span>Your browser does not support iFrames</span>
+		</iframe>
 	</div>		
 </template>
 
