@@ -100,7 +100,7 @@
 													</v-card>
 												</vue-draggable-resizable>
 												<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
-													<v-card v-if="isTabPanel(panel.panelType)" align="center" justify="center" class="tabs-card ma-0 pa-0">
+													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
 																<job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
@@ -109,7 +109,7 @@
 																<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
 																<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
 																<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-																<v-overlay v-if="isTabPanel(panel.panelType)" :absolute="true" :opacity="0.5" :value="editMode">
+																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
 																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
@@ -158,14 +158,14 @@
 													</v-card>
 												</vue-draggable-resizable>
 												<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-													<v-card v-if="isTabWebPanel(panel.panelType)" align="center" justify="center" class="tabs-card ma-0 pa-0">
+													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 														<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<td class="tabs-card">
 																<altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
 																<BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
 																<BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
 																<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
-																<v-overlay v-if="isTabWebPanel(panel.panelType)" :absolute="true" :opacity="0.5" :value="editMode">
+																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																	<tbody>
 																		<tr align="center" justify="center">
 																			<v-spacer></v-spacer>
@@ -315,11 +315,11 @@
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
-				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
-				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
-				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT"></BtnCmdSettingsDialogue>
+				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
+				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
-				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
+				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd"></BtnCmdEventSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete Tab" prompt="Delete this Tab plus all buttons and panels?" @confirmed="doTabDelete()"></confirm-dialog>	
 			</v-col>
@@ -788,7 +788,6 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
-					enableSelects: true,
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0
 				},
@@ -918,7 +917,6 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
-					enableSelects: true,
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0
 				},
@@ -1248,20 +1246,6 @@ export default {
 		bringPanelToFront(tmpPanelObj){
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			tmpPanelObj.panelZIndex = this.currTabObj.lastZIndex;
-		},
-		isTabPanel(panelType){
-			if(panelType !== 'remSrc' && panelType !== 'webcam' && panelType !== 'altwebcam' && panelType != "mmValue"){
-				return true;
-			}else{
-				return false;
-			}
-		},
-		isTabWebPanel(panelType){
-			if(panelType == 'remSrc' || panelType == 'webcam' || panelType == 'altwebcam' || panelType == "mmValue"){
-				return true;
-			}else{
-				return false;
-			}
 		},
 		//plugin UI functions
 		chkJobEnabled(item){
