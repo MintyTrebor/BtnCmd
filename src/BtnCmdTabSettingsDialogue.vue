@@ -58,7 +58,8 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            }
+            },
+            enableSelects: Boolean
         },
         computed: {
             show: {
