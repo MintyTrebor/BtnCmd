@@ -9,7 +9,7 @@
         <v-card style="overflow-x: hidden;">
 			<v-card-title>
 				<v-toolbar dark dense>
-                    <v-toolbar-title>Edit Tab</v-toolbar-title>
+                    <v-toolbar-title>{{labelTitle}}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
                         Close
@@ -21,7 +21,7 @@
                 <v-form lazy-validation class="mx-2">
                     <v-row dense>
                         <v-col cols="12">
-                            <v-text-field class="custom-label-color" label="Tab Caption*" v-model="passedObject.caption"></v-text-field>
+                            <v-text-field class="custom-label-color" :label="labelCaption" v-model="passedObject.caption"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -73,7 +73,9 @@
         },
         data: function () {
             return {
-                alertReqVal: false
+                alertReqVal: false,
+                labelCaption: '',
+                labelTitle: ''
             }
         },
         methods: {
@@ -96,11 +98,16 @@
                 }else {
                     this.passedObject.tabGridSize = [1,1];
                 }
-            },
-            checkAltWebCam(){
-                if(!this.passedObject.showWebCam){
-                    this.passedObject.showAltWebCam = false;
-                }
+            }
+        },
+        //automated functions
+        mounted() {
+            if(this.passedObject.embedTab){
+                this.labelCaption = "Custom Panel Name*";
+                this.labelTitle = "Edit Custom Panel";
+            }else{
+                this.labelCaption = "Tab Caption*";
+                this.labelTitle = "Edit Tab";
             }
         }
     }
