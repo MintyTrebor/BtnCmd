@@ -103,10 +103,10 @@
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType == 'window'">
-                        <v-col cols="6">
+                        <v-col>
                             <v-text-field class="custom-label-color" label="Window Height*" v-model="passedObject.btnWinHSize" required placeholder="200"></v-text-field>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col>
                             <v-text-field class="custom-label-color" label="Window Width*" v-model="passedObject.btnWinWSize" required placeholder="200"></v-text-field>
                         </v-col>
                     </v-row>
@@ -116,13 +116,26 @@
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
-                        <v-col cols="12">
+                        <v-col>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-switch label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-switch></span>
                                 </template>
                                 <span>Allow button to operate while a Job is active.</span>
                             </v-tooltip>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Require Confirmation" v-model="passedObject.btnReqConf"></v-switch></span>
+                                </template>
+                                <span>Prompt User for confirmation before button action is undertaken</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnReqConf">
+                        <v-col cols="12">
+                            <v-text-field class="custom-label-color" label="Confirmation Text*" v-model="passedObject.btnConfText" required placeholder="Are You Sure?"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
