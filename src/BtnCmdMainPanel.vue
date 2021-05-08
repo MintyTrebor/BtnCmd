@@ -369,10 +369,10 @@
 			</v-col>
 		</v-row>
 		<!-- Normal Footer with action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg && !mobileActive" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
+		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
 			<v-row class="pa-0 ma-0">	
 				<div>
-					<span v-if="btnCmd.globalSettings.enableActionMsg && !mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
+					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
 				</div>
 				<v-spacer></v-spacer>
 				<div class="mx-2" v-if="!backupMode && !editMode">
