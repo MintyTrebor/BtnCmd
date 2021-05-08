@@ -36,201 +36,241 @@
     <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!-- <v-row mt-0><v-col><span class="text-caption">cuur tab index = {{ currTabIdx }}</span></v-col></v-row> -->
-				<!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ getCurrTabIndex }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0>
+					<v-col><span class="text-caption">tab data= {{ tmpDebgug }}</span></v-col>
+					<v-col><span class="text-caption">curr tab = {{ getCurrTabIndex }}</span></v-col>
+				</v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ tmpDebgug }}</span></v-col></v-row> -->
 				<v-row>
-					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" >
-						<v-tabs-slider></v-tabs-slider>
-						<v-tab v-for="(tab, index2) in btnCmd.tabs" :key="'tab'+tab.tabID" :href="`#general-tab-${index2}`" @click="onChangeTab(tab.tabID, index2)" v-model="getCurrTabIndex">
-							<v-icon v-if="tab.icon" class="mr-1">{{ tab.icon }}</v-icon> {{ tab.caption }}
+					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
+						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
+						<v-tab v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
+							<v-icon v-if="tab.icon" class="mr-1" :style="'color:' + getMainBackgroundColor">{{ tab.icon }}</v-icon><span :style="'color:' + getMainBackgroundColor">{{ tab.caption }}</span>
 						</v-tab>
-						<v-tab-item v-for="(tab, index) in btnCmd.tabs" :key="'tabitem'+index" :value="`general-tab-${index}`">
-							<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width">
-								<v-container fluid class="pa-0 ma-0 tabs-default">
-									<v-row class="pa-0 ma-0 tabs-default">
-										<v-col cols="12">
-											<!--this div is here to constrain draggle items within the window-->
-											<div class="tabs-card" v-if="tab.lastZIndex">
-												<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-													<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
-														<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																		</v-btn>
-																	</template>
-																	<span >{{ btn.btnHoverText }}</span>
-																</v-tooltip>
-															</div>
-															<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
-																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																		</v-btn>
-																	</template>
-																	<span >{{ btn.btnHoverText }}</span>
-																</v-tooltip>
-															</div>
-															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
-																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																		</v-btn>
-																	</template>
-																	<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
-																</v-tooltip>
-															</div>
-															<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
-																<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																	<template v-slot:activator="{ on, attrs }">
-																		<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
-																			<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																		</v-btn>
-																	</template>
-																	<span>Click & Hold to drag - Right Click Edit Menu</span>
-																</v-tooltip>
-															</div>
-														</v-row>
-													</v-card>
-												</vue-draggable-resizable>
-												<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
-													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
-														<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
-															<td class="tabs-card">
-																<job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
-																<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
-																<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
-																<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
-																<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
-																<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
-																	<tbody>
-																		<tr align="center" justify="center">
-																			<v-spacer></v-spacer>
-																			<td>
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
-																								<v-icon>mdi-delete</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Delete Panel</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="drag-handle pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
-																								<v-icon>mdi-drag-variant</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Click to enable resize - Click & Hold to drag</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
-																								<v-icon>mdi-arrange-bring-to-front</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Bring the Panel to the top layer</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<v-spacer></v-spacer>
-																		</tr>
-																	</tbody>
-																</v-overlay>
-															</td>
-														</v-row>
-													</v-card>
-												</vue-draggable-resizable>
-												<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-													<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
-														<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
-															<td class="tabs-card">
-																<altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
-																<BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-																<BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
-																<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
-																<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
-																	<tbody>
-																		<tr align="center" justify="center">
-																			<v-spacer></v-spacer>
-																			<td v-if="panel.panelType != 'webcam'">
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panel.panelID)">
-																								<v-icon>mdi-playlist-edit</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Edit Panel</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
-																								<v-icon>mdi-delete</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Delete Panel</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="drag-handle pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
-																								<v-icon>mdi-drag-variant</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Click to enable resize - Click & Hold to drag</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<td>
-																				<div class="pa-md-1">
-																					<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																						<template v-slot:activator="{ on, attrs }">
-																							<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
-																								<v-icon>mdi-arrange-bring-to-front</v-icon>
-																							</v-btn>
-																						</template>
-																						<span>Bring the Panel to the top layer</span>
-																					</v-tooltip>
-																				</div>
-																			</td>
-																			<v-spacer></v-spacer>
-																		</tr>
-																	</tbody>
-																</v-overlay>
-															</td>
-														</v-row>
-													</v-card>
-												</vue-draggable-resizable>
-											</div>
-										</v-col>
-									</v-row>
-								</v-container>
-							</v-card>
-						</v-tab-item>
+						<v-tabs-items v-model="getCurrTabIndex">
+							<v-tab-item v-for="(tab) in getTabs" :key="tab.tabID" :value="`tab-${tab.tabID}`">
+								<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width">
+									<v-container fluid class="pa-0 ma-0 tabs-default">
+										<v-row class="pa-0 ma-0 tabs-default">
+											<v-col cols="12">
+												<!--this div is here to constrain draggle items within the window-->
+												<div class="tabs-card" v-if="tab.lastZIndex">
+													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+														<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
+															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																			</v-btn>
+																		</template>
+																		<span >{{ btn.btnHoverText }}</span>
+																	</v-tooltip>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																			</v-btn>
+																		</template>
+																		<span >{{ btn.btnHoverText }}</span>
+																	</v-tooltip>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
+																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																			</v-btn>
+																		</template>
+																		<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
+																	</v-tooltip>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																			</v-btn>
+																		</template>
+																		<span>Click & Hold to drag - Right Click Edit Menu</span>
+																	</v-tooltip>
+																</div>
+															</v-row>
+														</v-card>
+													</vue-draggable-resizable>
+													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
+														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
+																<td class="tabs-card">
+																	<job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
+																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
+																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
+																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
+																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
+																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel"></BtnCmdCustomPanel>
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																		<tbody>
+																			<tr align="center" justify="center">
+																				<v-spacer></v-spacer>
+																				<td>
+																					<div class="pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
+																									<v-icon>mdi-delete</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Delete Panel</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<td>
+																					<div class="drag-handle pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
+																									<v-icon>mdi-drag-variant</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Click to enable resize - Click & Hold to drag</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<td>
+																					<div class="pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
+																									<v-icon>mdi-arrange-bring-to-front</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Bring the Panel to the top layer</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<v-spacer></v-spacer>
+																			</tr>
+																		</tbody>
+																	</v-overlay>
+																</td>
+															</v-row>
+														</v-card>
+													</vue-draggable-resizable>
+													<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+															<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
+																<td class="tabs-card">
+																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
+																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
+																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
+																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																		<tbody>
+																			<tr align="center" justify="center">
+																				<v-spacer></v-spacer>
+																				<td>
+																					<div class="drag-handle pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
+																									<v-icon>mdi-drag-variant</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Click to enable resize - Click & Hold to drag</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<td>
+																					<div>
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small style="cursor: pointer" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="doPanelMenu($event, panel)">
+																									<v-icon>mdi-menu</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Click To Open Edit Menu</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<v-spacer></v-spacer>
+																			</tr>
+																		</tbody>
+																		<v-menu v-if="currTabObj" :key="'menu'+panel.panelID" v-model="showPanelMenu" :position-x="menuX" :position-y="menuY" absolute offset-y :style="`z-index:${currTabObj.lastZIndex+1}`">
+																			<v-card>
+																				<tbody>
+																					<tr>
+																						<v-spacer></v-spacer>
+																							<td>
+																								<div class="pa-md-1">
+																									<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																										<template v-slot:activator="{ on, attrs }">
+																											<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panelObjectToPass)">
+																												<v-icon>mdi-arrange-bring-to-front</v-icon>
+																											</v-btn>
+																										</template>
+																										<span>Bring the Panel to the top layer</span>
+																									</v-tooltip>
+																								</div>
+																							</td>
+																							<td v-if="panel.panelType != 'webcam'">
+																								<div class="pa-md-1">
+																									<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																										<template v-slot:activator="{ on, attrs }">
+																											<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelEdit(panelObjectToPass)">
+																												<v-icon>mdi-playlist-edit</v-icon>
+																											</v-btn>
+																										</template>
+																										<span>Edit Panel</span>
+																									</v-tooltip>
+																								</div>
+																							</td>
+																							<td>
+																								<div class="pa-md-1">
+																									<v-tooltip bottom>
+																										<template v-slot:activator="{ on, attrs }">
+																											<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="customPanelClone(panelObjectToPass)">
+																												<v-icon>mdi-content-duplicate</v-icon>
+																											</v-btn>
+																										</template>
+																										<span>Clone Panel</span>
+																									</v-tooltip>
+																								</div>
+																							</td>
+																							<td>
+																								<div class="pa-md-1">
+																									<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																										<template v-slot:activator="{ on, attrs }">
+																											<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panelObjectToPass.panelID)">
+																												<v-icon>mdi-delete</v-icon>
+																											</v-btn>
+																										</template>
+																										<span>Delete Panel</span>
+																									</v-tooltip>
+																								</div>
+																							</td>
+																						<v-spacer></v-spacer>
+																					</tr>
+																				</tbody>
+																			</v-card>
+																		</v-menu>
+																	</v-overlay>
+																</td>
+															</v-row>
+														</v-card>
+													</vue-draggable-resizable>
+												</div>
+											</v-col>
+										</v-row>
+									</v-container>
+								</v-card>
+							</v-tab-item>
+						</v-tabs-items>
 					</v-tabs>
 					<v-menu v-if="currTabObj" v-model="showMenu" :position-x="menuX" :position-y="menuY" absolute offset-y :style="`z-index:${currTabObj.lastZIndex+1}`">
 						<v-card>
@@ -309,7 +349,8 @@
 						<a href="https://www.npmjs.com/package/deepmerge" target="_blank">DeepMerge</a><span>, </span>
 						<a href="https://www.npmjs.com/package/mqtt" target="_blank">MQTT.js</a><span>, </span>
 						<a href="https://www.npmjs.com/package/vue-draggable-resizable" target="_blank">vue-draggable-resizable</a><span>, </span>
-						<a href="https://www.npmjs.com/package/axios" target="_blank">axios</a><br>
+						<a href="https://www.npmjs.com/package/axios" target="_blank">axios</a><span>, </span>
+						<a href="https://www.npmjs.com/package/jsonpath" target="_blank">jsonpath</a><br>
 						Plus re-uses components and code from <strong>DWC</strong>.<br>
 						<a href="https://github.com/MintyTrebor/BtnCmd/wiki" target="_blank">BtnCmd Wiki</a><br>
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
@@ -317,15 +358,53 @@
 				</v-row>
 				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
 				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
-				<BtnCmdPanelSettingsDialogue v-if="showPanelEdit" v-model="showPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
+				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
-				<confirm-dialog :shown.sync="confirmDelTab" title="Delete Tab" prompt="Delete this Tab plus all buttons and panels?" @confirmed="doTabDelete()"></confirm-dialog>	
+				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
+				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>	
 			</v-col>
 		</v-row>
-		<!-- Normal Footer -->
-		<v-footer v-if="!editMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
+		<!-- Normal Footer with action messages-->
+		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg && !mobileActive" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
+			<v-row class="pa-0 ma-0">	
+				<div>
+					<span v-if="btnCmd.globalSettings.enableActionMsg && !mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
+				</div>
+				<v-spacer></v-spacer>
+				<div class="mx-2" v-if="!backupMode && !editMode">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-1" >mdi-cog</v-icon>
+							</v-btn>
+						</template>
+						<span>Show Settings</span>
+					</v-tooltip>
+				</div>
+			</v-row>
+		</v-footer>
+		<!-- Normal Footer No action messages-->
+		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px; background-color: #FFFFFF00`">
+			<v-row class="pa-0 ma-0">	
+				<v-spacer></v-spacer>
+				<div class="mx-2" v-if="!backupMode && !editMode">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small color="#FFFFFF00" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-1" >mdi-cog</v-icon>
+							</v-btn>
+						</template>
+						<span>Show Settings</span>
+					</v-tooltip>
+				</div>
+			</v-row>
+		</v-footer>
+		<!--Settings Footer -->
+		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
@@ -399,18 +478,38 @@
 						<span v-if="backupMode">Hide Backup & Restore Options</span>
 					</v-tooltip>
 				</div>
-				<div>
+				<!-- <div>
 					<span v-if="btnCmd.globalSettings.enableActionMsg && !mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
-				</div>
+				</div> -->
 				<v-spacer></v-spacer>
-				<div class="mx-2" v-if="!backupMode">
+				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small :color="saveBtnCol" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
+							<v-btn small color="red" v-bind="attrs" v-on="on" :elevation="1" @click="createModeToggle()">
+								<v-icon class="mr-1" >mdi-wrench</v-icon>
+							</v-btn>
+						</template>
+						<span>Create & Edit Custom Panels</span>
+					</v-tooltip>
+				</div>
+				<div class="mx-2" v-if="!backupMode && !createMode">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small color="green" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
 								<v-icon class="mr-1">mdi-square-edit-outline</v-icon>
 							</v-btn>
 						</template>
-						<span>Edit Mode</span>
+						<span>Create & Edit Layouts</span>
+					</v-tooltip>
+				</div>
+				<div class="mx-2" v-if="!backupMode && !editMode">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-1" >mdi-cog</v-icon>
+							</v-btn>
+						</template>
+						<span>Hide Settings</span>
 					</v-tooltip>
 				</div>
 			</v-row>
@@ -426,7 +525,8 @@
 								<v-icon color="indigo">mdi-tab</v-icon>
 							</v-btn>
 						</template>
-						<span>Edit current tab properties</span>
+						<span v-if="!createMode">Edit current tab properties</span>
+						<span v-else>Edit current custom panel properties</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -436,7 +536,8 @@
 								<v-icon color="indigo">mdi-table-multiple</v-icon>
 							</v-btn>
 						</template>
-						<span>Clone Current Tab</span>
+						<span v-if="!createMode">Clone Current Tab</span>
+						<span v-else>Clone Current Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -446,17 +547,19 @@
 								<v-icon color="indigo">mdi-tab-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add Tab</span>
+						<span v-if="!createMode">Add Tab</span>
+						<span v-else>Add Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
+							<v-btn  x-small fab :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabObj)">
 								<v-icon color="red">mdi-tab-remove</v-icon>
 							</v-btn>
 						</template>
-						<span>Delete current Tab</span>
+						<span v-if="!createMode">Delete current Tab</span>
+						<span v-else>Delete current Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -496,7 +599,7 @@
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
-						<span>Save Changes & Exit Edit Mode</span>
+						<span>Save Changes & Exit</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -506,7 +609,7 @@
 								<v-icon color="red">mdi-progress-close</v-icon>
 							</v-btn>
 						</template>
-						<span>Exit Edit Mode & Undo All Changes Since Last Save</span>
+						<span>Exit & Undo All Changes Since Last Save</span>
 					</v-tooltip>
 				</div>
 				<v-spacer></v-spacer>
@@ -523,7 +626,8 @@
 								<v-icon dense color="indigo">mdi-tab</v-icon>
 							</v-btn>
 						</template>
-						<span>Edit current tab properties</span>
+						<span v-if="!createMode">Edit current tab properties</span>
+						<span v-else>Edit current custom panel properties</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
@@ -533,7 +637,8 @@
 								<v-icon color="indigo">mdi-table-multiple</v-icon>
 							</v-btn>
 						</template>
-						<span>Clone Current Tab</span>
+						<span v-if="!createMode">Clone Current Tab</span>
+						<span v-else>Clone Current Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
@@ -543,17 +648,19 @@
 								<v-icon color="indigo">mdi-tab-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add Tab</span>
+						<span v-if="!createMode">Add Tab</span>
+						<span v-else>Add Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabIdx)">
+							<v-btn small :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabObj)">
 								<v-icon color="red">mdi-tab-remove</v-icon>
 							</v-btn>
 						</template>
-						<span>Delete current Tab</span>
+						<span v-if="!createMode">Delete current Tab</span>
+						<span v-else>Delete current Custom Panel</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
@@ -593,7 +700,7 @@
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
-						<span>Save Changes & Exit Edit Mode</span>
+						<span>Save Changes & Exit</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-2">
@@ -603,7 +710,7 @@
 								<v-icon color="red">mdi-progress-close</v-icon>
 							</v-btn>
 						</template>
-						<span>Exit Edit Mode & Undo All Changes Since Last Save</span>
+						<span>Exit & Undo All Changes Since Last Save</span>
 					</v-tooltip>
 				</div>
 				<v-spacer></v-spacer>
@@ -639,7 +746,7 @@
 </template>
 
 <script>
-'use strict'
+
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
@@ -647,18 +754,18 @@ import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import BtnCmdPanelSettingsDialogue from './BtnCmdPanelSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
-import mqtt from 'mqtt';
-import axios from 'axios';
 import deepmerge from 'deepmerge';
-import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
 import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
 import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
-
-//needed to run gcode commands
-const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
+import BtnCmdAWCPanelDialogue from './BtnCmdAWCPanelDialogue.vue';
+import BtnCmdMMPanelDialogue from './BtnCmdMMPanelDialogue.vue';
+import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
+import BtnCmdEventFunctions from './BtnCmdEventFunctions.js';
+import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
+import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
 
 export default {
     components: {
@@ -670,7 +777,10 @@ export default {
 		VueDraggableResizable,
 		BtnCmdPanelSettingsDialogue,
 		BtnCmdWebPanel,
-		BtnCmdMMPanel
+		BtnCmdMMPanel,
+		BtnCmdAWCPanelDialogue,
+		BtnCmdMMPanelDialogue,
+		BtnCmdCustomPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -724,10 +834,32 @@ export default {
 				return false;
 			}
 		},
+		getTabs(){
+			return this.btnCmd.tabs.filter(item => item.embedTab === this.createMode);
+		},
+		getMainBackgroundColor(){
+			if(this.editMode){
+				if(this.createMode){
+					return 'red';
+				}else{
+					return 'green';
+				}
+			}else{
+				return '';
+			}
+		}	
 	},
+	mixins: [
+		BtnCmdDataFunctions,
+		BtnCmdEventFunctions,
+		BtnCmdBtnActionFunctions
+	],
 	data: function () {
+		//Changes to btnCmd:{} structure must also be made in BtnCmdDataFunctions.js
 		return {
 			editMode: false,
+			createMode: false,
+			settingsMode: false,
 			dialog: false,
 			showEdit: false,
 			showTabEdit: false,
@@ -736,6 +868,9 @@ export default {
 			showInfo: false,
 			showPanelEdit: false,
 			showFileDialog: false,
+			showBtnConfDialog: false,
+			showAWCPanelEdit: false,
+			showMMPanelEdit: false,
 			objectToPass: null,
 			tabObjectToPass: null,
 			panelObjectToPass: null,
@@ -748,16 +883,17 @@ export default {
 			actionResponse: null,
 			altWebCamToPass: null,
 			confirmRstSettings: false,
-			btnCmdVersion: '0.8.17',
 			code: '',
 			doingCode: false,
 			isSimulating: false,
 			newData: null,
 			currButtonObj: {},
+			currButtonEventObj: {},
 			currTabObj: {},
 			currPanelObj: {},
 			editDragging: false,
 			showMenu: false,
+			showPanelMenu: false,
 			menuX: 0,
 			menuY: 0,
 			window: {
@@ -770,9 +906,11 @@ export default {
 			alertFileChanged: false,
 			confirmDelTab: false,
 			lastTabHeight: 0,
-			getCurrTabIndex: "general-tab-0",
+			getCurrTabIndex: "tab-1",
+			currBtnPromptTxt: 'Are You Sure?',
+			btnCmdVersion: '0.8.18',
 			btnCmd : {
-				btnCmdVersion: '0.8.17',
+				btnCmdVersion: '0.8.18',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -832,22 +970,21 @@ export default {
 						btnHttpContType: 'text',
 						btnZIndex: 1,
 						btnWinHSize: 200,
-						btnWinWSize: 200
+						btnWinWSize: 200,
+						btnReqConf: false,
+						btnConfText: 'Are You Sure?'
 					}
 				],
 				tabs: [
 					{
 						tabID: 1,
+						embedTab: false,
 						icon: "mdi-view-module",
 						translated: false,
 						caption: "Group 1",
 						numberOfColumns: 12,
 						showWebCam: false,
 						showAltWebCam : false,
-						tabCamYpos: 20,
-						tabCamXpos: 20,
-						tabCamHSize: 'auto',
-						tabCamWSize: 'auto',
 						tabEnableSnap: false,
 						tabGridSize: [1,1],
 						lastZIndex: 2,
@@ -865,14 +1002,22 @@ export default {
 						panelZIndex: 2,
 						panelMMPrefix: '',
 						panelMMPath: '',
-						altWebCamParams : {
-							altWebCamURL : 'http://',
-							altWebCamRotation : 0,
-							altWebCamFlip : 'none',
-							altWebCamUpdateTimer :  5000,
-							altWebCamiFrame : false,
-							altWebCamAppndHTTP : false,
-							altWebCamClickURL : ''					
+						panelMMOrientation: 'H',
+						panelMMPrefixColor: '',
+						panelMMValueColor: '',
+						panelColor: '',
+						customPanelID: null,
+						altWebCamParams: {
+							altWebCamURL: 'http://',
+							altWebCamRotation: 0,
+							altWebCamFlip: 'none',
+							altWebCamUpdateTimer:  5000,
+							altWebCamiFrame: false,
+							altWebCamAppndHTTP: false,
+							altWebCamClickURL: ''					
+						},
+						MMParams: {
+
 						}
 					}
 				]
@@ -892,260 +1037,12 @@ export default {
         ...mapActions('machine', ['upload']),
 		...mapMutations('machine/settings', ['addCode', 'removeCode']),
 		setupPage(){
-			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
+			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
 		handleResize() {
             this.window.width = window.innerWidth;
             this.window.height = window.innerHeight;
-        },
-		//Data Manipulation
-		getRefData(){
-			//returns a clean copy of the main data structure, used for resetting config, and config data upgrades
-			return {
-				btnCmdVersion: this.btnCmdVersion,
-				systemSettings: {
-					lastID: 1,
-					lastTabID: 1,
-					lastEventID: 1,
-					lastPanelID: 1
-				},
-				globalSettings: {
-					enableActionMsg: true,
-					enableMQTT: false,
-					enableEvents: false,
-					MQTTUserName: '',
-					MQTTPassword: '',
-					MQTTServer: '',
-					MQTTPort: 1883,
-					MQTTClientID: 'BtnCmd',
-					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0
-				},
-				monitoredEvents: [
-					{
-						eventID: 1,
-						eventType: 'status',
-						eventOnlyInPrint: true,
-						eventTrigValue: 'busy',
-						eventTrigActionType: 'http',
-						eventTrigActionCmd: 'http://',
-						eventTrigActionTopic: '',
-						eventEnabled: false,
-						eventName: 'Example Event',
-						eventTgrmChatID: '',
-						eventTgrmAPIToken: '',
-						eventHttpType: 'GET',
-						eventHttpData: null,
-						eventHttpContType: 'text'
-					}
-				],
-				btns: [
-					{
-						btnID: '1',
-						btnLabel: 'Example',
-						btnType: 'Macro',
-						btnActionData: 'MacroName.g',
-						btnTopicData: '',
-						btnEnableWhileJob : false,
-						btnColour: '#FF0000FF',
-						btnGroupIdx: 1,
-						btnIcon: 'mdi-polymer',
-						btnHoverText: 'This is hover text',
-						btnXpos: 100,
-						btnYpos: 100,
-						autoSize: true,
-						btnHsize: 'auto',
-						btnWsize: 'auto',
-						btnHttpType: 'GET',
-						btnHttpData: null,
-						btnHttpContType: 'text',
-						btnZIndex: 1,
-						btnWinHSize: 200,
-						btnWinWSize: 200
-					}
-				],
-				tabs: [
-					{
-						tabID: 1,
-						icon: "mdi-view-module",
-						translated: false,
-						caption: "Group 1",
-						numberOfColumns: 12,
-						showWebCam: false,
-						showAltWebCam : false,
-						tabCamYpos: 20,
-						tabCamXpos: 20,
-						tabCamHSize: 'auto',
-						tabCamWSize: 'auto',
-						tabEnableSnap: false,
-						tabGridSize: [1,1],
-						lastZIndex: 2
-					}
-				],
-				panels: [
-					{
-						panelID: 1,
-						tabID: 1,
-						panelType: 'jobinfo',
-						panelYpos: 150,
-						panelXpos: 100,
-						panelHSize: 200,
-						panelWSize: 200,
-						panelZIndex: 2,
-						panelMMPrefix: '',
-						panelMMPath: '',
-						altWebCamParams : {
-							altWebCamURL : '',
-							altWebCamRotation : 0,
-							altWebCamFlip : 'none',
-							altWebCamUpdateTimer :  5000,
-							altWebCamiFrame : false,
-							altWebCamAppndHTTP : false,
-							altWebCamClickURL : ''					
-						}
-					}
-				]
-			};
-		},
-		saveSettings() {
-			localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
-		},
-		loadSettings() {
-			var btnString = localStorage.getItem('btnCmdsettings');
-				if (btnString) {
-					this.btnCmd = JSON.parse(btnString);
-					this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
-				} else {
-					this.resetSettings();
-			}
-		},
-		initSettings() {
-			var btnString = localStorage.getItem('btnCmdsettings');
-				if (btnString) {
-					this.btnCmd = JSON.parse(btnString);
-				} else {
-					this.resetSettings();
-			}
-		},
-		resetSettings(){
-			this.btnCmd = this.getRefData();
-			this.confirmRstSettings = false;
-			this.onChangeTab(this.btnCmd.tabs[0].tabID, 0);
-			this.saveSettings();			
-		},
-		async saveSettingsToFile() {
-			const content = new Blob([JSON.stringify(this.btnCmd)]);
-			const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
-			try {
-				await this.upload({ filename: setFileName, content, showSuccess: false });
-			} catch (e) {
-				console.warn(e);
-			}
-		},
-		async loadSettingsFromFile() {
-			try {
-				const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
-				this.btnCmd = response;
-				this.checkDataVersion();
-			} catch (e) {
-				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
-					console.warn(e);
-				}
-			}
-		},
-		async validateFileName(){
-			if(this.btnCmd.globalSettings.lastBackupFileName.length !== 0){
-				var newName = this.btnCmd.globalSettings.lastBackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
-				//var newName = System.Text.RegularExpressions.Regex.Replace(entName, '[^a-z A-Z 0-9 ()]', '');
-				if(newName !== this.btnCmd.globalSettings.lastBackupFileName){
-					//changes have been made
-					this.alertFileChanged = true;
-					this.btnCmd.globalSettings.lastBackupFileName = newName;
-					await this.sleep(4000);
-                    this.alertFileChanged = false;
-                    return;
-				}else{
-					//All conditions met
-					if(this.fileAction == 'load'){
-						this.loadSettingsFromFile();
-						this.showFileDialog = false;
-					}else if(this.fileAction == 'save'){
-						this.saveSettingsToFile();
-						this.showFileDialog = false;
-					}
-				}
-			}else{
-				this.alertReqVal = true;
-				await this.sleep(4000);
-				this.alertReqVal = false;
-				return;
-			}
-			
-		},
-		btnRestoreSettings(){
-			this.fileAction = 'load';
-			this.showFileDialog = true;
-		},
-		btnBackupSettings(){
-			this.fileAction = 'save';
-			this.showFileDialog = true;
-		},
-		async sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        },
-		checkDataVersion(){
-			//compare the loaded data version with the current plugin verison. If they don't match upgrade the data to the new version
-			if(this.btnCmdVersion != this.btnCmd.btnCmdVersion) {
-				//versions are different run the upgrade
-				this.setActionResponse('Running Configuration Data Upgrade to : ' + this.btnCmdVersion);
-				this.newData = {
-					btnCmdVersion: null,
-					systemSettings: null,
-					globalSettings: null,
-					monitoredEvents: [],
-					btns: [],
-					tabs: [],
-					panels: []
-				};				
-				var refData = this.getRefData();
-				var ni = null;
-				var tmpTabObj = null;
-				const merge = deepmerge;
-				//merge systemSettings
-				this.newData.systemSettings = merge(refData.systemSettings, this.btnCmd.systemSettings);
-				//merge globalSettings
-				this.newData.globalSettings = merge(refData.globalSettings, this.btnCmd.globalSettings);
-				//merge events
-				for(ni in this.btnCmd.monitoredEvents){
-					this.newData.monitoredEvents.push(merge(refData.monitoredEvents[0], this.btnCmd.monitoredEvents[ni]))
-				}
-				ni = null;
-				//merge buttons
-				for(ni in this.btnCmd.btns){
-					this.newData.btns.push(merge(refData.btns[0], this.btnCmd.btns[ni]))
-				}
-				ni = null;
-				//merge tabs
-				for(ni in this.btnCmd.tabs){
-					tmpTabObj = merge(refData.tabs[0], this.btnCmd.tabs[ni]);
-					//reset grid after merge as deepmerge combines the array
-					tmpTabObj.tabGridSize = this.btnCmd.tabs[ni].tabGridSize;
-					this.newData.tabs.push(tmpTabObj);
-					tmpTabObj = null;
-				}
-				ni = null;
-				//merge panels
-				for(ni in this.btnCmd.panels){
-					this.newData.panels.push(merge(refData.panels[0], this.btnCmd.panels[ni]))
-				}
-				this.setActionResponse('Configuration Data Upgraded from :' + this.btnCmd.btnCmdVersion + ' to : ' + this.btnCmdVersion);
-				this.btnCmd = this.newData;
-				this.newData = null;
-				this.btnCmd.btnCmdVersion = this.btnCmdVersion;
-				this.saveSettings();
-			}
-		},
+        },		
 		//PopUpMenu Functions
 		doMenu (e, btnObj) {
 			e.preventDefault();
@@ -1156,6 +1053,25 @@ export default {
 			this.$nextTick(() => {
 				this.showMenu = true
 			})
+		},
+		doPanelMenu (e, panel) {
+			e.preventDefault();
+			this.panelObjectToPass = panel;
+			this.showPanelMenu = false
+			this.menuX = e.clientX
+			this.menuY = e.clientY
+			this.$nextTick(() => {
+				this.showPanelMenu = true
+			})
+		},
+		afterAddPanel(){
+			//function runs after closing add panel dialog
+			if(this.panelObjectToPass[0].panelType == "altwebcam"){
+				this.showAWCPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "mmValue"){
+				this.showMMPanelEdit = true;
+			}			
 		},
 		//dragging functions
 		lastBtnMovePosition: function (x, y) {
@@ -1263,18 +1179,22 @@ export default {
 				return false;
 			}
 		},		
-		getTabBtns(tabIndex){
-			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === tabIndex);
+		getTabBtns(tabID){
+			var result = this.btnCmd.btns.filter(item => item.btnGroupIdx === tabID);
 			return result;
 		},
-		getTabPanels(tabIndex){
+		getTabPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabIndex && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue");
 			return result;
 		},
-		getTabCamPanels(tabIndex){
+		getTabCamPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabIndex) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue"));
+			return result;
+		},
+		getAllCustomPanels(){
+			var result = this.btnCmd.tabs.filter(item => item.embedTab === true);
 			return result;
 		},
 		onEditBtnClick(item) {
@@ -1298,23 +1218,25 @@ export default {
 			}
 		},
 		isLastTab(){
-			if(this.btnCmd.tabs.length > 1){
+			var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === this.createMode);
+			if(tmpArr.length > 1){
 				return false;
 			}else{
 				return true;
 			}
 		},
-		onTabDelBtnClick(tabIndex) {
+		onTabDelBtnClick(tabObj) {
 			this.setActionResponse('');
-			var tmpTabInx = tabIndex;
-			if(this.btnCmd.tabs.length > 1){
+			var tmpTabInx = this.btnCmd.tabs.findIndex(item => item.tabID == tabObj.tabID);
+			if(this.btnCmd.tabs.length >= 1){
 				if(this.hasBtns()){
 					this.confirmDelTab = true;
 					return;
 				}
 				this.btnCmd.tabs.splice(tmpTabInx, 1);
 			}
-			this.onChangeTab(this.btnCmd.tabs[tmpTabInx - 1].tabID, tmpTabInx - 1);
+			var tmptabArr = this.btnCmd.tabs.filter(item => item.embedTab == this.createMode);
+			this.onChangeTab(tmptabArr[0].tabID);
 		},
 		doTabDelete(){
 			var tmpBtns = this.btnCmd.btns.filter(item => item.btnGroupIdx === this.currTab);
@@ -1327,8 +1249,9 @@ export default {
 				var newPanelsArray = this.btnCmd.panels.filter(item => item.tabID !== this.currTab);
 				this.btnCmd.panels = newPanelsArray;
 			}
-			this.btnCmd.tabs.splice(this.currTabIdx, 1);
-			this.onChangeTab(this.btnCmd.tabs[this.currTabIdx - 1].tabID, this.currTabIdx - 1);
+			this.btnCmd.tabs.splice(this.btnCmd.tabs.findIndex(item => item.tabID == this.currTab), 1);
+			var tmpTabs = this.btnCmd.tabs.filter(item => item.embedTab == this.createMode);
+			this.onChangeTab(tmpTabs[0].tabID);
 		},
 		onTabAddBtnClick() {
 			this.setActionResponse('');
@@ -1337,8 +1260,11 @@ export default {
 			newTab_object.tabID = tmpTabID;
 			newTab_object.lastZIndex = 1;
 			newTab_object.caption = 'Group ' + tmpTabID;
+			newTab_object.embedTab = this.createMode;
 			this.btnCmd.systemSettings.lastTabID = tmpTabID;
-			this.btnCmd.tabs.push(newTab_object);			
+			this.btnCmd.tabs.push(newTab_object);
+			//var tmpTabInx = this.btnCmd.tabs.filter(item => item.embedTab == this.createMode);
+			this.onChangeTab(tmpTabID);			
 			this.showTabEdit = true;
 			this.tabObjectToPass = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
 		},
@@ -1387,6 +1313,19 @@ export default {
 			}
 
 		},
+		customPanelClone(panelObj){
+			this.setActionResponse('');
+			const merge = deepmerge;
+			var tmpPanel_object = merge(this.getRefData().panels[0], panelObj)
+			var tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1;
+			this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
+			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
+			tmpPanel_object.panelID = tmpPanelID;
+			tmpPanel_object.panelYpos = panelObj.panelYpos + 20;
+			tmpPanel_object.panelXpos = panelObj.panelXpos + 20;
+			tmpPanel_object.panelZIndex = this.currTabObj.lastZIndex;
+			this.btnCmd.panels.push(tmpPanel_object);
+		},
 		onAddPanelClick(tmpTab){					
 			this.setActionResponse('');
 			var tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1
@@ -1400,9 +1339,17 @@ export default {
 			this.panelObjectToPass = this.btnCmd.panels.filter(itemPanel => itemPanel.panelID == tmpPanelID);
 			this.showPanelEdit = true;
 		},
-		panelEdit(panelID){
-			this.panelObjectToPass = this.btnCmd.panels.filter(itemPanel => itemPanel.panelID == panelID);
-			this.showPanelEdit = true;
+		panelEdit(panelObj){
+			this.panelObjectToPass = this.btnCmd.panels.filter(itemPanel => itemPanel.panelID == panelObj.panelID);
+			if(this.panelObjectToPass[0].panelType == "altwebcam"){
+				this.showAWCPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "mmValue"){
+				this.showMMPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "remSrc"){
+				this.showPanelEdit = true;
+			}
 		},
 		onAddBtnClick(tmpTab){					
 			this.setActionResponse('');
@@ -1466,12 +1413,25 @@ export default {
 			this.setActionResponse('');
 			this.editMode = !this.editMode;
 			if(!this.editMode){
-				this.onChangeTab(this.currTab, this.currTabIdx);
+				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === false);
+				this.tmpDebgug = tmpArr;
+				this.onChangeTab(tmpArr[0].tabID);
 				this.saveSettings();
 				this.saveBtnCol = 'primary';
+				this.createMode = false;
 			}else {
 				this.saveBtnCol = 'green';
 			}
+		},
+		createModeToggle(){
+			this.setActionResponse('');
+			this.createMode = true;
+			var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
+			this.tmpDebgug = tmpArr;
+			if(tmpArr.length >= 1){
+				this.onChangeTab(tmpArr[0].tabID);
+			}
+			this.editModeToggle()
 		},
 		undoEditChanges(){
 			this.setActionResponse('');
@@ -1487,231 +1447,12 @@ export default {
 				this.brBtnCol = 'red';
 			}
 		},
-		onChangeTab(tmpTabID, tmpTabIndex){
+		onChangeTab(tmpTabID){
 			this.currTab = tmpTabID;
-			this.currTabIdx = tmpTabIndex;
-			this.getCurrTabIndex = `general-tab-${tmpTabIndex}`;
+			//this.currTabIdx = tmpTabIndex;
+			this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
-		},
-		//mqtt Msg Send Functions
-		sendMQTTMsg(msgStr, topicStr){
-			var mqttOptions;
-			var tmpParent = this;
-				
-				if(this.btnCmd.globalSettings.MQTTUserName){
-					mqttOptions = {
-						clientid: this.btnCmd.globalSettings.MQTTClientID,
-						username: this.btnCmd.globalSettings.MQTTUserName,
-						password: this.btnCmd.globalSettings.MQTTPassword,
-						reconnectPeriod: 0
-					};
-				}else {
-					mqttOptions = {
-						clientid: this.btnCmd.globalSettings.MQTTClientID,
-						reconnectPeriod: 0
-					};
-				}
-				
-				var client  = mqtt.connect(this.btnCmd.globalSettings.MQTTServer, mqttOptions);
-				
-				client.on('connect', function () {
-					client.subscribe(topicStr, function (e) {
-						if(!e){
-							client.publish(topicStr, msgStr, function (err) {
-								if (err){
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Failed Result = " + err);
-								}else{
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Sent = " + msgStr);
-								}
-							});
-						}else{
-							client.end();
-							tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed to Subscribe Topic = " + topicStr + ". Reason = " + e);
-						}
-					});
-					
-				});
-		
-				client.on('error', function (error) {
-					client.end();
-					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
-				});
-
-		},
-		//function triggered by custom button click
-		async onBtnClick(e, btnJSONOb){
-			this.setActionResponse('');
-			var tmpParent = this;
-			const axiosHtpp = axios;
-			if(btnJSONOb.btnType == "Macro"){
-				tmpParent.runFile(btnJSONOb.btnActionData);
-				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
-			}else if(btnJSONOb.btnType == "http"){
-				tmpParent.setActionResponse("Last Action :  -- http -- Sending: " + btnJSONOb.btnActionData);
-				if(btnJSONOb.btnHttpType == "POST") {
-					axiosHtpp.post(btnJSONOb.btnActionData, btnJSONOb.btnHttpData)
-						.then(function (response) {
-							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-						})
-						.catch(function (error) {
-							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
-						});
-				}
-				if(btnJSONOb.btnHttpType == "GET") {
-						axiosHtpp.get(btnJSONOb.btnActionData, { headers: {'Content-Type': `application/${btnJSONOb.btnHttpContType}`}})
-						.then(function (response) {
-							// handle success
-							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-						})
-						.catch(function (error) {
-							// handle error
-							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
-						});
-				}
-			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
-				this.sendMQTTMsg(btnJSONOb.btnActionData, btnJSONOb.btnTopicData);
-			}else if(btnJSONOb.btnType == "gcode"){
-				tmpParent.setActionResponse("Last Action :  -- gcode -- " + btnJSONOb.btnActionData);
-				tmpParent.code = btnJSONOb.btnActionData;
-				tmpParent.send();
-
-			}else if(btnJSONOb.btnType == "MQTT" && !this.btnCmd.globalSettings.enableMQTT){
-				tmpParent.setActionResponse("This button has been configured as MQTT, but MQTT is disabled. No Action Taken. Please re-enable MQTT.");
-			}else if(btnJSONOb.btnType == "window"){
-				var btnWindow = window.open(btnJSONOb.btnActionData, "BtnCmd", `menubar=0, resizable=0, status=0, toolbar=0, location=0, directories=0, scrollbars=1, width=${btnJSONOb.btnWinWSize}, height=${btnJSONOb.btnWinHSize}`);
-				btnWindow.moveTo(e.clientX, e.clientY-210);
-			}
-		},
-		//set the value of the action footer msg
-		setActionResponse(actionTxt){
-			this.actionResponse = actionTxt;
-		},
-		//run maro file
-		runFile(filename) {
-			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
-		},
-		//run gcode commands - taken from codeinput.vue
-		hasUnprecedentedParameters: (code) => !code || /(M23|M28|M30|M32|M36|M117)[^0-9]/i.test(code),
-		async send() {
-			this.showItems = false;
-
-			const code = (!this.code || this.code.constructor === String) ? this.code : this.code.value;
-			if (code && code.trim() !== '' && !this.doingCode) {
-				let codeToSend = '', bareCode = '', inQuotes = false, inExpression = false, inWhiteSpace = false, inComment = false;
-				if (!this.hasUnprecedentedParameters(codeToSend) &&
-					!conditionalKeywords.some(keyword => code.trim().startsWith(keyword))) {
-					// Convert code to upper-case and remove comments
-					for (let i = 0; i < code.length; i++) {
-						const char = code[i];
-						if (inQuotes) {
-							if (i < code.length - 1 && char === '\\' && code[i + 1] === '"') {
-								codeToSend += '\\"';
-								i++;
-							} else {
-								if (char === '"') {
-									inQuotes = false;
-								}
-								codeToSend += char;
-							}
-						} else if (inExpression) {
-							codeToSend += char;
-							inExpression = (char !== '}');
-						} else if (inComment) {
-							codeToSend += char;
-							inComment = (char !== ')');
-						} else {
-							if (char === '"') {
-								// don't convert escaped strings
-								inQuotes = true;
-							} else if (char === ' ' || char === '\t') {
-								// remove duplicate white spaces
-								if (inWhiteSpace) {
-									continue;
-								}
-								inWhiteSpace = true;
-							} else if (char === ';') {
-								// stop when final comments start
-								break;
-							} else if (char === '(') {
-								// don't process chars from encapsulated comments
-								inComment = true;
-							} else if (char === '{') {
-								// don't process chars from expressions
-								inExpression = true;
-							}
-							inWhiteSpace = false;
-							codeToSend += char.toUpperCase();
-							bareCode += code.toUpperCase();
-						}
-					}
-				} else {
-					// Don't modify the user input
-					codeToSend = code;
-				}
-
-				// Send the code and wait for completion
-				this.doingCode = true;
-				try {
-					const reply = await this.sendCode({ code: codeToSend, fromInput: true });
-					if (!inQuotes && !reply.startsWith('Error: ') && !reply.startsWith('Warning: ') &&
-						bareCode.indexOf('M587') === -1 && bareCode.indexOf('M589') === -1 &&
-						!this.disableAutoComplete && this.codes.indexOf(codeToSend.trim()) === -1) {
-						// Automatically remember successful codes
-						//this.addCode(codeToSend.trim());
-					}
-				} catch {
-					// handled before we get here
-				}
-				this.doingCode = false;
-			}
-		},
-		//Event monitoring functions
-		async checkEvents(typeStr, val){
-			var bi;
-			var tmpParent = this;
-			const axiosHtpp = axios;
-			for (bi in this.btnCmd.monitoredEvents) {
-				//this.setActionResponse("In checkEvents Sending: " + this.btnCmd.monitoredEvents[bi].eventTrigActionCmd);
-				if(this.btnCmd.monitoredEvents[bi].eventType === typeStr && this.btnCmd.monitoredEvents[bi].eventEnabled && this.btnCmd.monitoredEvents[bi].eventTrigValue === val) {
-					if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "http" || this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
-						var tmpURL = null;
-						if(this.btnCmd.monitoredEvents[bi].eventTrigActionType == "telegram"){
-							this.btnCmd.monitoredEvents[bi].eventHttpType = "POST";
-							this.btnCmd.monitoredEvents[bi].eventHttpData = {};
-							this.btnCmd.monitoredEvents[bi].eventHttpContType = "json";
-							tmpURL = `https://api.telegram.org/bot${this.btnCmd.monitoredEvents[bi].eventTgrmAPIToken}/sendMessage?chat_id=${this.btnCmd.monitoredEvents[bi].eventTgrmChatID}&text=${this.btnCmd.monitoredEvents[bi].eventTrigActionCmd}`;
-						}else{
-							tmpURL = this.btnCmd.monitoredEvents[bi].eventTrigActionCmd;
-						}
-						this.setActionResponse("Event Action : -- Sending: " + tmpURL);
-						if(this.btnCmd.monitoredEvents[bi].eventHttpType == "POST") {
-							axiosHtpp.post(tmpURL, tmpParent.btnCmd.monitoredEvents[bi].eventHttpData)
-								.then(function (response) {
-									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-								})
-								.catch(function (error) {
-									console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
-								});
-						}
-						if(this.btnCmd.monitoredEvents[bi].eventHttpType == "GET") {
-							axiosHtpp.get(tmpURL, { headers: {'Content-Type': `application/${tmpParent.btnCmd.monitoredEvents[bi].eventHttpContType}`}})
-								.then(function (response) {
-									// handle success
-									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-								})
-								.catch(function (error) {
-									// handle error
-									console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
-								});
-						}
-					}else if (this.btnCmd.monitoredEvents[bi].eventTrigActionType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
-						this.sendMQTTMsg(this.btnCmd.monitoredEvents[bi].eventTrigActionCmd, this.btnCmd.monitoredEvents[bi].eventTrigActionTopic);	
-					}
-				}
-			}
 		}
 	},
 	//automated functions
