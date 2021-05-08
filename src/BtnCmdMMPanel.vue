@@ -1,14 +1,30 @@
 <template>
-	<v-card :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID">
-		<v-card-text class="text-center pb-2">
+	<v-card :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID" :color="passedObject.panelColor">
+		<v-card-text v-if="passedObject.panelMMOrientation == 'V'" class="text-center pb-1">
 			<v-row dense>
 				<v-col class="d-flex flex-column">
-					<strong>
+					<strong :style="'color: ' + passedObject.panelMMPrefixColor">
+						{{ passedObject.panelMMPrefix }}
+					</strong>
+				</v-col>
+			</v-row>
+			<v-row dense>
+				<v-col class="d-flex flex-column">
+					<span :style="'color: ' + passedObject.panelMMValueColor">
+						{{ matchedMMVal }}
+					</span>
+				</v-col>
+			</v-row>
+		</v-card-text>
+		<v-card-text v-else class="text-center pb-1">
+			<v-row dense>
+				<v-col class="d-flex flex-column">
+					<strong :style="'color: ' + passedObject.panelMMPrefixColor">
 						{{ passedObject.panelMMPrefix }}
 					</strong>
 				</v-col>
 				<v-col class="d-flex flex-column">
-					<span>
+					<span :style="'color: ' + passedObject.panelMMValueColor">
 						{{ matchedMMVal }}
 					</span>
 				</v-col>
@@ -36,10 +52,14 @@ export default {
 	methods: {
 		getModelValue(){
 			const jp = jsonpath;
-			var matchInModel = jp.query(this.model, (`$.${this.passedObject.panelMMPath}`));
-			if(JSON.stringify(matchInModel) != "[]"){
-				return  matchInModel[0];
-			}else{
+			if(this.passedObject.panelMMPath){
+				var matchInModel = jp.query(this.model, (`$.${this.passedObject.panelMMPath}`));
+				if(JSON.stringify(matchInModel) != "[]"){
+					return  matchInModel[0];
+				}else{
+					return "###";
+				}
+			}else {
 				return "###";
 			}		
 		}
