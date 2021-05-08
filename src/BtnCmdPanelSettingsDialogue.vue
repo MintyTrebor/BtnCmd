@@ -7,12 +7,16 @@
 <template>
     <v-dialog v-model="show" persistent max-width="600">
         <v-card style="overflow-x: hidden;">
-			<v-card-title>
+			<!-- <v-row mt-0>
+                <v-col><span class="text-caption">curr tab id = {{ customPanels }}</span></v-col>
+            </v-row> -->
+            <v-card-title>
 				<v-toolbar dark dense>
                     <v-toolbar-title>Edit Panel</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
-                        Close
+                        <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue'">Click to Enter Settings</span>
+                        <span v-else>Close</span>
                     </v-btn>
                 </v-toolbar>
                 <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
@@ -41,7 +45,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'remSrc'">
+                    <v-row dense v-if="passedObject.panelType == 'remSrc'">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -52,107 +56,25 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Webcam Image Click URL" v-model="passedObject.altWebCamParams.altWebCamClickURL" placeholder="http://"></v-text-field>
-                                </template>
-                                <span>URL to open on click of the Alt Webcam Img</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
+                    <v-row dense v-if="enableSelects && passedObject.panelType == 'custom'">
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Webcam Rotation:" v-model="passedObject.altWebCamParams.altWebCamRotation" row required>
-                                        <v-radio v-for="type in rotateItems" :key="'WR'+type.value" :label="type.text" :value="type.value"></v-radio>
+                                    <v-select v-bind="attrs" v-on="on" :items="customPanelItems" item-text="text" item-value="value" label="Custom Panel" required v-model="passedObject.customPanelID" ></v-select>
+                                </template>
+                                <span>Select Custom Panel</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="!enableSelects && passedObject.panelType == 'custom'">
+                        <v-col cols="12">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Custom Panel:" v-model="passedObject.customPanelID" row required>
+                                        <v-radio v-for="type in customPanelItems" :key="'PT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
                                 </template>
-                                <span>Rotation Angle</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam' && enableSelects">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-select v-bind="attrs" v-on="on" :items="rotateItems" item-text="text" item-value="value" label="Webcam Rotation" required v-model="passedObject.altWebCamParams.altWebCamRotation"></v-select>
-                                </template>
-                                <span>Rotation Angle</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'&& !enableSelects">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Flip Webcam Img:" v-model="passedObject.altWebCamParams.altWebCamFlip" row required>
-                                        <v-radio v-for="type in flipItems" :key="'FW'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                </template>
-                                <span>Flip Webcam Image</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam' && enableSelects">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-select v-bind="attrs" v-on="on" :items="flipItems" item-text="text" item-value="value" label="Flip Webcam Img" required v-model="passedObject.altWebCamParams.altWebCamFlip"></v-select>
-                                </template>
-                                <span>Flip Webcam Image</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Refresh Period (ms)*" v-model="passedObject.altWebCamParams.altWebCamUpdateTimer" placeholder="5000"></v-text-field>
-                                </template>
-                                <span>Period in milliseconds to refresh image (min 5000)</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamAppndHTTP"></v-switch></span>
-                                </template>
-                                <span>Do not append extra HTTP qualifier when reloading images</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'altwebcam'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamiFrame"></v-switch></span>
-                                </template>
-                                <span>Embedd Webcam image in iFrame</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'mmValue'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
-                                </template>
-                                <span>Text to display prefixing the model value</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="passedObject.panelType == 'mmValue'">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Model Path" v-model="tmpModelPath" placeholder="heat.heaters[0].current"></v-text-field>
-                                </template>
-                                <span>Use the Object Model Browser Plugin to get Model Paths</span>
+                                <span>Select Custom Panel</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -178,8 +100,6 @@
                         intended to display internal LAN web services - <br>
                         for example: an rpi webcam control panel, or NodeDSF.<br>
                         Compatability will vary depending on the remote service.</span>
-                        <span v-if="passedObject.panelType == 'mmValue'">Use the Object Model Browser<br>
-                        plugin to lookup Model Paths.</span>
                     </v-alert>
                 </tbody>
             </v-card-text>
@@ -195,7 +115,11 @@
             passedObject: {
                 type: Object
             },
-            enableSelects: Boolean
+            customPanels: {
+                type: Array
+            },
+            enableSelects: Boolean,
+            createMode: Boolean
         },
         computed: {
             show: {
@@ -208,22 +132,39 @@
             },
             currPanel: {
                 get() {return this.passedObject.panelType;}
-            }
+            },
+            customPanelItems() {
+                var custPan = null;
+                var tmpItems = [];
+                var tmpItem = null;
+                for (custPan in this.customPanels) {
+                    tmpItem = {
+                        text: this.customPanels[custPan].caption,
+                        value: this.customPanels[custPan].tabID
+                    };
+                    tmpItems.push(tmpItem);
+                }
+                return tmpItems;
+            },
+            panelItemsFull(){ return [
+                {text: 'DWC Webcam', value: 'webcam', disabled: false, hSize: 240, wSize: 320},
+                {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 240, wSize: 320},
+                {text: 'Job Info', value: 'jobinfo', disabled: false, hSize: 200, wSize: 200},
+                {text: 'Layer Chart', value: 'layerchart', disabled: false, hSize: 240, wSize: 280},
+                {text: 'Collected Data', value: 'collectdata', disabled: false, hSize: 110, wSize: 600},
+                {text: 'Job Estimations', value: 'jobestimates', disabled: false, hSize: 110, wSize: 280},
+                {text: 'Speed', value: 'speed', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Fans', value: 'fans', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 240, wSize: 320},
+                {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
+                {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250}
+            ]},
+            panelItems() {
+                return this.panelItemsFull.filter(item => {return item.disabled === false});
+            },
         },
         data: function () {
             return {
-                panelItems: [
-                    {text: 'DWC Webcam', value: 'webcam', hSize: 240, wSize: 320},
-                    {text: 'Alt Webcam', value: 'altwebcam', hSize: 240, wSize: 320},
-                    {text: 'Job Info', value: 'jobinfo', hSize: 200, wSize: 200},
-                    {text: 'Layer Chart', value: 'layerchart', hSize: 240, wSize: 280},
-                    {text: 'Collected Data', value: 'collectdata', hSize: 110, wSize: 600},
-                    {text: 'Job Estimations', value: 'jobestimates', hSize: 110, wSize: 280},
-                    {text: 'Speed', value: 'speed', hSize: 200, wSize: 300},
-                    {text: 'Fans', value: 'fans', hSize: 200, wSize: 300},
-                    {text: 'Remote Source', value: 'remSrc', hSize: 240, wSize: 320},
-                    {text: 'Object Model Value', value: 'mmValue', hSize: 100, wSize: 300}
-                ],
                 rotateItems: [
                     {text: '0°', value: 0},
                     {text: '90°', value: 90},
@@ -249,29 +190,22 @@
             async validateData() {
                 this.passedObject.altWebCamParams.altWebCamURL = this.tmpURL;
                 if (this.passedObject.panelType == 'altwebcam') {
-                   //Alt Webcam Selected
-                    if(this.passedObject.altWebCamParams.altWebCamURL && this.passedObject.altWebCamParams.altWebCamUpdateTimer >= 5000) {
-                        //req fields met so exit
-                        this.show = false;
-                        return;
-                    }
+                    this.$emit('exit', true);
+                    this.show = false;
+                    return;
                 }else if (this.passedObject.panelType == 'remSrc') {
-                   //Alt Webcam Selected
                     if(this.passedObject.altWebCamParams.altWebCamURL) {
                         //req fields met so exit
                         this.show = false;
                         return;
                     }
                 }else if (this.passedObject.panelType == 'mmValue') {
-                   //Alt Webcam Selected
-                    if(this.passedObject.panelMMPrefix && this.tmpModelPath) {
-                        //req fields met so exit
-                        this.passedObject.panelMMPath = this.tmpModelPath;
-                        this.show = false;
-                        return;
-                    }
+                    this.passedObject.panelMMPath = this.tmpModelPath;
+                    this.$emit('exit', true);
+                    this.show = false;
+                    return;
                 }else if (this.passedObject.panelType) {
-                    //Not alt webcam and req fields met so exit
+                    //No Req fields so exit
                     this.show = false;
                     return;
                 }
