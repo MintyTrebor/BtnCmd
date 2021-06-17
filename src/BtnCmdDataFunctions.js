@@ -99,10 +99,11 @@ export default {
 						panelZIndex: 2,
 						panelMMPrefix: '',
 						panelMMPath: '',
-						panelColor: '',
 						panelMMOrientation: 'H',
 						panelMMPrefixColor: '',
 						panelMMValueColor: '',
+						panelMMTextSize: 'body-2',
+						panelColor: '',
 						customPanelID: null,
 						altWebCamParams: {
 							altWebCamURL: 'http://',
