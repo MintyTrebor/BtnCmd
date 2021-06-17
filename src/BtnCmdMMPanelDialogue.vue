@@ -5,7 +5,7 @@
     }
 </style>
 <template>
-    <v-dialog v-model="show" persistent max-width="600">
+    <v-dialog v-model="show" persistent max-width="700">
         <v-card style="overflow-x: hidden;">
 			<v-card-title>
 				<v-toolbar dark dense>
@@ -48,6 +48,18 @@
                                     </v-radio-group>
                                 </template>
                                 <span>Change the text orientation</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense> 
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="passedObject.panelMMTextSize" row required>
+                                        <v-radio v-for="type in textSizeItems" :key="'MMTS'+type.value" :label="type.text" :value="type.value"></v-radio>
+                                    </v-radio-group>
+                                </template>
+                                <span>Modify the font size</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -151,6 +163,15 @@
                 orientationItems: [
                     {text: 'Horizontal', value: 'H'},
                     {text: 'Vertical', value: 'V'}
+                ],
+                textSizeItems: [
+                    {text: 'STD', value: 'body-2'},
+                    {text: '+1', value: 'h6'},
+                    {text: '+2', value: 'h5'},
+                    {text: '+3', value: 'h4'},
+                    {text: '+4', value: 'h3'},
+                    {text: '+5', value: 'h2'},
+                    {text: '+6', value: 'h1'}
                 ],
                 alertReqVal: false,
                 showInfo: false,
