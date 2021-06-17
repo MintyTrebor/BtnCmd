@@ -3,14 +3,14 @@
 		<v-card-text v-if="passedObject.panelMMOrientation == 'V'" class="text-center pb-1">
 			<v-row dense>
 				<v-col class="d-flex flex-column">
-					<strong :style="'color: ' + passedObject.panelMMPrefixColor">
+					<strong :style="'color: ' + passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ passedObject.panelMMPrefix }}
 					</strong>
 				</v-col>
 			</v-row>
 			<v-row dense>
 				<v-col class="d-flex flex-column">
-					<span :style="'color: ' + passedObject.panelMMValueColor">
+					<span :style="'color: ' + passedObject.panelMMValueColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ matchedMMVal }}
 					</span>
 				</v-col>
@@ -19,12 +19,12 @@
 		<v-card-text v-else class="text-center pb-1">
 			<v-row dense>
 				<v-col class="d-flex flex-column">
-					<strong :style="'color: ' + passedObject.panelMMPrefixColor">
+					<strong :style="'color: ' + passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ passedObject.panelMMPrefix }}
 					</strong>
 				</v-col>
 				<v-col class="d-flex flex-column">
-					<span :style="'color: ' + passedObject.panelMMValueColor">
+					<span :style="'color: ' + passedObject.panelMMValueColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ matchedMMVal }}
 					</span>
 				</v-col>
