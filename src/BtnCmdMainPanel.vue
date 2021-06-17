@@ -908,9 +908,9 @@ export default {
 			lastTabHeight: 0,
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
-			btnCmdVersion: '0.8.18',
+			btnCmdVersion: '0.8.19',
 			btnCmd : {
-				btnCmdVersion: '0.8.18',
+				btnCmdVersion: '0.8.19',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -1005,6 +1005,7 @@ export default {
 						panelMMOrientation: 'H',
 						panelMMPrefixColor: '',
 						panelMMValueColor: '',
+						panelMMTextSize: 'body-2',
 						panelColor: '',
 						customPanelID: null,
 						altWebCamParams: {
