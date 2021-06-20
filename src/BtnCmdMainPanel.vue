@@ -36,10 +36,10 @@
     <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!-- <v-row mt-0>
-					<v-col><span class="text-caption">tab data= {{ tmpDebgug }}</span></v-col>
-					<v-col><span class="text-caption">curr tab = {{ getCurrTabIndex }}</span></v-col>
-				</v-row> -->
+				<!--<v-row mt-0>
+					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
+					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
+				</v-row>-->
 				<!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ tmpDebgug }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
@@ -55,55 +55,7 @@
 											<v-col cols="12">
 												<!--this div is here to constrain draggle items within the window-->
 												<div class="tabs-card" v-if="tab.lastZIndex">
-													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-														<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
-															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																			</v-btn>
-																		</template>
-																		<span >{{ btn.btnHoverText }}</span>
-																	</v-tooltip>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																			</v-btn>
-																		</template>
-																		<span >{{ btn.btnHoverText }}</span>
-																	</v-tooltip>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
-																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																			</v-btn>
-																		</template>
-																		<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
-																	</v-tooltip>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
-																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																			</v-btn>
-																		</template>
-																		<span>Click & Hold to drag - Right Click Edit Menu</span>
-																	</v-tooltip>
-																</div>
-															</v-row>
-														</v-card>
-													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
+													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
 														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
@@ -113,7 +65,7 @@
 																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
 																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel"></BtnCmdCustomPanel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -162,7 +114,7 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+													<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
 														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
@@ -261,6 +213,69 @@
 																		</v-menu>
 																	</v-overlay>
 																</td>
+															</v-row>
+														</v-card>
+													</vue-draggable-resizable>
+													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="getZidx(btn.btnZIndex)" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+														<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
+															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
+																<!--tooltip buttons-->
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																			</v-btn>
+																		</template>
+																		<span >{{ btn.btnHoverText }}</span>
+																	</v-tooltip>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																			</v-btn>
+																		</template>
+																		<span >{{ btn.btnHoverText }}</span>
+																	</v-tooltip>
+																</div>
+																<!--Non tooltip buttons-->
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																		<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																		<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																	</v-btn>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
+																	<v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																		<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																		<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																	</v-btn>
+																</div>
+																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
+																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																			</v-btn>
+																		</template>
+																		<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
+																	</v-tooltip>
+																</div>
+																<!--Other Buttons-->
+																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
+																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																		<template v-slot:activator="{ on, attrs }">
+																			<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																			</v-btn>
+																		</template>
+																		<span>Click & Hold to drag - Right Click Edit Menu</span>
+																	</v-tooltip>
+																</div>
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
@@ -828,7 +843,7 @@ export default {
 			return tmpHeight;
 		},
 		mobileActive() {
-			if(!this.$vuetify.breakpoint.mdAndUp){
+			if(this.$vuetify.breakpoint.mdAndDown){
 				return true;
 			}else {
 				return false;
@@ -908,9 +923,9 @@ export default {
 			lastTabHeight: 0,
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
-			btnCmdVersion: '0.8.19',
+			btnCmdVersion: '0.8.20',
 			btnCmd : {
-				btnCmdVersion: '0.8.19',
+				btnCmdVersion: '0.8.20',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -1040,10 +1055,20 @@ export default {
 		setupPage(){
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
+		updateAR(ActionText){
+			this.actionResponse=ActionText;
+		},
 		handleResize() {
             this.window.width = window.innerWidth;
             this.window.height = window.innerHeight;
         },		
+		getZidx(idxVal) {
+			if(this.mobileActive && !this.editMode){
+				return null;
+			}else {
+				return idxVal;
+			}
+		},
 		//PopUpMenu Functions
 		doMenu (e, btnObj) {
 			e.preventDefault();
@@ -1415,7 +1440,6 @@ export default {
 			this.editMode = !this.editMode;
 			if(!this.editMode){
 				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === false);
-				this.tmpDebgug = tmpArr;
 				this.onChangeTab(tmpArr[0].tabID);
 				this.saveSettings();
 				this.saveBtnCol = 'primary';
@@ -1428,7 +1452,6 @@ export default {
 			this.setActionResponse('');
 			this.createMode = true;
 			var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
-			this.tmpDebgug = tmpArr;
 			if(tmpArr.length >= 1){
 				this.onChangeTab(tmpArr[0].tabID);
 			}
