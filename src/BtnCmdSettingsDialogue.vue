@@ -47,12 +47,23 @@
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
-                        <v-col cols="12">
+                        <v-col cols="11">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Icon [mdi-#]" v-model="passedObject.btnIcon" placeholder="mdi-"></v-text-field>
+                                    <v-text-field v-bind="attrs" v-on="on" label="Icon [mdi-*]" v-model="passedObject.btnIcon" placeholder="mdi-"></v-text-field>
                                 </template>
-                                <span>Material design icons from https://materialdesignicons.com/ (Format = mdi-[icon name])</span>
+                                <span>Material design icon name (Format = mdi-[icon name])</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="1">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <a v-bind="attrs" v-on="on" href="https://materialdesignicons.com/" target="_blank">
+                                        <v-icon v-if="passedObject.btnIcon.length>0" class="mr-1 pt-3">{{ passedObject.btnIcon }}</v-icon>
+                                        <v-icon v-if="passedObject.btnIcon.length==0" class="mr-1 pt-3">mdi-cog</v-icon>
+                                    </a>
+                                </template>
+                                <span>Go To https://materialdesignicons.com</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
