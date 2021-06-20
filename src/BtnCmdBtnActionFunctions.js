@@ -72,6 +72,7 @@ export default {
 			var tmpParent = this;
 			const axiosHtpp = axios;
 			if(btnJSONOb.btnType == "Macro"){
+				//tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 				tmpParent.runFile(btnJSONOb.btnActionData);
 				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 			}else if(btnJSONOb.btnType == "http"){
