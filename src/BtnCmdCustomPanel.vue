@@ -55,6 +55,15 @@
                                         <job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
                                         <job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
                                         <fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
+                                        <job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
+										<!--<fan-panel v-if="panel.panelType == 'fan-panel'" align="center" class="tabs-card pa-0 ma-0"></fan-panel>-->
+                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+                                        <extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
+                                        <extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
+                                        <z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
+                                        <status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0"></status-panel>
+                                        <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
+                                        <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
                                         <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
                                     </td>
                                 </v-row>
