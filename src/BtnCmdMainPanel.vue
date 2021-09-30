@@ -59,11 +59,19 @@
 														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
 															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
-																	<job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
+																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0"></job-info-panel>
 																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
 																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
 																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
+																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
 																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
+																	<!--<fan-panel v-if="panel.panelType == 'fan-panel'" align="center" class="tabs-card pa-0 ma-0"></fan-panel>-->
+																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
+																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
+																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
+																	<status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0"></status-panel>
+																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
+																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
@@ -390,6 +398,17 @@
 					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
 				</div>
 				<v-spacer></v-spacer>
+				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
+								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
+							</v-btn>
+						</template>
+						<span>Show/Hide Top Panel</span>
+					</v-tooltip>
+				</div>
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
@@ -406,6 +425,17 @@
 		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px; background-color: #FFFFFF00`">
 			<v-row class="pa-0 ma-0">	
 				<v-spacer></v-spacer>
+				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
+								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
+							</v-btn>
+						</template>
+						<span>Show/Hide Top Panel</span>
+					</v-tooltip>
+				</div>
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
@@ -813,7 +843,13 @@ export default {
 			var tmpUsrHeightMod = 0;
 			var tmpHeight = 0;
 			var currHeight = parseInt(this.window.height);
-			var tmpPlgH = parseInt(this.btnCmd.globalSettings.pluginMinimumHeight)
+			var tmpPlgH = parseInt(this.btnCmd.globalSettings.pluginMinimumHeight);
+			var iNormHeightModifier = 420;
+
+			if(this.currHideTopPanel){
+				iNormHeightModifier = 110;
+			}
+
 
 			if(tmpPlgH < 0){
 				//Negative Modifier
@@ -835,7 +871,7 @@ export default {
 				}
 			}else {
 				//Normal Heigh modifiers
-				tmpHeight = (tmpUsrHeightMod + currHeight -420);
+				tmpHeight = (tmpUsrHeightMod + currHeight - iNormHeightModifier);
 				if(tmpHeight > (currHeight - 110)) {
 					tmpHeight = currHeight - 110;
 				}
@@ -923,9 +959,10 @@ export default {
 			lastTabHeight: 0,
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
-			btnCmdVersion: '0.8.20',
+			currHideTopPanel: false,
+			btnCmdVersion: '0.8.21',
 			btnCmd : {
-				btnCmdVersion: '0.8.20',
+				btnCmdVersion: '0.8.21',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 1,
@@ -943,7 +980,9 @@ export default {
 					MQTTClientID: 'BtnCmd',
 					enableSelects: true,
 					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0
+					pluginMinimumHeight: 0,
+					enableGC_SH_Btn: false,
+					defaultGC_Hidden: false
 				},
 				monitoredEvents: [
 					{
@@ -1041,11 +1080,12 @@ export default {
 		}
 	},
 	created() {
-        window.addEventListener('resize', this.handleResize);
+		window.addEventListener('resize', this.handleResize);
         this.handleResize();
     },
     destroyed() {
-        window.removeEventListener('resize', this.handleResize);
+        alert("Destroyed");
+		window.removeEventListener('resize', this.handleResize);
     },
     methods: {
 		...mapActions('machine', ['sendCode']),
@@ -1061,7 +1101,20 @@ export default {
 		handleResize() {
             this.window.width = window.innerWidth;
             this.window.height = window.innerHeight;
-        },		
+        },
+		toggleTopPanelBtn(){
+			this.currHideTopPanel = !this.currHideTopPanel;
+			this.toggleTopPanel(this.currHideTopPanel);
+		},
+		toggleTopPanel(bHideGCPanel){
+			if(bHideGCPanel){
+				window.document.getElementById("global-container").hidden = true;
+				this.currHideTopPanel = true;
+			}else {
+				window.document.getElementById("global-container").hidden = false;
+				this.currHideTopPanel = false;
+			}
+		},		
 		getZidx(idxVal) {
 			if(this.mobileActive && !this.editMode){
 				return null;
@@ -1493,6 +1546,14 @@ export default {
 			if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
 				//console.log("Conditions Met lauching checkEvents");
 				this.checkEvents('status', val);
+			}
+		},
+		$route (to, from){
+			if(to.path === "/BtnCmd" && this.btnCmd.globalSettings.defaultGC_Hidden){
+				this.toggleTopPanel(true);
+			}
+			if(from.path === "/BtnCmd"){
+				this.toggleTopPanel(false);
 			}
 		}	
 	}
