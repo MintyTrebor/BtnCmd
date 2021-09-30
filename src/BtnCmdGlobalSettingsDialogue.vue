@@ -50,6 +50,26 @@
                             <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
                         </v-col>
                     </v-row>
+                    <v-row dense v-if="!mobileActive">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Top Panel Show/Hide button" v-model="passedObject.enableGC_SH_Btn"></v-switch></span>
+                                </template>
+                                <span>Enable Button to show hide the default DWC top panel</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="!mobileActive">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Top Panel by default" v-model="passedObject.defaultGC_Hidden"></v-switch></span>
+                                </template>
+                                <span>Hide the default DWC top panel by default</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
