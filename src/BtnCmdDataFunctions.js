@@ -25,7 +25,9 @@ export default {
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
 					lastBackupFileName: 'BtnCmdSettings',
-					pluginMinimumHeight: 0
+					pluginMinimumHeight: 0,
+					enableGC_SH_Btn: false,
+					defaultGC_Hidden: false
 				},
 				monitoredEvents: [
 					{
