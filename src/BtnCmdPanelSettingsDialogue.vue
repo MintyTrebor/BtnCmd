@@ -5,7 +5,7 @@
     }
 </style>
 <template>
-    <v-dialog v-model="show" persistent max-width="600">
+    <v-dialog v-model="show" persistent max-width="600" :key="passedObject.PanelType">
         <v-card style="overflow-x: hidden;">
 			<!-- <v-row mt-0>
                 <v-col><span class="text-caption">curr tab id = {{ customPanels }}</span></v-col>
@@ -153,8 +153,16 @@
                 {text: 'Layer Chart', value: 'layerchart', disabled: false, hSize: 240, wSize: 280},
                 {text: 'Collected Data', value: 'collectdata', disabled: false, hSize: 110, wSize: 600},
                 {text: 'Job Estimations', value: 'jobestimates', disabled: false, hSize: 110, wSize: 280},
-                {text: 'Speed', value: 'speed', disabled: false, hSize: 200, wSize: 300},
-                {text: 'Fans', value: 'fans', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Job Control', value: 'job-control-panel', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Speed', value: 'speed', disabled: false, hSize: 230, wSize: 320},
+                {text: 'Fan Control', value: 'fans', disabled: false, hSize: 200, wSize: 300},
+                //{text: 'Fan Info', value: 'fan-panel', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Extrusion Control', value: 'extrude-panel', disabled: false, hSize: 340, wSize: 380},
+                {text: 'Extrusion Factors', value: 'extrusion-factors-panel', disabled: false, hSize: 300, wSize: 320},
+                {text: 'Baby-Stepping', value: 'z-babystep-panel', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Status', value: 'status-panel', disabled: false, hSize: 240, wSize: 280},
+                {text: 'Tools', value: 'tools-panel', disabled: false, hSize: 300, wSize: 380},
+                {text: 'Movement', value: 'movement-panel', disabled: false, hSize: 240, wSize: 800},
                 {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 240, wSize: 320},
                 {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250}
