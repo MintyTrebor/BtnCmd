@@ -61,7 +61,7 @@ img {
 <template>
 	<v-card>
 		<v-card-title>
-			{{ $t('panel.webcam.caption') }}
+			<!-- {{ $t('panel.webcam.caption') }} -->
 		</v-card-title>
 
 		<v-card-text class="pt-0 img-container">
