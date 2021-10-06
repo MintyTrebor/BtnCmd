@@ -61,11 +61,11 @@
 																<td class="tabs-card">
 																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0"></job-info-panel>
 																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
+																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></temperature-chart>
 																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
 																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
 																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
 																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
-																	<!--<fan-panel v-if="panel.panelType == 'fan-panel'" align="center" class="tabs-card pa-0 ma-0"></fan-panel>-->
 																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
 																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
 																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
@@ -960,12 +960,12 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.8.21',
+			btnCmdVersion: '0.8.22',
 			btnCmd : {
-				btnCmdVersion: '0.8.21',
+				btnCmdVersion: '0.8.22',
 				systemSettings: {
 					lastID: 1,
-					lastTabID: 1,
+					lastTabID: 2,
 					lastEventID: 1,
 					lastPanelID: 1
 				},
@@ -1035,13 +1035,26 @@ export default {
 						embedTab: false,
 						icon: "mdi-view-module",
 						translated: false,
-						caption: "Group 1",
+						caption: "Layout 1",
 						numberOfColumns: 12,
 						showWebCam: false,
 						showAltWebCam : false,
 						tabEnableSnap: false,
 						tabGridSize: [1,1],
 						lastZIndex: 2,
+					},
+					{
+						tabID: 2,
+						embedTab: true,
+						icon: "mdi-view-module",
+						translated: false,
+						caption: "Custom Panel 1",
+						numberOfColumns: 12,
+						showWebCam: false,
+						showAltWebCam : false,
+						tabEnableSnap: false,
+						tabGridSize: [1,1],
+						lastZIndex: 2
 					}
 				],
 				panels: [
