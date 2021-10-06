@@ -960,9 +960,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.8.22',
+			btnCmdVersion: '0.9.01',
 			btnCmd : {
-				btnCmdVersion: '0.8.22',
+				btnCmdVersion: '0.9.01',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
