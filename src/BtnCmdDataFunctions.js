@@ -11,7 +11,7 @@ export default {
 				btnCmdVersion: this.btnCmdVersion,
 				systemSettings: {
 					lastID: 1,
-					lastTabID: 1,
+					lastTabID: 2,
 					lastEventID: 1,
 					lastPanelID: 1
 				},
@@ -80,7 +80,20 @@ export default {
 						embedTab: false,
 						icon: "mdi-view-module",
 						translated: false,
-						caption: "Group 1",
+						caption: "Layout 1",
+						numberOfColumns: 12,
+						showWebCam: false,
+						showAltWebCam : false,
+						tabEnableSnap: false,
+						tabGridSize: [1,1],
+						lastZIndex: 2
+					},
+					{
+						tabID: 2,
+						embedTab: true,
+						icon: "mdi-view-module",
+						translated: false,
+						caption: "Custom Panel 1",
 						numberOfColumns: 12,
 						showWebCam: false,
 						showAltWebCam : false,
@@ -170,6 +183,18 @@ export default {
 				}
 			}
 		},
+		// async importCustomPanelFromFile() {
+		// 	try {
+		// 		const setFileName = Path.combine(this.systemDirectory, `CustPanelName.json`);
+		// 		const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
+		// 		this.btnCmd = response;
+		// 		this.checkDataVersion();
+		// 	} catch (e) {
+		// 		if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
+		// 			console.warn(e);
+		// 		}
+		// 	}
+		// },
 		async validateFileName(){
 			if(this.btnCmd.globalSettings.lastBackupFileName.length !== 0){
 				var newName = this.btnCmd.globalSettings.lastBackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
