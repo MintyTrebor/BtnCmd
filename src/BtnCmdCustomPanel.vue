@@ -6,6 +6,41 @@
                 <v-col cols="12">
                     <!--this div is here to constrain draggle items within the window-->
                     <div class="tabs-card" v-if="passedObject.panelZIndex">
+                        <vue-draggable-resizable v-for="(panel) in getTabPanels(passedObject.customPanelID)" :key="'dwcpan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
+                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+                                <v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
+                                    <td class="tabs-card">
+                                        <job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
+                                        <layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
+                                        <temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></temperature-chart>
+                                        <job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
+                                        <job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
+                                        <fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
+                                        <job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
+                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+                                        <extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
+                                        <extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
+                                        <z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
+                                        <status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0"></status-panel>
+                                        <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
+                                        <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
+                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+                                    </td>
+                                </v-row>
+                            </v-card>
+                        </vue-draggable-resizable>
+                        <vue-draggable-resizable v-for="(panel) in getTabCamPanels(passedObject.customPanelID)" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
+                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+                                <v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
+                                    <td class="tabs-card">
+                                        <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
+                                        <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
+                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
+                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
+                                    </td>
+                                </v-row>
+                            </v-card>
+                        </vue-draggable-resizable>
                         <vue-draggable-resizable v-for="(btn) in getTabBtns(passedObject.customPanelID)" :key="'btn' + btn.btnID + btn.autoSize" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="false" :draggable="false">
                             <v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
                                 <v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
@@ -43,41 +78,6 @@
                                             <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
                                         </v-btn>
                                     </div>
-                                </v-row>
-                            </v-card>
-                        </vue-draggable-resizable>
-                        <vue-draggable-resizable v-for="(panel) in getTabPanels(passedObject.customPanelID)" :key="'dwcpan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
-                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                <v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                    <td class="tabs-card">
-                                        <job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0"></job-info-panel>
-                                        <layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
-                                        <job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
-                                        <job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
-                                        <fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
-                                        <job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
-										<!--<fan-panel v-if="panel.panelType == 'fan-panel'" align="center" class="tabs-card pa-0 ma-0"></fan-panel>-->
-                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-                                        <extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
-                                        <extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
-                                        <z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
-                                        <status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0"></status-panel>
-                                        <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
-                                        <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
-                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-                                    </td>
-                                </v-row>
-                            </v-card>
-                        </vue-draggable-resizable>
-                        <vue-draggable-resizable v-for="(panel) in getTabCamPanels(passedObject.customPanelID)" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
-                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                <v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                    <td class="tabs-card">
-                                        <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
-                                        <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
-                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
-                                    </td>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
