@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ tmpDebgug }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpDebgug }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -844,7 +844,10 @@ export default {
 			var tmpHeight = 0;
 			var currHeight = parseInt(this.window.height);
 			var tmpPlgH = parseInt(this.btnCmd.globalSettings.pluginMinimumHeight);
-			var iNormHeightModifier = 420;
+			var globalCont = window.document.getElementById("global-container");
+			
+			//var iNormHeightModifier = 420;
+			var iNormHeightModifier = 110 + globalCont.offsetHeight;
 
 			if(this.currHideTopPanel){
 				iNormHeightModifier = 110;
@@ -879,7 +882,7 @@ export default {
 			return tmpHeight;
 		},
 		mobileActive() {
-			if(this.$vuetify.breakpoint.mdAndDown){
+			if(this.$vuetify.breakpoint.smAndDown){
 				return true;
 			}else {
 				return false;
@@ -960,9 +963,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.9.01',
+			btnCmdVersion: '0.9.02',
 			btnCmd : {
-				btnCmdVersion: '0.9.01',
+				btnCmdVersion: '0.9.02',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1095,7 +1098,14 @@ export default {
 	created() {
 		window.addEventListener('resize', this.handleResize);
         this.handleResize();
-    },
+		//dirty hack to stop the navigation bar rendering behind some BtnCmd user created objects when it auto hides based on screen size - mitigates issues with zIndex
+		// tmpg = window.document.getElementsByClassName("v-app-bar")[0];
+		// tmpg.style = "z-index: 99999999999";
+		if(this.$vuetify.breakpoint.mdAndDown){
+			var tmpg = window.document.getElementsByClassName("v-navigation-drawer")[0];
+			tmpg.style = "z-index: 99999999999";
+		}
+	},
     destroyed() {
         alert("Destroyed");
 		window.removeEventListener('resize', this.handleResize);
@@ -1552,6 +1562,10 @@ export default {
 		this.checkDataVersion();
 		this.setupPage();
 		this.isSimulating = (this.status === StatusType.simulating);
+		//Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
+		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.smAndDown){
+			this.toggleTopPanel(true);
+		}
 	},
 	watch: {
 		status: function (val) {
@@ -1562,12 +1576,15 @@ export default {
 			}
 		},
 		$route (to, from){
-			if(to.path === "/BtnCmd" && this.btnCmd.globalSettings.defaultGC_Hidden){
+			if(to.path === "/BtnCmd" && this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
 				this.toggleTopPanel(true);
 			}
-			if(from.path === "/BtnCmd"){
+			if(from.path === "/BtnCmd" && !this.mobileActive){
 				this.toggleTopPanel(false);
 			}
+		},
+		mobileActive (val) {
+			if(val){this.toggleTopPanel(false);}
 		}	
 	}
 }
