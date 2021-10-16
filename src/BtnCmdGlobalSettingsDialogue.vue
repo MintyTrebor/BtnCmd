@@ -54,7 +54,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Top Panel Show/Hide button" v-model="passedObject.enableGC_SH_Btn"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Top Panel Show/Hide button" v-model="passedObject.enableGC_SH_Btn" @change="if(!passedObject.enableGC_SH_Btn){passedObject.defaultGC_Hidden = false}"></v-switch></span>
                                 </template>
                                 <span>Enable Button to show hide the default DWC top panel</span>
                             </v-tooltip>
@@ -64,7 +64,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Top Panel by default" v-model="passedObject.defaultGC_Hidden"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Top Panel by default" v-model="passedObject.defaultGC_Hidden" @change="if(passedObject.defaultGC_Hidden){passedObject.enableGC_SH_Btn = true}"></v-switch></span>
                                 </template>
                                 <span>Hide the default DWC top panel by default</span>
                             </v-tooltip>
