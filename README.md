@@ -6,11 +6,12 @@ Duet Web Control Custom Buttons Plugin - Run Macros, g-code, Post http GET reque
 Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how to install configure and use.
 
 In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may also choose to display a selection of panels including:  
-* DWC info panels
-* DWC webcam
+* Standard DWC information & control panels
+* Standard DWC webcam
 * Alternatve webcam
 * Remote Source (Web service from your LAN)
 * Machine Model Values  
+* Static Text Panel
 
 ![BtnCmd Edit Mode](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
 
