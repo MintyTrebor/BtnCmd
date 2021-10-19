@@ -13,7 +13,8 @@ export default {
 					lastID: 1,
 					lastTabID: 2,
 					lastEventID: 1,
-					lastPanelID: 1
+					lastPanelID: 1,
+					lastTxtIconID: 1
 				},
 				globalSettings: {
 					enableActionMsg: true,
@@ -119,6 +120,7 @@ export default {
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
 						panelColor: '',
+						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
 							altWebCamURL: 'http://',
