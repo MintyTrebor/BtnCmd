@@ -15,7 +15,7 @@
                     <v-toolbar-title>Edit Panel</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
-                        <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue'">Click to Enter Settings</span>
+                        <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue' || passedObject.panelType == 'txtLabel'">Click to Enter Settings</span>
                         <span v-else>Close</span>
                     </v-btn>
                 </v-toolbar>
@@ -165,6 +165,7 @@
                 {text: 'Movement', value: 'movement-panel', disabled: false, hSize: 240, wSize: 800},
                 {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 240, wSize: 320},
                 {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
+                {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250}
             ]},
             panelItems() {
@@ -207,7 +208,7 @@
                         this.show = false;
                         return;
                     }
-                }else if (this.passedObject.panelType == 'mmValue') {
+                }else if (this.passedObject.panelType == 'mmValue' || this.passedObject.panelType == 'txtLabel') {
                     this.passedObject.panelMMPath = this.tmpModelPath;
                     this.$emit('exit', true);
                     this.show = false;
