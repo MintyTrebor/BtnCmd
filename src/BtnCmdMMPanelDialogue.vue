@@ -9,7 +9,7 @@
         <v-card style="overflow-x: hidden;">
 			<v-card-title>
 				<v-toolbar dark dense>
-                    <v-toolbar-title>Edit Model Panel Settings</v-toolbar-title>
+                    <v-toolbar-title>Edit Panel Settings</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
                         Close
@@ -23,17 +23,19 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
+                                    <v-text-field v-if="passedObject.panelType == 'mmValue'" required v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
+                                    <v-text-field v-if="passedObject.panelType == 'txtLabel'" required v-bind="attrs" v-on="on" label="Enter Text" v-model="passedObject.panelMMPrefix"></v-text-field>
                                 </template>
-                                <span>Text to display prefixing the model value</span>
+                                <span v-if="passedObject.panelType == 'mmValue'" >Text to display prefixing the model value</span>
+                                <span v-if="passedObject.panelType == 'txtLabel'" >Text to display</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
+                    <v-row dense v-if="passedObject.panelType == 'mmValue'" >
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Model Path" v-model="tmpModelPath" placeholder="heat.heaters[0].current"></v-text-field>
+                                    <v-text-field required v-bind="attrs" v-on="on" label="Model Path" v-model="tmpModelPath" placeholder="heat.heaters[0].current"></v-text-field>
                                 </template>
                                 <span>Use the Object Model Browser Plugin to get Model Paths</span>
                             </v-tooltip>
@@ -75,7 +77,7 @@
                     </v-row>
                     <v-row >
                         <v-col>
-                            <v-row dense><v-col><span style="font-weight: bold">Panel Background Color</span></v-col></v-row>
+                            <v-row dense><v-col><span style="font-weight: bold">Panel Background Colour</span></v-col></v-row>
                         </v-col>
                         <v-col>
                             <v-tooltip bottom>
@@ -85,13 +87,13 @@
                                         <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelColor = ''">Reset</v-btn></div></v-col>
                                     </v-row>
                                 </template>
-                                <span>Click to edit color</span>
+                                <span>Click to edit panel colour</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
                     <v-row >
                         <v-col>
-                            <v-row dense><v-col><span style="font-weight: bold">Prefix Text Color</span></v-col></v-row>
+                            <v-row dense><v-col><span style="font-weight: bold">Text Colour</span></v-col></v-row>
                         </v-col>
                         <v-col>
                             <v-tooltip bottom>
@@ -101,13 +103,13 @@
                                         <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelMMPrefixColor = ''">Reset</v-btn></div></v-col>
                                     </v-row>
                                 </template>
-                                <span>Click to edit prefix text color</span>
+                                <span>Click to edit text colour</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row >
+                    <v-row v-if="passedObject.panelType == 'mmValue'" >
                         <v-col>
-                            <v-row dense><v-col><span style="font-weight: bold">Value Text Color</span></v-col></v-row>
+                            <v-row dense><v-col><span style="font-weight: bold">Value Colour</span></v-col></v-row>
                         </v-col>
                         <v-col>
                             <v-tooltip bottom>
@@ -117,7 +119,17 @@
                                         <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelMMValueColor = ''">Reset</v-btn></div></v-col>
                                     </v-row>
                                 </template>
-                                <span>Click to edit value text color</span>
+                                <span>Click to edit value colour</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Panel Border" v-model="passedObject.borderless"></v-switch></span>
+                                </template>
+                                <span>Hide the panel border</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -185,16 +197,27 @@
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
             async validateData() {
-                if(this.passedObject.panelMMPrefix && this.tmpModelPath) {
-                    //req fields met so exit
-                    this.passedObject.panelMMPath = this.tmpModelPath;
-                    this.$emit('exit', true);
-                    this.show = false;
-                    return;
-                }
-                this.alertReqVal = true;
-                await this.sleep(2000);
-                this.alertReqVal = false;
+                if(this.passedObject.panelType == 'mmValue'){
+                    if(this.passedObject.panelMMPrefix && this.tmpModelPath) {
+                        //req fields met so exit
+                        this.passedObject.panelMMPath = this.tmpModelPath;
+                        this.$emit('exit', true);
+                        this.show = false;
+                        return;
+                    } else {
+                        this.alertReqVal = true;
+                        await this.sleep(2000);
+                        this.alertReqVal = false;
+                    }
+                }else if (this.passedObject.panelType != 'mmValue'){
+                    if(this.passedObject.panelMMPrefix) {
+                        //req fields met so exit
+                        this.passedObject.panelMMPath = this.tmpModelPath;
+                        this.$emit('exit', true);
+                        this.show = false;
+                        return;
+                    }
+                }    
             },
             setColor(colorField){
                 this.colField = colorField;
