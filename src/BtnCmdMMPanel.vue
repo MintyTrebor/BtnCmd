@@ -1,5 +1,5 @@
 <template>
-	<v-card :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID" :color="passedObject.panelColor">
+	<v-card :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID" :flat="passedObject.borderless" :color="passedObject.panelColor">
 		<v-card-text v-if="passedObject.panelMMOrientation == 'V'" class="text-center pb-1">
 			<v-row dense>
 				<v-col class="d-flex flex-column">
@@ -8,7 +8,7 @@
 					</strong>
 				</v-col>
 			</v-row>
-			<v-row dense>
+			<v-row v-if="passedObject.panelType == 'mmValue'" dense>
 				<v-col class="d-flex flex-column">
 					<span :style="'color: ' + passedObject.panelMMValueColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ matchedMMVal }}
@@ -23,13 +23,13 @@
 						{{ passedObject.panelMMPrefix }}
 					</strong>
 				</v-col>
-				<v-col class="d-flex flex-column">
+				<v-col v-if="passedObject.panelType == 'mmValue'" class="d-flex flex-column">
 					<span :style="'color: ' + passedObject.panelMMValueColor" :class="`text-${passedObject.panelMMTextSize}`">
 						{{ matchedMMVal }}
 					</span>
 				</v-col>
 			</v-row>
-		</v-card-text> 
+		</v-card-text>
 	</v-card>		
 </template>
 
