@@ -35,7 +35,7 @@
                                     <td class="tabs-card">
                                         <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
                                         <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
+                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
                                         <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
                                     </td>
                                 </v-row>
@@ -167,12 +167,12 @@
             },
             getTabPanels(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue");
+                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
                 return result;
             },
             getTabCamPanels(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue"));
+                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
                 return result;
             },
             chkJobEnabled(item){
