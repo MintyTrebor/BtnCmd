@@ -123,12 +123,12 @@
 														</v-card>
 													</vue-draggable-resizable>
 													<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+														<v-card align="center" justify="center" flat class="tabs-card ma-0 pa-0">
 															<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
 																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
+																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																		<tbody>
@@ -963,9 +963,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.9.02',
+			btnCmdVersion: '0.9.03',
 			btnCmd : {
-				btnCmdVersion: '0.9.02',
+				btnCmdVersion: '0.9.03',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1077,6 +1077,7 @@ export default {
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
 						panelColor: '',
+						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
 							altWebCamURL: 'http://',
@@ -1171,7 +1172,7 @@ export default {
 			if(this.panelObjectToPass[0].panelType == "altwebcam"){
 				this.showAWCPanelEdit = true;
 			}
-			if(this.panelObjectToPass[0].panelType == "mmValue"){
+			if(this.panelObjectToPass[0].panelType == "mmValue" || this.panelObjectToPass[0].panelType == "txtLabel"){
 				this.showMMPanelEdit = true;
 			}			
 		},
@@ -1287,12 +1288,12 @@ export default {
 		},
 		getTabPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
 			return result;
 		},
 		getTabCamPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
 			return result;
 		},
 		getAllCustomPanels(){
@@ -1446,7 +1447,7 @@ export default {
 			if(this.panelObjectToPass[0].panelType == "altwebcam"){
 				this.showAWCPanelEdit = true;
 			}
-			if(this.panelObjectToPass[0].panelType == "mmValue"){
+			if(this.panelObjectToPass[0].panelType == "mmValue" || this.panelObjectToPass[0].panelType == "txtLabel"){
 				this.showMMPanelEdit = true;
 			}
 			if(this.panelObjectToPass[0].panelType == "remSrc"){
