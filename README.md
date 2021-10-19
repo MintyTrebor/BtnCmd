@@ -1,5 +1,5 @@
 # BtnCmd
-A Duet Web Control (DWC) browser plugin which allows the user to create custom layouts with panels and buttons, which can run Macros and g-code, Post http GET requests, send MQTT messages, and get status update alerts.  
+A Duet Web Control (DWC) browser plugin which allows the user to create custom layouts with panels and buttons, which can run Macros and g-code, Post http GET requests, send MQTT messages. BtnCmd also includes a simple status monitoring feature.  
 
 ![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_1.png)  
 
