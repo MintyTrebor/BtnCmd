@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpDebgug }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ currTabObj }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -49,14 +49,14 @@
 						</v-tab>
 						<v-tabs-items v-model="getCurrTabIndex">
 							<v-tab-item v-for="(tab) in getTabs" :key="tab.tabID" :value="`tab-${tab.tabID}`">
-								<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width">
+								<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width" >
 									<v-container fluid class="pa-0 ma-0 tabs-default">
 										<v-row class="pa-0 ma-0 tabs-default">
 											<v-col cols="12">
 												<!--this div is here to constrain draggle items within the window-->
 												<div class="tabs-card" v-if="tab.lastZIndex">
 													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
-														<v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+														<v-card align="center" :flat="panel.borderless" justify="center" class="tabs-card ma-0 pa-0">
 															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
 																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0"></job-info-panel>
@@ -73,6 +73,7 @@
 																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																		<tbody>
@@ -114,6 +115,20 @@
 																						</v-tooltip>
 																					</div>
 																				</td>
+																				<td v-if="panel.panelType == 'custom'">
+																					<div class="pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panel.borderless = !panel.borderless">
+																									<v-icon v-if="!panel.borderless">mdi-border-none-variant</v-icon>
+																									<v-icon v-if="panel.borderless">mdi-border-all-variant</v-icon>
+																								</v-btn>
+																							</template>
+																							<span v-if="!panel.borderless">Hide Custom Panel Border</span>
+																							<span v-if="panel.borderless">Show Custom Panel Border</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
 																				<v-spacer></v-spacer>
 																			</tr>
 																		</tbody>
@@ -122,17 +137,16 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabCamPanels(tab.tabID)" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-														<v-card align="center" justify="center" flat class="tabs-card ma-0 pa-0">
-															<v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<td class="tabs-card">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+														<v-card align="center" justify="center" flat class="tabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
+															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
+																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
 																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
-																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
-																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
 																		<tbody>
-																			<tr align="center" justify="center">
+																			<tr class="pa-0 ma-0">
 																				<v-spacer></v-spacer>
 																				<td>
 																					<div class="drag-handle pa-md-1">
@@ -178,7 +192,7 @@
 																									</v-tooltip>
 																								</div>
 																							</td>
-																							<td v-if="panel.panelType != 'webcam'">
+																							<td>
 																								<div class="pa-md-1">
 																									<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																										<template v-slot:activator="{ on, attrs }">
@@ -963,9 +977,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.9.03',
+			btnCmdVersion: '0.9.04',
 			btnCmd : {
-				btnCmdVersion: '0.9.03',
+				btnCmdVersion: '0.9.04',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1044,7 +1058,7 @@ export default {
 						showAltWebCam : false,
 						tabEnableSnap: false,
 						tabGridSize: [1,1],
-						lastZIndex: 2,
+						lastZIndex: 2
 					},
 					{
 						tabID: 2,
@@ -1288,12 +1302,12 @@ export default {
 		},
 		getTabPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
 			return result;
 		},
-		getTabCamPanels(tabID){
+		getTabPanelsEditable(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
 			return result;
 		},
 		getAllCustomPanels(){
