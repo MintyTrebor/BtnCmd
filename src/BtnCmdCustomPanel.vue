@@ -1,5 +1,5 @@
 <template>
-    <v-card class="tab-item-wrapper">
+    <v-card :flat="passedObject.borderless" class="tab-item-wrapper">
         <v-container fluid class="pa-0 ma-0 tabs-default">
             <!-- <v-row mt-0><v-col><span class="text-caption">v-model = {{ mainData }}</span></v-col></v-row> -->
             <v-row class="pa-0 ma-0 tabs-default">
@@ -25,18 +25,18 @@
                                         <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
                                         <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
                                         <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
+                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
                                     </td>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
-                        <vue-draggable-resizable v-for="(panel) in getTabCamPanels(passedObject.customPanelID)" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
-                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
+                        <vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(passedObject.customPanelID)" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
+                            <v-card align="center" justify="center" flat class="tabs-card ma-0 pa-0">
                                 <v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
                                     <td class="tabs-card">
                                         <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
                                         <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0"></BtnCmdMMPanel>
-                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
+                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0" style="height: 100%; width: 100%"></BtnCmdMMPanel>                                     
                                     </td>
                                 </v-row>
                             </v-card>
@@ -167,12 +167,12 @@
             },
             getTabPanels(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "webcam" && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
+                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
                 return result;
             },
-            getTabCamPanels(tabID){
+            getTabPanelsEditable(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "webcam" || item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
+                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
                 return result;
             },
             chkJobEnabled(item){
