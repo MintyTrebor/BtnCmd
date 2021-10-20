@@ -41,7 +41,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!enableSelects">
+                    <v-row dense v-if="!enableSelects && passedObject.panelType == 'mmValue'">
                         <v-col class="d-flex flex-column">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
@@ -65,7 +65,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="enableSelects">
+                    <v-row dense v-if="enableSelects && passedObject.panelType == 'mmValue'">
                         <v-col class="d-flex flex-column">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
