@@ -120,6 +120,8 @@ export default {
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
 						panelColor: '',
+						panelBGColor: '',
+						panelUseDWCThemeBGColor: true,
 						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
