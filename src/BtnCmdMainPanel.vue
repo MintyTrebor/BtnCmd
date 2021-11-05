@@ -59,21 +59,21 @@
 														<v-card align="center" :flat="panel.borderless" justify="center" class="tabs-card ma-0 pa-0">
 															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card">
-																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0"></job-info-panel>
-																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></layer-chart>
-																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0"></temperature-chart>
-																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0"></job-estimations-panel>
-																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0"></job-data-panel>
-																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0"></job-control-panel>
-																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0"></fans-panel>
-																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0"></extrude-panel>
-																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0"></extrusion-factors-panel>
-																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0"></z-babystep-panel>
-																	<status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0"></status-panel>
-																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0"></tools-panel>
-																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0"></movement-panel>
-																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0"></speed-factor-panel>
-																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0"></webcam-panel>
+																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-info-panel>
+																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></layer-chart>
+																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
+																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
+																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
+																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
+																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
+																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
+																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrusion-factors-panel>
+																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></z-babystep-panel>
+																	<status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></status-panel>
+																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
+																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
+																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
+																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
 																		<tbody>
@@ -141,8 +141,8 @@
 														<v-card align="center" justify="center" flat class="tabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
-																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></altWebCamPanel>
-																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
+																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
+																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
 																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
 																		<tbody>
@@ -849,6 +849,9 @@ export default {
 		}),
 		...mapGetters('machine/model', ['jobProgress']),
 		...mapState('machine/settings', ['codes']),
+		...mapState({
+			darkTheme: state => state.settings.darkTheme
+		}),
 		isPrinting() { return isPrinting(this.status); },
 		isPaused() { return isPaused(this.status); },
 		eventStatusText() { return this.status; },
@@ -977,9 +980,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.9.04',
+			btnCmdVersion: '0.9.06',
 			btnCmd : {
-				btnCmdVersion: '0.9.04',
+				btnCmdVersion: '0.9.06',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1091,6 +1094,8 @@ export default {
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
 						panelColor: '',
+						panelBGColor: '',
+						panelUseDWCThemeBGColor: true,
 						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
@@ -1568,6 +1573,19 @@ export default {
 			this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
+		},
+		getDWCPanelBGColor(panBGColor, panUseDWCThemeBGColor){
+			//Sets the background colour of the std DWC panels
+			//Done this way to allow for future user defined background color functionality
+			if(panUseDWCThemeBGColor){
+				if(this.darkTheme){
+					return "#515151";
+				}else{
+					return "#f5f5f5";
+				}
+			}else{
+				return panBGColor;
+			}
 		}
 	},
 	//automated functions
