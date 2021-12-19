@@ -1,0 +1,17 @@
+{
+    "dwcWebpackChunk": "BtnCmd",
+    "id": "BtnCmd",
+    "name": "BtnCmd",
+    "author": "Minty Trebor",
+    "version": "0.9.07",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/MintyTrebor",
+    "dwcVersion": "auto",
+    "dependencies": {
+      "mqtt": "^4.2.6",
+      "deepmerge": "^1.5.2",
+      "axios": "^0.21.1",
+      "vue-draggable-resizable": "^2.3.0",
+      "jsonpath": "^1.1.1"
+    }
+  }

@@ -1,12 +1,18 @@
 import mqtt from 'mqtt';
 import axios from 'axios';
 import Path from '../../utils/path.js';
+import { mapGetters, mapState} from 'vuex';
+import jsonpath from 'jsonpath';
 
 //needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
 
 export default {
-    methods: {
+    computed: {
+		...mapState('machine', ['model']),
+		...mapGetters(['uiFrozen'])
+	},
+	methods: {
         //mqtt Msg Send Functions
 		sendMQTTMsg(msgStr, topicStr){
 			var mqttOptions;
@@ -54,6 +60,19 @@ export default {
 				});
 
 		},
+		getModelValue(gVarName){
+			const jp = jsonpath;
+			if(gVarName){
+				var matchInModel = jp.query(this.model, (`$.global.${gVarName}`));
+				if(JSON.stringify(matchInModel) != "[]"){
+					return  matchInModel[0];
+				}else{
+					return "###";
+				}
+			}else {
+				return "###";
+			}		
+		},
 		//functions triggered by custom button click
 		onBtnClick(e, btnJSONOb){
 			this.currButtonObj = btnJSONOb;
@@ -63,6 +82,36 @@ export default {
 				this.showBtnConfDialog = true;	
 			}else{
 				this.onBtnConf();
+			}
+		},
+		getCurrGVarVal(gVarName){
+			return this.getModelValue(gVarName);
+		},
+		async setGVarVal(tmpBtnObj, newValue){
+			var tmpParent = this;
+			var tmpCmd = "";
+			if(tmpBtnObj.btnActionData){
+				if(tmpBtnObj.inputType == "text"){
+					if(!newValue) {newValue="";}
+					tmpCmd = `set global.${tmpBtnObj.btnActionData} = "${newValue}"`;
+					tmpParent.setActionResponse("Last Action :  -- Set Text Variable -- " + tmpCmd);
+					tmpParent.code = tmpCmd;
+					tmpParent.send();
+					tmpBtnObj.inputLastVal = newValue;
+					return;
+				} else{
+					if(!newValue){
+						tmpParent.setActionResponse("Last Action :  -- Set Numeric Variable -- ERROR You have entered a invalid Number.");
+						return;
+					}else{
+						tmpCmd = `set global.${tmpBtnObj.btnActionData} = ${Number(newValue)}`;
+					}
+					tmpParent.setActionResponse("Last Action :  -- Set Numeric Variable -- " + tmpCmd);
+					tmpParent.code = tmpCmd;
+					tmpParent.send();
+					tmpBtnObj.inputLastVal = Number(newValue);
+					return;
+				}
 			}
 		},
 		async onBtnConf(){

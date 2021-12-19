@@ -75,13 +75,13 @@
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
-																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode">
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
 																				<v-spacer></v-spacer>
 																				<td>
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
 																									<v-icon>mdi-delete</v-icon>
@@ -93,7 +93,7 @@
 																				</td>
 																				<td>
 																					<div class="drag-handle pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
 																									<v-icon>mdi-drag-variant</v-icon>
@@ -105,7 +105,7 @@
 																				</td>
 																				<td>
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
 																									<v-icon>mdi-arrange-bring-to-front</v-icon>
@@ -117,7 +117,7 @@
 																				</td>
 																				<td v-if="panel.panelType == 'custom'">
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panel.borderless = !panel.borderless">
 																									<v-icon v-if="!panel.borderless">mdi-border-none-variant</v-icon>
@@ -238,66 +238,161 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
+													<!--Draw buttons Last-->
 													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="getZidx(btn.btnZIndex)" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
-														<v-card style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize">
+														<v-card align="center" justify="center" style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
 															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<!--tooltip buttons-->
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																			</v-btn>
-																		</template>
-																		<span >{{ btn.btnHoverText }}</span>
-																	</v-tooltip>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																				<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																				<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																			</v-btn>
-																		</template>
-																		<span >{{ btn.btnHoverText }}</span>
-																	</v-tooltip>
-																</div>
-																<!--Non tooltip buttons-->
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																	<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																		<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																		<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																	</v-btn>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
-																	<v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-																		<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-																		<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-																	</v-btn>
-																</div>
-																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
-																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																			</v-btn>
-																		</template>
-																		<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
-																	</v-tooltip>
-																</div>
-																<!--Other Buttons-->
-																<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
-																	<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																		<template v-slot:activator="{ on, attrs }">
-																			<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
-																				<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
-																			</v-btn>
-																		</template>
-																		<span>Click & Hold to drag - Right Click Edit Menu</span>
-																	</v-tooltip>
-																</div>
+																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
+																	<!--tooltip buttons-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																			<template v-slot:activator="{ on, attrs }">
+																				<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																				</v-btn>
+																			</template>
+																			<span >{{ btn.btnHoverText }}</span>
+																		</v-tooltip>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'">
+																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																			<template v-slot:activator="{ on, attrs }">
+																				<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																					<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																					<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																				</v-btn>
+																			</template>
+																			<span >{{ btn.btnHoverText }}</span>
+																		</v-tooltip>
+																	</div>
+																	<!--Non tooltip buttons-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																		</v-btn>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'">
+																		<v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+																		</v-btn>
+																	</div>
+																	<!--Edit Mode Button-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize && btn.btnType != 'vInput'" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																			<template v-slot:activator="{ on, attrs }">
+																				<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
+																					<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																				</v-btn>
+																			</template>
+																			<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
+																		</v-tooltip>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize && btn.btnType != 'vInput'" class="drag-handle">
+																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																			<template v-slot:activator="{ on, attrs }">
+																				<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																					<v-icon>mdi-cog</v-icon>{{ btn.btnLabel }}
+																				</v-btn>
+																			</template>
+																			<span>Click & Hold to drag - Right Click Edit Menu</span>
+																		</v-tooltip>
+																	</div>
+																	<!--Input Buttons (yes I know they are not technically buttons, I'm just re-using existing code in a different way) -->
+																	<!--tooltip input buttons-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																				<template v-slot:activator="{ on, attrs }">
+																					<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
+																					</v-text-field>
+																				</template>
+																				<span >{{ btn.btnHoverText }}</span>
+																			</v-tooltip>
+																		</v-card>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																				<template v-slot:activator="{ on, attrs }">
+																					<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
+																					</v-text-field>
+																				</template>
+																				<span >{{ btn.btnHoverText }}</span>
+																			</v-tooltip>
+																		</v-card>
+																	</div>
+																	<!--tooltip input buttons no hover-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
+																			</v-text-field>
+																		</v-card>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
+																			</v-text-field>
+																		</v-card>
+																	</div>
+																	<!--Edit Mode input Button-->
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize && btn.btnType == 'vInput'" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																				<template v-slot:activator="{ on, attrs }">
+																					<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" class="drag-button" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" value="##VarVal##" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																					</v-text-field>
+																				</template>
+																				<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
+																			</v-tooltip>
+																		</v-card>
+																	</div>
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize && btn.btnType == 'vInput'" class="drag-handle">
+																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
+																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																				<template v-slot:activator="{ on, attrs }">
+																					<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" class="drag-button" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" value="##VarVal##"  block  v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
+																					</v-text-field>
+																				</template>
+																				<span>Click & Hold to drag - Right Click Edit Menu</span>
+																			</v-tooltip>
+																		</v-card>
+																	</div>
+																	<v-overlay v-if="btn.btnType == 'vInput'" :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
+																		<tbody>
+																			<tr class="pa-0 ma-0">
+																				<v-spacer></v-spacer>
+																				<td>
+																					<div class="drag-handle pa-md-1">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1">
+																									<v-icon>mdi-drag-variant</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Click to enable resize - Click & Hold to drag</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<td>
+																					<div>
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
+																							<template v-slot:activator="{ on, attrs }">
+																								<v-btn x-small style="cursor: pointer" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="doMenu($event, btn)">
+																									<v-icon>mdi-menu</v-icon>
+																								</v-btn>
+																							</template>
+																							<span>Click To Open Edit Menu</span>
+																						</v-tooltip>
+																					</div>
+																				</td>
+																				<v-spacer></v-spacer>
+																			</tr>
+																		</tbody>
+																	</v-overlay>
+																</td>
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
@@ -406,7 +501,7 @@
 			</v-col>
 		</v-row>
 		<!-- Normal Footer with action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
+		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
 			<v-row class="pa-0 ma-0">	
 				<div>
 					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
@@ -415,7 +510,7 @@
 				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
 								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
 								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
 							</v-btn>
@@ -426,7 +521,7 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
 								<v-icon class="mr-1" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
@@ -436,13 +531,13 @@
 			</v-row>
 		</v-footer>
 		<!-- Normal Footer No action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px; background-color: #FFFFFF00`">
+		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; background-color: #FFFFFF00`">
 			<v-row class="pa-0 ma-0">	
 				<v-spacer></v-spacer>
 				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
 								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
 								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
 							</v-btn>
@@ -453,7 +548,7 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small color="#FFFFFF00" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" color="#FFFFFF00" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
 								<v-icon class="mr-1" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
@@ -463,12 +558,12 @@
 			</v-row>
 		</v-footer>
 		<!--Settings Footer -->
-		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`">
+		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showInfo = !showInfo">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showInfo = !showInfo">
 								<v-icon>mdi-information</v-icon>
 							</v-btn>
 						</template>
@@ -478,7 +573,7 @@
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showGSEdit = !showGSEdit">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showGSEdit = !showGSEdit">
 								<v-icon>mdi-puzzle-edit</v-icon>
 							</v-btn>
 						</template>
@@ -488,7 +583,7 @@
 				<div class="mx-2" v-if="btnCmd.globalSettings.enableEvents && !mobileActive">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small  v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
+							<v-btn :small="!mobileActive" :x-small="mobileActive"  v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
 								<v-icon>mdi-monitor-eye</v-icon>
 							</v-btn>
 						</template>
@@ -498,7 +593,7 @@
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
 								<v-icon>mdi-backup-restore</v-icon>
 							</v-btn>
 						</template>
@@ -508,7 +603,7 @@
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
 								<v-icon>mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
@@ -518,7 +613,7 @@
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
 								<v-icon>mdi-autorenew</v-icon>
 							</v-btn>
 						</template>
@@ -528,7 +623,7 @@
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
 								<v-icon v-if="!backupMode">mdi-database-arrow-right</v-icon>
 								<v-icon v-if="backupMode">mdi-database-arrow-left</v-icon>
 							</v-btn>
@@ -544,8 +639,8 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small color="red" v-bind="attrs" v-on="on" :elevation="1" @click="createModeToggle()">
-								<v-icon class="mr-1" >mdi-wrench</v-icon>
+							<v-btn :small="!mobileActive" :x-small="mobileActive" color="red" v-bind="attrs" v-on="on" :elevation="1" @click="createModeToggle()">
+								<v-icon :small="mobileActive" :dense="mobileActive" >mdi-wrench</v-icon>
 							</v-btn>
 						</template>
 						<span>Create & Edit Custom Panels</span>
@@ -554,7 +649,7 @@
 				<div class="mx-2" v-if="!backupMode && !createMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small color="green" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" color="green" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
 								<v-icon class="mr-1">mdi-square-edit-outline</v-icon>
 							</v-btn>
 						</template>
@@ -564,7 +659,7 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
 								<v-icon class="mr-1" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
@@ -573,14 +668,14 @@
 				</div>
 			</v-row>
 		</v-footer>
-		<!-- Edit Mode Footer Mobile -->
-		<v-footer v-if="editMode && mobileActive" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`" class="pa-0 ma-0">
+		<!-- Edit Mode Footer -->
+		<v-footer v-if="editMode" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn x-small fab v-bind="attrs" v-on="on" @click="onTabEditBtnClick(currTabObj.tabID)">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="onTabEditBtnClick(currTabObj.tabID)">
 								<v-icon color="indigo">mdi-tab</v-icon>
 							</v-btn>
 						</template>
@@ -591,7 +686,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn x-small fab v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(currTabObj.tabID)">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(currTabObj.tabID)">
 								<v-icon color="indigo">mdi-table-multiple</v-icon>
 							</v-btn>
 						</template>
@@ -602,7 +697,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
 								<v-icon color="indigo">mdi-tab-plus</v-icon>
 							</v-btn>
 						</template>
@@ -613,7 +708,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabObj)">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabObj)">
 								<v-icon color="red">mdi-tab-remove</v-icon>
 							</v-btn>
 						</template>
@@ -624,7 +719,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onAddPanelClick(currTabObj)">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="onAddPanelClick(currTabObj)">
 								<v-icon color="blue">mdi-credit-card-plus</v-icon>
 							</v-btn>
 						</template>
@@ -634,17 +729,17 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="onAddBtnClick(currTabObj)">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="onAddBtnClick(currTabObj)">
 								<v-icon color="blue">mdi-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add Button</span>
+						<span>Add Button / Variable Input</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveSettings()">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveSettings()">
 								<v-icon color="green">mdi-content-save-all</v-icon>
 							</v-btn>
 						</template>
@@ -654,7 +749,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
@@ -664,108 +759,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  x-small fab v-bind="attrs" v-on="on" @click="undoEditChanges()">
-								<v-icon color="red">mdi-progress-close</v-icon>
-							</v-btn>
-						</template>
-						<span>Exit & Undo All Changes Since Last Save</span>
-					</v-tooltip>
-				</div>
-				<v-spacer></v-spacer>
-			</v-row>
-		</v-footer>	
-		<!-- Edit Mode Footer -->
-		<v-footer v-if="editMode && !mobileActive" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: 12px;`" class="pa-0 ma-0">
-			<v-row class="pa-0 ma-0">
-				<v-spacer></v-spacer>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="onTabEditBtnClick(currTabObj.tabID)">
-								<v-icon dense color="indigo">mdi-tab</v-icon>
-							</v-btn>
-						</template>
-						<span v-if="!createMode">Edit current tab properties</span>
-						<span v-else>Edit current custom panel properties</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="onCloneTabBtnClick(currTabObj.tabID)">
-								<v-icon color="indigo">mdi-table-multiple</v-icon>
-							</v-btn>
-						</template>
-						<span v-if="!createMode">Clone Current Tab</span>
-						<span v-else>Clone Current Custom Panel</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="onTabAddBtnClick()">
-								<v-icon color="indigo">mdi-tab-plus</v-icon>
-							</v-btn>
-						</template>
-						<span v-if="!createMode">Add Tab</span>
-						<span v-else>Add Custom Panel</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small :disabled="isLastTab()" v-bind="attrs" v-on="on" @click="onTabDelBtnClick(currTabObj)">
-								<v-icon color="red">mdi-tab-remove</v-icon>
-							</v-btn>
-						</template>
-						<span v-if="!createMode">Delete current Tab</span>
-						<span v-else>Delete current Custom Panel</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="onAddPanelClick(currTabObj)">
-								<v-icon color="blue">mdi-credit-card-plus</v-icon>
-							</v-btn>
-						</template>
-						<span>Add Panel</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="onAddBtnClick(currTabObj)">
-								<v-icon color="blue">mdi-card-plus</v-icon>
-							</v-btn>
-						</template>
-						<span>Add Button</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveSettings()">
-								<v-icon color="green">mdi-content-save-all</v-icon>
-							</v-btn>
-						</template>
-						<span>Save Changes</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
-								<v-icon color="green">mdi-content-save-move</v-icon>
-							</v-btn>
-						</template>
-						<span>Save Changes & Exit</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn small v-bind="attrs" v-on="on" @click="undoEditChanges()">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" @click="undoEditChanges()">
 								<v-icon color="red">mdi-progress-close</v-icon>
 							</v-btn>
 						</template>
@@ -870,6 +864,9 @@ export default {
 				iNormHeightModifier = 110;
 			}
 
+			// if(parseInt(this.window.width) <= 720){
+			// 	currHeight = 629;
+			// }
 
 			if(tmpPlgH < 0){
 				//Negative Modifier
@@ -882,10 +879,10 @@ export default {
 			if(parseInt(this.window.width) <= 720){
 				//Mobile Height modifiers
 				if(!this.dialogDisplayed()){
-					tmpHeight = tmpUsrHeightMod + 601;
-					if(tmpHeight > (currHeight - 110)) {
-						tmpHeight = currHeight - 110;
-					}
+					tmpHeight = tmpUsrHeightMod + currHeight - 147; //629;
+					// if(tmpHeight > (currHeight - 186)) {
+					// 	tmpHeight = currHeight - 110;
+					// }
 				}else{
 					return;
 				}
@@ -980,14 +977,15 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.9.06',
+			btnCmdVersion: '0.10.01',
 			btnCmd : {
-				btnCmdVersion: '0.9.06',
+				btnCmdVersion: '0.10.01',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
 					lastEventID: 1,
-					lastPanelID: 1
+					lastPanelID: 1,
+					lastInputID: 1
 				},
 				globalSettings: {
 					enableActionMsg: true,
@@ -1030,7 +1028,7 @@ export default {
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
-						btnColour: '#FF0000FF',
+						btnColour: '#00DBFFFF',
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
@@ -1043,10 +1041,15 @@ export default {
 						btnHttpData: null,
 						btnHttpContType: 'text',
 						btnZIndex: 1,
-						btnWinHSize: 200,
+						btnWinHSize: 100,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?'
+						btnConfText: 'Are You Sure?',
+						inputClass: 'variable',
+						inputType: 'text',
+						inputPostfixText: '',
+						inputEnableClear: true,
+						inputLastVal: '',
 					}
 				],
 				tabs: [
@@ -1124,6 +1127,8 @@ export default {
 		if(this.$vuetify.breakpoint.mdAndDown){
 			var tmpg = window.document.getElementsByClassName("v-navigation-drawer")[0];
 			tmpg.style = "z-index: 99999999999";
+			tmpg = window.document.getElementsByClassName("v-bottom-navigation")[0];
+			tmpg.style = "z-index: 99999999999";
 		}
 	},
     destroyed() {
@@ -1163,6 +1168,13 @@ export default {
 				return null;
 			}else {
 				return idxVal;
+			}
+		},
+		getBottomPixels() {
+			if(this.mobileActive) {
+				return 0;
+			} else{
+				return 12;
 			}
 		},
 		//PopUpMenu Functions
@@ -1499,7 +1511,7 @@ export default {
 				tmpNewBtn[0].btnColour = 'green';
 				await this.sleep(150);
 			}
-			tmpNewBtn[0].btnColour = '#0077FFFF';
+			tmpNewBtn[0].btnColour = '#00DBFFFF';
 		},
 		btnClone(srcBtn){
 			this.setActionResponse('');

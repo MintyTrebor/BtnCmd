@@ -23,11 +23,11 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-if="passedObject.panelType == 'mmValue'" required v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
+                                    <v-text-field v-if="passedObject.panelType == 'mmValue'"  v-bind="attrs" v-on="on" label="Model Value Prefix" v-model="passedObject.panelMMPrefix"></v-text-field>
                                     <v-text-field v-if="passedObject.panelType == 'txtLabel'" required v-bind="attrs" v-on="on" label="Enter Text" v-model="passedObject.panelMMPrefix"></v-text-field>
                                 </template>
-                                <span v-if="passedObject.panelType == 'mmValue'" >Text to display prefixing the model value</span>
-                                <span v-if="passedObject.panelType == 'txtLabel'" >Text to display</span>
+                                <span v-if="passedObject.panelType == 'mmValue'" >Text to display prefixing the model value (optional)</span>
+                                <span v-if="passedObject.panelType == 'txtLabel'" >Text to display. (Enter a space for a blank panel)</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -198,7 +198,7 @@
             },
             async validateData() {
                 if(this.passedObject.panelType == 'mmValue'){
-                    if(this.passedObject.panelMMPrefix && this.tmpModelPath) {
+                    if(this.tmpModelPath) {
                         //req fields met so exit
                         this.passedObject.panelMMPath = this.tmpModelPath;
                         this.$emit('exit', true);

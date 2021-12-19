@@ -56,7 +56,7 @@ export default {
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
-						btnColour: '#FF0000FF',
+						btnColour: '#00DBFFFF',
 						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
@@ -72,7 +72,12 @@ export default {
 						btnWinHSize: 200,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?'
+						btnConfText: 'Are You Sure?',
+						inputClass: 'variable',
+						inputType: 'text',
+						inputPostfixText: '',
+						inputEnableClear: true,
+						inputLastVal: '',
 					}
 				],
 				tabs: [
