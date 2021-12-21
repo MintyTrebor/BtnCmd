@@ -33,7 +33,7 @@
 	.drag-button:hover {cursor: move !important}
 </style>
 <template>
-    <div :height="tabCardHeight" class="div-main-wrapper pa-0 ma-0">
+    <div :height="tabCardHeight()" id="BtnCmdMainDiv" class="div-main-wrapper pa-0 ma-0">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
 				<!--<v-row mt-0>
@@ -49,7 +49,7 @@
 						</v-tab>
 						<v-tabs-items v-model="getCurrTabIndex">
 							<v-tab-item v-for="(tab) in getTabs" :key="tab.tabID" :value="`tab-${tab.tabID}`">
-								<v-card class="tab-item-wrapper" :height="tabCardHeight" :key="'maincard' + tabCardHeight + window.width" >
+								<v-card class="tab-item-wrapper" id="BtnCmdMainTabCard" :height="tabCardHeight()" :key="'maincard' + tab.tabID" >
 									<v-container fluid class="pa-0 ma-0 tabs-default">
 										<v-row class="pa-0 ma-0 tabs-default">
 											<v-col cols="12">
@@ -74,7 +74,7 @@
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR"></BtnCmdCustomPanel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -137,13 +137,14 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :active="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
 														<v-card align="center" justify="center" flat class="tabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
 																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
 																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
+																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
 																		<tbody>
 																			<tr class="pa-0 ma-0">
@@ -244,7 +245,7 @@
 															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
 																	<!--tooltip buttons-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
 																				<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
@@ -255,7 +256,7 @@
 																			<span >{{ btn.btnHoverText }}</span>
 																		</v-tooltip>
 																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
 																				<v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
@@ -267,20 +268,20 @@
 																		</v-tooltip>
 																	</div>
 																	<!--Non tooltip buttons-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
 																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0">
 																		<v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
 																			<span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
 																			<span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
 																		</v-btn>
 																	</div>
 																	<!--Edit Mode Button-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize && btn.btnType != 'vInput'" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
 																				<v-btn block v-bind="attrs" class="drag-button" style="height: 100%; width: 100%" v-on="on" :color="btn.btnColour" :elevation="1"  @contextmenu="doMenu($event, btn)">
@@ -290,7 +291,7 @@
 																			<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
 																		</v-tooltip>
 																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize && btn.btnType != 'vInput'" class="drag-handle">
+																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize" class="drag-handle">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
 																			<template v-slot:activator="{ on, attrs }">
 																				<v-btn v-bind="attrs" class="drag-button" v-on="on" :color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
@@ -300,98 +301,6 @@
 																			<span>Click & Hold to drag - Right Click Edit Menu</span>
 																		</v-tooltip>
 																	</div>
-																	<!--Input Buttons (yes I know they are not technically buttons, I'm just re-using existing code in a different way) -->
-																	<!--tooltip input buttons-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																				<template v-slot:activator="{ on, attrs }">
-																					<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-																					</v-text-field>
-																				</template>
-																				<span >{{ btn.btnHoverText }}</span>
-																			</v-tooltip>
-																		</v-card>
-																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																				<template v-slot:activator="{ on, attrs }">
-																					<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-																					</v-text-field>
-																				</template>
-																				<span >{{ btn.btnHoverText }}</span>
-																			</v-tooltip>
-																		</v-card>
-																	</div>
-																	<!--tooltip input buttons no hover-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-																			</v-text-field>
-																		</v-card>
-																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-																			</v-text-field>
-																		</v-card>
-																	</div>
-																	<!--Edit Mode input Button-->
-																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && !btn.autoSize && btn.btnType == 'vInput'" class="drag-handle ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																				<template v-slot:activator="{ on, attrs }">
-																					<v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" class="drag-button" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" value="##VarVal##" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
-																					</v-text-field>
-																				</template>
-																				<span>Click to enable resize - Click & Hold to drag - Right Click Edit Menu</span>
-																			</v-tooltip>
-																		</v-card>
-																	</div>
-																	<div v-if="btn.btnGroupIdx==tab.tabID && editMode && btn.autoSize && btn.btnType == 'vInput'" class="drag-handle">
-																		<v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :color="btn.btnColour">
-																			<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																				<template v-slot:activator="{ on, attrs }">
-																					<v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" class="drag-button" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" value="##VarVal##"  block  v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" @contextmenu="doMenu($event, btn)">
-																					</v-text-field>
-																				</template>
-																				<span>Click & Hold to drag - Right Click Edit Menu</span>
-																			</v-tooltip>
-																		</v-card>
-																	</div>
-																	<v-overlay v-if="btn.btnType == 'vInput'" :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
-																		<tbody>
-																			<tr class="pa-0 ma-0">
-																				<v-spacer></v-spacer>
-																				<td>
-																					<div class="drag-handle pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																							<template v-slot:activator="{ on, attrs }">
-																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1">
-																									<v-icon>mdi-drag-variant</v-icon>
-																								</v-btn>
-																							</template>
-																							<span>Click to enable resize - Click & Hold to drag</span>
-																						</v-tooltip>
-																					</div>
-																				</td>
-																				<td>
-																					<div>
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-																							<template v-slot:activator="{ on, attrs }">
-																								<v-btn x-small style="cursor: pointer" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="doMenu($event, btn)">
-																									<v-icon>mdi-menu</v-icon>
-																								</v-btn>
-																							</template>
-																							<span>Click To Open Edit Menu</span>
-																						</v-tooltip>
-																					</div>
-																				</td>
-																				<v-spacer></v-spacer>
-																			</tr>
-																		</tbody>
-																	</v-overlay>
 																</td>
 															</v-row>
 														</v-card>
@@ -475,7 +384,7 @@
 						</v-card>
 					</v-menu>
 					<v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo" style="position: absolute; z-index:99999; bottom: 36px; left: 10px;">
-						<strong>BtnCmd Alpha v{{ btnCmdVersion }}</strong><br>
+						<strong>BtnCmd Beta v{{ btnCmdVersion }}</strong><br>
 						Cobbled together by <a href="https://github.com/MintyTrebor" target="_blank">Minty Trebor</a><br>
 						BtnCmd uses the following libraries/modules:<br>
 						<a href="https://www.npmjs.com/package/deepmerge" target="_blank">DeepMerge</a><span>, </span>
@@ -493,6 +402,7 @@
 				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
+				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
@@ -501,7 +411,7 @@
 			</v-col>
 		</v-row>
 		<!-- Normal Footer with action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
+		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
 			<v-row class="pa-0 ma-0">	
 				<div>
 					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
@@ -531,7 +441,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Normal Footer No action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; background-color: #FFFFFF00`">
+		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; background-color: #FFFFFF00`">
 			<v-row class="pa-0 ma-0">	
 				<v-spacer></v-spacer>
 				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
@@ -558,7 +468,7 @@
 			</v-row>
 		</v-footer>
 		<!--Settings Footer -->
-		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" absolute width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
+		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
@@ -669,7 +579,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Edit Mode Footer -->
-		<v-footer v-if="editMode" height="37" absolute width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0">
+		<v-footer v-if="editMode" height="37" fixed width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-1">
@@ -819,6 +729,8 @@ import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
 import BtnCmdEventFunctions from './BtnCmdEventFunctions.js';
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
 import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
+import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
+import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 
 export default {
     components: {
@@ -833,7 +745,9 @@ export default {
 		BtnCmdMMPanel,
 		BtnCmdAWCPanelDialogue,
 		BtnCmdMMPanelDialogue,
-		BtnCmdCustomPanel
+		BtnCmdCustomPanel,
+		BtnCmdVInputDialogue,
+		BtnCmdVInputPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -849,54 +763,8 @@ export default {
 		isPrinting() { return isPrinting(this.status); },
 		isPaused() { return isPaused(this.status); },
 		eventStatusText() { return this.status; },
-		tabCardHeight () {
-			//First set the height modifers
-			var tmpUsrHeightMod = 0;
-			var tmpHeight = 0;
-			var currHeight = parseInt(this.window.height);
-			var tmpPlgH = parseInt(this.btnCmd.globalSettings.pluginMinimumHeight);
-			var globalCont = window.document.getElementById("global-container");
-			
-			//var iNormHeightModifier = 420;
-			var iNormHeightModifier = 110 + globalCont.offsetHeight;
-
-			if(this.currHideTopPanel){
-				iNormHeightModifier = 110;
-			}
-
-			// if(parseInt(this.window.width) <= 720){
-			// 	currHeight = 629;
-			// }
-
-			if(tmpPlgH < 0){
-				//Negative Modifier
-				tmpUsrHeightMod = -Math.abs(Math.floor((currHeight / 100)*tmpPlgH));
-			}else if(tmpPlgH > 0){
-				//Positve Modifier
-				tmpUsrHeightMod = Math.floor((currHeight/ 100)*tmpPlgH);
-			}	
-
-			if(parseInt(this.window.width) <= 720){
-				//Mobile Height modifiers
-				if(!this.dialogDisplayed()){
-					tmpHeight = tmpUsrHeightMod + currHeight - 147; //629;
-					// if(tmpHeight > (currHeight - 186)) {
-					// 	tmpHeight = currHeight - 110;
-					// }
-				}else{
-					return;
-				}
-			}else {
-				//Normal Heigh modifiers
-				tmpHeight = (tmpUsrHeightMod + currHeight - iNormHeightModifier);
-				if(tmpHeight > (currHeight - 110)) {
-					tmpHeight = currHeight - 110;
-				}
-			}
-			return tmpHeight;
-		},
 		mobileActive() {
-			if(this.$vuetify.breakpoint.smAndDown){
+			if(this.$vuetify.breakpoint.mobile){
 				return true;
 			}else {
 				return false;
@@ -939,6 +807,7 @@ export default {
 			showBtnConfDialog: false,
 			showAWCPanelEdit: false,
 			showMMPanelEdit: false,
+			showVInputPanelEdit: false,
 			objectToPass: null,
 			tabObjectToPass: null,
 			panelObjectToPass: null,
@@ -977,9 +846,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.10.01',
+			btnCmdVersion: '0.10.02',
 			btnCmd : {
-				btnCmdVersion: '0.10.01',
+				btnCmdVersion: '0.10.02',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1044,12 +913,7 @@ export default {
 						btnWinHSize: 100,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?',
-						inputClass: 'variable',
-						inputType: 'text',
-						inputPostfixText: '',
-						inputEnableClear: true,
-						inputLastVal: '',
+						btnConfText: 'Are You Sure?'
 					}
 				],
 				tabs: [
@@ -1099,6 +963,7 @@ export default {
 						panelColor: '',
 						panelBGColor: '',
 						panelUseDWCThemeBGColor: true,
+						panelHoverText: 'This is hover text',
 						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
@@ -1112,29 +977,44 @@ export default {
 						},
 						MMParams: {
 
-						}
+						},
+						inputClass: 'variable',
+						inputType: 'text',
+						inputPrefixText: '',
+						inputSuffixText: '',
+						inputEnableClear: false,
+						inputLastVal: '',
+						inputVarName: ''
 					}
 				]
 			}
 		}
 	},
 	created() {
-		window.addEventListener('resize', this.handleResize);
-        this.handleResize();
-		//dirty hack to stop the navigation bar rendering behind some BtnCmd user created objects when it auto hides based on screen size - mitigates issues with zIndex
-		// tmpg = window.document.getElementsByClassName("v-app-bar")[0];
-		// tmpg.style = "z-index: 99999999999";
-		if(this.$vuetify.breakpoint.mdAndDown){
-			var tmpg = window.document.getElementsByClassName("v-navigation-drawer")[0];
-			tmpg.style = "z-index: 99999999999";
-			tmpg = window.document.getElementsByClassName("v-bottom-navigation")[0];
-			tmpg.style = "z-index: 99999999999";
-		}
+		//dirty hack to stop the core dwc elements rendering behind some BtnCmd user created objects - mitigates issues with zIndex
+		if(this.mobileActive){
+			var tmpg = null;
+			var i = 0		
+			tmpg = window.document.getElementsByClassName("v-bottom-navigation");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style = "z-index: 99991;";
+				}
+			}
+			tmpg = window.document.getElementsByClassName("v-navigation-drawer");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style = "z-index: 99992;";
+				}
+			}
+			tmpg = window.document.getElementsByClassName("iziToast-wrapper");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style = "z-index: 99993;";
+				}
+			}
+		}	
 	},
-    destroyed() {
-        alert("Destroyed");
-		window.removeEventListener('resize', this.handleResize);
-    },
     methods: {
 		...mapActions('machine', ['sendCode']),
 		...mapActions('machine', {machineDownload: 'download'}),
@@ -1146,16 +1026,21 @@ export default {
 		updateAR(ActionText){
 			this.actionResponse=ActionText;
 		},
-		handleResize() {
-            this.window.width = window.innerWidth;
-            this.window.height = window.innerHeight;
-        },
+		tabCardHeight () {
+			if(!this.mobileActive){
+				return window.innerHeight - 70;
+			}else{
+				return window.innerHeight ;
+			}
+		},
 		toggleTopPanelBtn(){
 			this.currHideTopPanel = !this.currHideTopPanel;
 			this.toggleTopPanel(this.currHideTopPanel);
 		},
 		toggleTopPanel(bHideGCPanel){
 			if(bHideGCPanel){
+				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
+				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70 + window.document.getElementById("global-container").offsetHeight;
 				window.document.getElementById("global-container").hidden = true;
 				this.currHideTopPanel = true;
 			}else {
@@ -1172,9 +1057,14 @@ export default {
 		},
 		getBottomPixels() {
 			if(this.mobileActive) {
+				var tmpElement = window.document.getElementsByClassName("v-bottom-navigation")[0];
+				if(typeof tmpElement != 'undefined' || tmpElement !== null){
+					return tmpElement.offsetHeight;
+				}else{
+					return 0;
+				}
+			}else{
 				return 0;
-			} else{
-				return 12;
 			}
 		},
 		//PopUpMenu Functions
@@ -1205,6 +1095,9 @@ export default {
 			}
 			if(this.panelObjectToPass[0].panelType == "mmValue" || this.panelObjectToPass[0].panelType == "txtLabel"){
 				this.showMMPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "vInput"){
+				this.showVInputPanelEdit = true;
 			}			
 		},
 		//dragging functions
@@ -1319,12 +1212,12 @@ export default {
 		},
 		getTabPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput");
 			return result;
 		},
 		getTabPanelsEditable(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput"));
 			return result;
 		},
 		getAllCustomPanels(){
@@ -1484,6 +1377,9 @@ export default {
 			if(this.panelObjectToPass[0].panelType == "remSrc"){
 				this.showPanelEdit = true;
 			}
+			if(this.panelObjectToPass[0].panelType == "vInput"){
+				this.showVInputPanelEdit = true;
+			}
 		},
 		onAddBtnClick(tmpTab){					
 			this.setActionResponse('');
@@ -1608,7 +1504,7 @@ export default {
 		this.setupPage();
 		this.isSimulating = (this.status === StatusType.simulating);
 		//Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
-		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.smAndDown){
+		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
 			this.toggleTopPanel(true);
 		}
 	},
@@ -1627,9 +1523,40 @@ export default {
 			if(from.path === "/BtnCmd" && !this.mobileActive){
 				this.toggleTopPanel(false);
 			}
+			if(from.path === "/BtnCmd" && this.mobileActive){
+				var tmpg = null;
+				var i = 0		
+				tmpg = window.document.getElementsByClassName("v-bottom-navigation");
+				if(typeof tmpg != 'undefined' || tmpg !== null){
+					for (i = 0; i < tmpg.length; i++) {
+						tmpg.item(i).style = "z-index: 99991;";
+					}
+				}
+				tmpg = window.document.getElementsByClassName("v-navigation-drawer");
+				if(typeof tmpg != 'undefined'  || tmpg !== null){
+					for (i = 0; i < tmpg.length; i++) {
+						tmpg.item(i).style = "z-index: 99992;";
+					}
+				}
+				tmpg = window.document.getElementsByClassName("iziToast-wrapper");
+				if(typeof tmpg != 'undefined'  || tmpg !== null){
+					for (i = 0; i < tmpg.length; i++) {
+						tmpg.item(i).style = "z-index: 99993;";
+					}
+				}
+			}
 		},
 		mobileActive (val) {
-			if(val){this.toggleTopPanel(false);}
+			if(val){
+				//console.log("triggering mobile");
+				this.toggleTopPanel(false);
+				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
+				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
+			}else{
+				//console.log("triggering desktop")
+				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
+				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
+			}
 		}	
 	}
 }

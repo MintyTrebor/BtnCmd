@@ -25,6 +25,7 @@ export default {
 					MQTTServer: '',
 					MQTTPort: 1883,
 					MQTTClientID: 'BtnCmd',
+					enableSelects: true,
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0,
 					enableGC_SH_Btn: false,
@@ -72,12 +73,7 @@ export default {
 						btnWinHSize: 200,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?',
-						inputClass: 'variable',
-						inputType: 'text',
-						inputPostfixText: '',
-						inputEnableClear: true,
-						inputLastVal: '',
+						btnConfText: 'Are You Sure?'
 					}
 				],
 				tabs: [
@@ -127,6 +123,7 @@ export default {
 						panelColor: '',
 						panelBGColor: '',
 						panelUseDWCThemeBGColor: true,
+						panelHoverText: 'This is hover text',
 						borderless: false,
 						customPanelID: null,
 						altWebCamParams: {
@@ -140,7 +137,14 @@ export default {
 						},
 						MMParams: {
 
-						}
+						},
+						inputClass: 'variable',
+						inputType: 'text',
+						inputPrefixText: '',
+						inputSuffixText: '',
+						inputEnableClear: false,
+						inputLastVal: '',
+						inputVarName: ''
 					}
 				]
 			};

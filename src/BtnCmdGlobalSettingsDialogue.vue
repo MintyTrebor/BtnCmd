@@ -70,7 +70,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <!-- <v-row>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-col cols="12" v-bind="attrs" v-on="on">
@@ -79,7 +79,7 @@
                             </template>
                             <span>Modify the available vertical layout size</span>
                         </v-tooltip>
-                    </v-row>
+                    </v-row> -->
                     <v-row dense>
                         <v-col cols="12">
                             <v-tooltip bottom>

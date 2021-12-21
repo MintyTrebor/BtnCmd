@@ -38,12 +38,7 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
-                            <v-text-field :label="prefixLabel()" v-model="passedObject.btnLabel"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='vInput'">
-                        <v-col cols="12">
-                            <v-text-field label="Suffix Text" v-model="passedObject.inputPostfixText"></v-text-field>
+                            <v-text-field label="Label" v-model="passedObject.btnLabel"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense>
@@ -51,7 +46,7 @@
                             <v-text-field label="Hover Text" v-model="passedObject.btnHoverText"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType != 'vInput'">
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="11">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -131,24 +126,11 @@
                             <v-text-field class="custom-label-color" label="MQTT Topic*" v-model="passedObject.btnTopicData" required></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType == 'vInput'">
-                        <v-col cols="12">
-                            <v-radio-group v-model="passedObject.inputType" row required>
-                                <v-subheader>Variable Type:</v-subheader>
-                                <v-radio v-for="type in radioVarTypeItems" :key="'BtnT'+type.value" label="Variable Type*" :value="type.value"></v-radio>
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType == 'vInput'">
-                        <v-col cols="12">
-                            <v-select :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="passedObject.inputType"></v-select>
-                        </v-col>
-                    </v-row>
                     <v-row class="mx-2 my-n4" dense>
                         <v-col>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Allow In Job" v-model="passedObject.btnEnableWhileJob"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enabled In Job" v-model="passedObject.btnEnableWhileJob"></v-switch></span>
                                 </template>
                                 <span>Allow button to operate while a Job is active.</span>
                             </v-tooltip>
@@ -156,17 +138,9 @@
                         <v-col>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Confirmation" v-model="passedObject.btnReqConf"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Require Confirmation" v-model="passedObject.btnReqConf"></v-switch></span>
                                 </template>
                                 <span>Prompt User for confirmation before button action is undertaken</span>
-                            </v-tooltip>
-                        </v-col>
-                        <v-col v-if="passedObject.btnType == 'vInput'">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Clear Button" v-model="passedObject.inputEnableClear"></v-switch></span>
-                                </template>
-                                <span>Enables a clear button next to input</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -213,8 +187,7 @@
                     {text: 'http', value: 'http', disabled: false},
                     {text: 'gcode', value: 'gcode', disabled: false},
                     {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT},
-                    {text: 'Window', value: 'window', disabled: false},
-                    {text: 'Variable Input', value: 'vInput', disabled: false}
+                    {text: 'Window', value: 'window', disabled: false}
                 ]
             },
             radioItems() {
@@ -230,12 +203,6 @@
                 return [
                     {text: 'Text', value: 'text', disabled: false},
                     {text: 'JSON', value: 'json', disabled: false}
-                ]
-            },
-            radioVarTypeItems() {
-                return [
-                    {text: 'String', value: 'text', disabled: false},
-                    {text: 'Number', value: 'number', disabled: false}
                 ]
             }
         },
@@ -254,23 +221,13 @@
                 if (this.passedObject.btnType == "MQTT") {return "MQTT MSG*";}
                 if (this.passedObject.btnType == "gcode") {return "gcode Command*";}
                 if (this.passedObject.btnType == "window") {return "PopUp URL*";}
-                if (this.passedObject.btnType == "vInput") {return "Global Variable Name*";}
-
             },
             actionHover() {
                 if (this.passedObject.btnType == "Macro") {return "Enter the full macro filename [name.g]";}
                 if (this.passedObject.btnType == "http") {return "Enter GET url. e.g http://[address]/params";}
                 if (this.passedObject.btnType == "MQTT") {return "Enter the message text to send";}
                 if (this.passedObject.btnType == "gcode") {return "Enter the gcode command to send";}
-                if (this.passedObject.btnType == "window") {return "Enter the Window PopUp URL";}
-                if (this.passedObject.btnType == "vInput") {return "Enter the Global Variable Name. Variables must already be defind before assignment";}
-            },
-            prefixLabel() {
-                if (this.passedObject.btnType == "vInput") {
-                    return "Prefix Text";
-                } else {
-                    return "Label";
-                }
+                if (this.passedObject.btnType == "window") {return "Enter the Window PopUp URL*";}
             },
             async validateData() {
                 if (this.passedObject.btnActionData) {

@@ -37,6 +37,7 @@
                                         <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
                                         <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
                                         <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0" style="height: 100%; width: 100%"></BtnCmdMMPanel>                                     
+                                        <BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="LZIndex"></BtnCmdVInputPanel>
                                     </td>
                                 </v-row>
                             </v-card>
@@ -44,81 +45,40 @@
                         <vue-draggable-resizable v-for="(btn) in getTabBtns(passedObject.customPanelID)" :z="getCustPanZidx(btn.btnZIndex)" :key="'btn' + btn.btnID + btn.autoSize" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="false" :draggable="false">
                             <v-card align="center" justify="center" style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
                                 <v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                    <td class="tabs-card ma-0 pa-0" align="center" justify="center">
-                                        <!--tooltip buttons-->
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-                                            <v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-                                                        <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-                                                        <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-                                                    </v-btn>
-                                                </template>
-                                                <span >{{ btn.btnHoverText }}</span>
-                                            </v-tooltip>
-                                        </div>
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType != 'vInput'">
-                                            <v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-                                                        <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-                                                        <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-                                                    </v-btn>
-                                                </template>
-                                                <span >{{ btn.btnHoverText }}</span>
-                                            </v-tooltip>
-                                        </div>
-                                        <!--Non tooltip buttons-->
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-                                            <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-                                                <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-                                                <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-                                            </v-btn>
-                                        </div>
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType != 'vInput'">
-                                            <v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
-                                                <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
-                                                <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
-                                            </v-btn>
-                                        </div>
-                                        <!--Input Buttons (yes I know they are not technically buttons, I'm just re-using existing code in a different way) -->
-                                        <!--tooltip input buttons-->
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID  && !btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-                                            <v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-                                            <v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-                                                    </v-text-field>
-                                                </template>
-                                                <span >{{ btn.btnHoverText }}</span>
-                                            </v-tooltip>
-                                            </v-card>
-                                        </div>
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length>0 && btn.btnType == 'vInput'">
-                                            <v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-                                            <v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" v-bind="attrs" v-on="on" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-                                                    </v-text-field>
-                                                </template>
-                                                <span >{{ btn.btnHoverText }}</span>
-                                            </v-tooltip>
-                                            </v-card>
-                                        </div>
-                                        <!--tooltip input buttons no hover-->
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID  && !btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
-                                            <v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-                                            <v-text-field flat solo dense hide-details :style="'height :' + btn.btnHsize +'px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="!btn.autoSize" block style="height: 100%; width: 100%" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-                                            </v-text-field>
-                                            </v-card>
-                                        </div>
-                                        <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length==0 && btn.btnType == 'vInput'">
-                                            <v-card flat align="center" justify="center" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-                                            <v-text-field flat solo dense hide-details :style="'height : 38px'" align="center" justify="center" :prefix="btn.btnLabel" :key="btn.inputLastVal + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos" :type="btn.inputType" :clearable="btn.inputEnableClear" :suffix="btn.inputPostfixText" :value="getCurrGVarVal(btn.btnActionData)" v-if="btn.autoSize" :background-color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @change="setGVarVal(btn, $event)">
-                                            </v-text-field>
-                                            </v-card>
-                                        </div>
-                                    </td>
+                                    <div v-if="btn.btnGroupIdx==passedObject.customPanelID && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+                                        <v-tooltip bottom :style="`position: absolute; z-index:${passedObject.panelZIndex+1}`">
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+                                                    <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+                                                    <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+                                                </v-btn>
+                                            </template>
+                                            <span >{{ btn.btnHoverText }}</span>
+                                        </v-tooltip>
+                                    </div>
+                                    <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length>0">
+                                        <v-tooltip bottom :style="`position: absolute; z-index:${passedObject.panelZIndex+1}`">
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-btn v-if="btn.autoSize" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+                                                    <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+                                                    <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+                                                </v-btn>
+                                            </template>
+                                            <span >{{ btn.btnHoverText }}</span>
+                                        </v-tooltip>
+                                    </div>
+                                    <div v-if="btn.btnGroupIdx==passedObject.customPanelID && !btn.autoSize && btn.btnHoverText.length==0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
+                                        <v-btn v-if="!btn.autoSize" block style="height: 100%; width: 100%" v-bind="attrs" v-on="on" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+                                            <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+                                            <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+                                        </v-btn>
+                                    </div>
+                                    <div v-if="btn.btnGroupIdx==passedObject.customPanelID && btn.autoSize && btn.btnHoverText.length==0">
+                                        <v-btn v-if="btn.autoSize" :color="btn.btnColour" :elevation="1" :disabled="chkJobEnabled(btn)" @click="onBtnClick($event, btn)">
+                                            <span v-if="btn.btnIcon"><v-icon class="mr-1">{{ btn.btnIcon }}</v-icon>{{ btn.btnLabel }}</span>
+                                            <span v-if="!btn.btnIcon">{{ btn.btnLabel }}</span>
+                                        </v-btn>
+                                    </div>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
@@ -140,13 +100,15 @@
     import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
     import BtnCmdCustPanelBtnActionFunctions from './BtnCmdCustPanelBtnActionFunctions.js';
     import Path from '../../utils/path.js';
+    import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 
     export default {
         components: {
             altWebCamPanel,
             VueDraggableResizable,
             BtnCmdWebPanel,
-            BtnCmdMMPanel
+            BtnCmdMMPanel,
+            BtnCmdVInputPanel
         },
         props: {
             passedObject: {
@@ -154,7 +116,8 @@
             },
             mainData: {
                 type: Object
-            }
+            },
+            LZIndex: Number
         },
         computed: {
             ...mapState('machine/model', {
@@ -211,12 +174,12 @@
             },
             getTabPanels(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel");
+                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput");
                 return result;
             },
             getTabPanelsEditable(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel"));
+                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput"));
                 return result;
             },
             chkJobEnabled(item){
