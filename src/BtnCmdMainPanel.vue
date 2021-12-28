@@ -137,7 +137,7 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :active="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
 														<v-card align="center" justify="center" flat class="tabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
 																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
@@ -411,7 +411,7 @@
 			</v-col>
 		</v-row>
 		<!-- Normal Footer with action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
+		<v-footer app v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; width: auto !important`">
 			<v-row class="pa-0 ma-0">	
 				<div>
 					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
@@ -441,7 +441,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Normal Footer No action messages-->
-		<v-footer v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; background-color: #FFFFFF00`">
+		<v-footer app v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px; background-color: #FFFFFF00; width: auto !important`">
 			<v-row class="pa-0 ma-0">	
 				<v-spacer></v-spacer>
 				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
@@ -468,7 +468,7 @@
 			</v-row>
 		</v-footer>
 		<!--Settings Footer -->
-		<v-footer v-if="settingsMode && !editMode && !createMode" height="37" fixed width="100%" class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
+		<v-footer app v-if="settingsMode && !editMode && !createMode" height="37" fixed inset class="pa-0 ma-0" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
@@ -579,7 +579,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Edit Mode Footer -->
-		<v-footer v-if="editMode" height="37" fixed width="100%" :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0">
+		<v-footer app v-if="editMode" height="37" fixed inset :style="`z-index:${currTabObj.lastZIndex+1}; bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-1">
@@ -643,7 +643,7 @@
 								<v-icon color="blue">mdi-card-plus</v-icon>
 							</v-btn>
 						</template>
-						<span>Add Button / Variable Input</span>
+						<span>Add Button</span>
 					</v-tooltip>
 				</div>
 				<div class="mx-1">
@@ -846,9 +846,9 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.10.02',
+			btnCmdVersion: '0.10.03',
 			btnCmd : {
-				btnCmdVersion: '0.10.02',
+				btnCmdVersion: '0.10.03',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -991,28 +991,10 @@ export default {
 		}
 	},
 	created() {
-		//dirty hack to stop the core dwc elements rendering behind some BtnCmd user created objects - mitigates issues with zIndex
 		if(this.mobileActive){
-			var tmpg = null;
-			var i = 0		
-			tmpg = window.document.getElementsByClassName("v-bottom-navigation");
-			if(typeof tmpg != 'undefined' || tmpg !== null){
-				for (i = 0; i < tmpg.length; i++) {
-					tmpg.item(i).style = "z-index: 99991;";
-				}
-			}
-			tmpg = window.document.getElementsByClassName("v-navigation-drawer");
-			if(typeof tmpg != 'undefined' || tmpg !== null){
-				for (i = 0; i < tmpg.length; i++) {
-					tmpg.item(i).style = "z-index: 99992;";
-				}
-			}
-			tmpg = window.document.getElementsByClassName("iziToast-wrapper");
-			if(typeof tmpg != 'undefined' || tmpg !== null){
-				for (i = 0; i < tmpg.length; i++) {
-					tmpg.item(i).style = "z-index: 99993;";
-				}
-			}
+			this.updateForMobile();
+		}else{
+			this.updateForDesktop();
 		}	
 	},
     methods: {
@@ -1023,14 +1005,42 @@ export default {
 		setupPage(){
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
+		//DWC Z index 
+		//dirty hack to stop the core dwc elements rendering behind some BtnCmd user created objects - mitigates issues with zIndex
+		updateForMobile(){
+			var tmpg = null;
+			var i = 0		
+			tmpg = window.document.getElementsByClassName("v-bottom-navigation");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style["z-index"] = "99991;";
+				}
+			}
+			tmpg = window.document.getElementsByClassName("v-navigation-drawer");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style["z-index"] = "99992;";
+				}
+			}
+			tmpg = window.document.getElementsByClassName("iziToast-wrapper");
+			if(typeof tmpg != 'undefined' || tmpg !== null){
+				for (i = 0; i < tmpg.length; i++) {
+					tmpg.item(i).style["z-index"] = "99993;";
+				}
+			}
+		},
+		updateForDesktop(){
+			//not needed so far but here just in case
+		},
+		/// Main Stuff
 		updateAR(ActionText){
 			this.actionResponse=ActionText;
 		},
 		tabCardHeight () {
 			if(!this.mobileActive){
-				return window.innerHeight - 70;
+				return window.innerHeight - 140;
 			}else{
-				return window.innerHeight ;
+				return window.innerHeight;
 			}
 		},
 		toggleTopPanelBtn(){
@@ -1519,31 +1529,14 @@ export default {
 		$route (to, from){
 			if(to.path === "/BtnCmd" && this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
 				this.toggleTopPanel(true);
+				this.updateForDesktop();
 			}
 			if(from.path === "/BtnCmd" && !this.mobileActive){
 				this.toggleTopPanel(false);
+				this.updateForDesktop();
 			}
 			if(from.path === "/BtnCmd" && this.mobileActive){
-				var tmpg = null;
-				var i = 0		
-				tmpg = window.document.getElementsByClassName("v-bottom-navigation");
-				if(typeof tmpg != 'undefined' || tmpg !== null){
-					for (i = 0; i < tmpg.length; i++) {
-						tmpg.item(i).style = "z-index: 99991;";
-					}
-				}
-				tmpg = window.document.getElementsByClassName("v-navigation-drawer");
-				if(typeof tmpg != 'undefined'  || tmpg !== null){
-					for (i = 0; i < tmpg.length; i++) {
-						tmpg.item(i).style = "z-index: 99992;";
-					}
-				}
-				tmpg = window.document.getElementsByClassName("iziToast-wrapper");
-				if(typeof tmpg != 'undefined'  || tmpg !== null){
-					for (i = 0; i < tmpg.length; i++) {
-						tmpg.item(i).style = "z-index: 99993;";
-					}
-				}
+				this.updateForMobile();
 			}
 		},
 		mobileActive (val) {
@@ -1552,10 +1545,12 @@ export default {
 				this.toggleTopPanel(false);
 				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight;
 				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight;
+				this.updateForMobile();
 			}else{
 				//console.log("triggering desktop")
 				window.document.getElementById("BtnCmdMainDiv").height = window.innerHeight - 70;
 				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
+				this.updateForDesktop();
 			}
 		}	
 	}

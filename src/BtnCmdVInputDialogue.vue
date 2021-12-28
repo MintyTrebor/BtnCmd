@@ -19,14 +19,27 @@
 			</v-card-title>
             <v-card-text>
                 <v-form lazy-validation class="mx-2">
-                    <v-row dense>
+                    <v-row dense v-if="!enableSelects">
                         <v-col cols="12">
-                            <v-text-field label="Prefix Text" v-model="passedObject.inputPrefixText"></v-text-field>
+                            <v-radio-group v-model="passedObject.inputType" row required>
+                                <v-subheader>Variable Type:</v-subheader>
+                                <v-radio v-for="type in radioVarTypeItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
+                            </v-radio-group>
+                        </v-col>
+                    </v-row>
+                    <v-row dense v-if="enableSelects">
+                        <v-col cols="12">
+                            <v-select :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="passedObject.inputType"></v-select>
                         </v-col>
                     </v-row>
                     <v-row dense>
                         <v-col cols="12">
-                            <v-text-field label="Suffix Text" v-model="passedObject.inputSuffixText"></v-text-field>
+                            <v-text-field :label="getPrefixLabel()" v-model="passedObject.inputPrefixText"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-text-field :label="getSuffixLabel()" v-model="passedObject.inputSuffixText"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -43,20 +56,7 @@
                                 <span>Variables must be pre-defined before use.</span>
                             </v-tooltip>
                         </v-col>
-                    </v-row>
-                    <v-row dense v-if="!enableSelects">
-                        <v-col cols="12">
-                            <v-radio-group v-model="passedObject.inputType" row required>
-                                <v-subheader>Variable Type:</v-subheader>
-                                <v-radio v-for="type in radioVarTypeItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="enableSelects">
-                        <v-col cols="12">
-                            <v-select :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="passedObject.inputType"></v-select>
-                        </v-col>
-                    </v-row>
+                    </v-row>                    
                     <v-row dense> 
                         <v-col cols="12">
                             <v-tooltip bottom>
@@ -110,7 +110,7 @@
                                 <span>Hide the panel border</span>
                             </v-tooltip>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="6" v-if="passedObject.inputType !='boolean'">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-switch label="Clear Button" v-model="passedObject.inputEnableClear"></v-switch></span>
@@ -164,7 +164,8 @@
                 ],
                 radioVarTypeItems: [
                     {text: 'String', value: 'text', disabled: false},
-                    {text: 'Number', value: 'number', disabled: false}
+                    {text: 'Number', value: 'number', disabled: false},
+                    {text: 'Boolean', value: 'boolean', disabled: false}
                 ],
                 alertReqVal: false,
                 showInfo: false,
@@ -193,6 +194,20 @@
             setColor(colorField){
                 this.colField = colorField;
                 this.showColPicker = true;
+            },
+            getPrefixLabel(){
+                if(this.passedObject.inputType == 'boolean'){
+                    return "False Label"
+                }else {
+                    return "Prefix Text"
+                }
+            },
+            getSuffixLabel(){
+                if(this.passedObject.inputType == 'boolean'){
+                    return "True Label"
+                }else {
+                    return "Suffix Text"
+                }
             }
         },
         mounted() {

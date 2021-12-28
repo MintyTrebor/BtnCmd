@@ -166,7 +166,7 @@
                 {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 240, wSize: 320},
                 {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
-                {text: 'Global Variable Input', value: 'vInput', disabled: false, hSize: 38, wSize: 300},
+                {text: 'Global Variable Input', value: 'vInput', disabled: false, hSize: 60, wSize: 300},
                 {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250}
             ]},
             panelItems() {
