@@ -1,0 +1,19 @@
+{
+    "SBCC_Settings": {
+        "SBCC_Version": "0.0.1",
+        "Last_SBCC_Cmd_ID": 1001,
+        "HTTP_Port": "8089",
+        "API_KEY": "12345"
+    },
+    "SBCC_Cmd_Template": {
+        "SBCC_Cmd_ID": 0,
+        "SBCC_Cmd_Name": "Enter Name",
+        "SBCC_Cmd_CmdText": "Enter command to execute on SBC",
+        "Enable_In_Job": false,
+        "SBCC_Cmd_Timeout": 30,
+        "SBCC_ShowResult": false
+    },
+    "SBCC_Cmds": [
+        
+    ]
+}

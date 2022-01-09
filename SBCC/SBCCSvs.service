@@ -1,0 +1,14 @@
+[Unit]
+Requires=duetcontrolserver.service
+After=duetcontrolservice.service
+Description=SBCCSvs
+After=multi-user.target
+[Service]
+User=root
+ExecStartPre=/bin/sleep 30
+WorkingDirectory=/opt/dsf/plugins/SBCC
+Type=idle
+ExecStart=/usr/bin/python3 /opt/dsf/plugins/SBCC/SBCC_Main.py &> /dev/null
+Restart=always
+[Install]
+WantedBy=multi-user.target
