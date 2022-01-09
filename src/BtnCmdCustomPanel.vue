@@ -86,6 +86,7 @@
                 </v-col>
             </v-row>
             <confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>
+            <BtnCmdMsgDialog :shown.sync="showBtnSBCCDialog" title="Command Response" :prompt="currBtnPromptTxt" @confirmed="showBtnSBCCDialog = !showBtnSBCCDialog"></BtnCmdMsgDialog>
         </v-container>
     </v-card>
 </template>
@@ -101,6 +102,7 @@
     import BtnCmdCustPanelBtnActionFunctions from './BtnCmdCustPanelBtnActionFunctions.js';
     import Path from '../../utils/path.js';
     import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
+    import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 
     export default {
         components: {
@@ -108,13 +110,17 @@
             VueDraggableResizable,
             BtnCmdWebPanel,
             BtnCmdMMPanel,
-            BtnCmdVInputPanel
+            BtnCmdVInputPanel,
+            BtnCmdMsgDialog
         },
         props: {
             passedObject: {
                 type: Object
             },
             mainData: {
+                type: Object
+            },
+            tmpSBCCSet: {
                 type: Object
             },
             LZIndex: Number
@@ -141,7 +147,7 @@
                 }
             },
             getTabs(){
-                return this.btnCmd.tabs.filter(item => item.embedTab === true);
+                return this.mainData.tabs.filter(item => item.embedTab === true);
             }	
         },
         mixins: [
@@ -159,7 +165,8 @@
                 currButtonObj: {},
                 currButtonEventObj: {},
                 currBtnPromptTxt: 'Are You Sure?',
-                directory: Path.macros                
+                directory: Path.macros,
+                showBtnSBCCDialog: false
             }
         },
         methods: {

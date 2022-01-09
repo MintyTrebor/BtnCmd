@@ -115,6 +115,36 @@ export default {
 			}else if(btnJSONOb.btnType == "window"){
 				var btnWindow = window.open(btnJSONOb.btnActionData, "BtnCmd", `menubar=0, resizable=0, status=0, toolbar=0, location=0, directories=0, scrollbars=1, width=${btnJSONOb.btnWinWSize}, height=${btnJSONOb.btnWinHSize}`);
 				btnWindow.moveTo(e.clientX, e.clientY-210);
+			}else if(btnJSONOb.btnType == "SBCC"){
+				if(!this.btnCmd.globalSettings.enableSBCC){
+					tmpParent.setActionResponse("This button has been configured as SBCC, but SBCC is disabled. No Action Taken. Please re-enable SBCC.");
+					return;
+				}else{
+					tmpParent.setActionResponse("Last Action :  -- SBCC -- ID: " + btnJSONOb.btnActionData);
+					var tmpHttpData = {"SBCCID": btnJSONOb.btnActionData, "SBCCAPI": tmpParent.tmpSBCCSet.SBCC_Settings["API_KEY"]};
+					var tmpRes = location.host.indexOf(':');
+					var tmpLoc = "";
+					if(tmpRes > 0){
+						tmpLoc = location.host.substring(0, tmpRes);
+					}else{
+						tmpLoc = location.host;
+					}
+					axiosHtpp.post(`http://${tmpLoc}:${tmpParent.tmpSBCCSet.SBCC_Settings["HTTP_Port"]}`, tmpHttpData)
+						.then(function (response) {
+							var tmpSBCCmd
+							for(tmpSBCCmd in tmpParent.tmpSBCCSet.SBCC_Cmds){
+								if(tmpParent.tmpSBCCSet.SBCC_Cmds[tmpSBCCmd].SBCC_Cmd_ID === btnJSONOb.btnActionData && tmpParent.tmpSBCCSet.SBCC_Cmds[tmpSBCCmd].SBCC_ShowResult){
+									tmpParent.currBtnPromptTxt = response.data["Cmd_Response"];
+									tmpParent.showBtnSBCCDialog = true;
+								}
+							}
+						})
+						.catch(function (error) {
+							console.log(error);
+							tmpParent.$makeNotification('error', 'SBCC Encountered an error. Response:', `${error}`);
+						});
+					
+				}
 			}
 		},
 		//set the value of the action footer msg

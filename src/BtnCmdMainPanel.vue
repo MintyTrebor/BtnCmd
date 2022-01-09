@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ currTabObj }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpDebgug }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -74,7 +74,7 @@
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex" :tmpSBCCSet="tmpSBCCSet"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -383,7 +383,7 @@
 							</tbody>
 						</v-card>
 					</v-menu>
-					<v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo" style="position: absolute; z-index:99999; bottom: 36px; left: 10px;">
+					<v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo" :style="`position: absolute; z-index:99999; bottom: 36px; left: 10px;`">
 						<strong>BtnCmd Beta v{{ btnCmdVersion }}</strong><br>
 						Cobbled together by <a href="https://github.com/MintyTrebor" target="_blank">Minty Trebor</a><br>
 						BtnCmd uses the following libraries/modules:<br>
@@ -397,17 +397,19 @@
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
-				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdSettingsDialogue>
+				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
 				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
 				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
-				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings"></BtnCmdGlobalSettingsDialogue>
+				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :bSBCCInstalled="bSBCCInstalled"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
+				<BtnCmdSBCCSettingsDialogue @exit="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="tmpSBCCUsr"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
-				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>	
+				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>
+				<BtnCmdMsgDialog :shown.sync="showBtnSBCCDialog" title="Command Response" :prompt="currBtnPromptTxt" @confirmed="showBtnSBCCDialog = !showBtnSBCCDialog"></BtnCmdMsgDialog>	
 			</v-col>
 		</v-row>
 		<!-- Normal Footer with action messages-->
@@ -421,8 +423,8 @@
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
-								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
-								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
+								<v-icon v-if="!currHideTopPanel" class="mr-0" >mdi-eye-off</v-icon>
+								<v-icon v-if="currHideTopPanel" class="mr-0" >mdi-eye</v-icon>
 							</v-btn>
 						</template>
 						<span>Show/Hide Top Panel</span>
@@ -431,8 +433,8 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
-								<v-icon class="mr-1" >mdi-cog</v-icon>
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-0" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
 						<span>Show Settings</span>
@@ -458,8 +460,8 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" color="#FFFFFF00" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
-								<v-icon class="mr-1" >mdi-cog</v-icon>
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" color="#FFFFFF00" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-0" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
 						<span>Show Settings</span>
@@ -473,7 +475,7 @@
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showInfo = !showInfo">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showInfo = !showInfo">
 								<v-icon>mdi-information</v-icon>
 							</v-btn>
 						</template>
@@ -483,7 +485,7 @@
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showGSEdit = !showGSEdit">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" color="primary" v-bind="attrs" v-on="on" :elevation="1" :disabled="editMode || backupMode" @click="showGSEdit = !showGSEdit">
 								<v-icon>mdi-puzzle-edit</v-icon>
 							</v-btn>
 						</template>
@@ -493,17 +495,27 @@
 				<div class="mx-2" v-if="btnCmd.globalSettings.enableEvents && !mobileActive">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive"  v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
 								<v-icon>mdi-monitor-eye</v-icon>
 							</v-btn>
 						</template>
 						<span>Configure Status Event Monitoring</span>
 					</v-tooltip>
+				</div>
+				<div class="mx-2" v-if="btnCmd.globalSettings.enableSBCC && bSBCCInstalled">
+					<v-tooltip top>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showSBCCEdit = !showSBCCEdit">
+								<v-icon>mdi-powershell</v-icon>
+							</v-btn>
+						</template>
+						<span>Configure SBCC Commands</span>
+					</v-tooltip>
 				</div>				
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
 								<v-icon>mdi-backup-restore</v-icon>
 							</v-btn>
 						</template>
@@ -513,7 +525,7 @@
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
 								<v-icon>mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
@@ -523,7 +535,7 @@
 				<div class="mx-2" v-if="backupMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
 								<v-icon>mdi-autorenew</v-icon>
 							</v-btn>
 						</template>
@@ -533,7 +545,7 @@
 				<div class="mx-2">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
 								<v-icon v-if="!backupMode">mdi-database-arrow-right</v-icon>
 								<v-icon v-if="backupMode">mdi-database-arrow-left</v-icon>
 							</v-btn>
@@ -549,7 +561,7 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" color="red" v-bind="attrs" v-on="on" :elevation="1" @click="createModeToggle()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" color="red" v-bind="attrs" v-on="on" :elevation="1" @click="createModeToggle()">
 								<v-icon :small="mobileActive" :dense="mobileActive" >mdi-wrench</v-icon>
 							</v-btn>
 						</template>
@@ -559,8 +571,8 @@
 				<div class="mx-2" v-if="!backupMode && !createMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" color="green" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
-								<v-icon class="mr-1">mdi-square-edit-outline</v-icon>
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" color="green" v-bind="attrs" v-on="on" :elevation="1" @click="editModeToggle()">
+								<v-icon class="mr-0">mdi-square-edit-outline</v-icon>
 							</v-btn>
 						</template>
 						<span>Create & Edit Layouts</span>
@@ -569,8 +581,8 @@
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
-								<v-icon class="mr-1" >mdi-cog</v-icon>
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="settingsMode = !settingsMode">
+								<v-icon class="mr-0" >mdi-cog</v-icon>
 							</v-btn>
 						</template>
 						<span>Hide Settings</span>
@@ -715,6 +727,7 @@ import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
 import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import BtnCmdPanelSettingsDialogue from './BtnCmdPanelSettingsDialogue.vue';
+import BtnCmdSBCCSettingsDialogue from './BtnCmdSBCCSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
 import deepmerge from 'deepmerge';
@@ -731,6 +744,8 @@ import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
 import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
 import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
+import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
+import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js'
 
 export default {
     components: {
@@ -747,7 +762,9 @@ export default {
 		BtnCmdMMPanelDialogue,
 		BtnCmdCustomPanel,
 		BtnCmdVInputDialogue,
-		BtnCmdVInputPanel
+		BtnCmdVInputPanel,
+		BtnCmdMsgDialog,
+		BtnCmdSBCCSettingsDialogue
     },
 	computed: {
 		...mapState('machine/model', {
@@ -783,12 +800,13 @@ export default {
 			}else{
 				return '';
 			}
-		}	
+		}
 	},
 	mixins: [
 		BtnCmdDataFunctions,
 		BtnCmdEventFunctions,
-		BtnCmdBtnActionFunctions
+		BtnCmdBtnActionFunctions,
+		BtnCmdSCCFunctions
 	],
 	data: function () {
 		//Changes to btnCmd:{} structure must also be made in BtnCmdDataFunctions.js
@@ -805,6 +823,7 @@ export default {
 			showPanelEdit: false,
 			showFileDialog: false,
 			showBtnConfDialog: false,
+			showBtnSBCCDialog: false,
 			showAWCPanelEdit: false,
 			showMMPanelEdit: false,
 			showVInputPanelEdit: false,
@@ -846,9 +865,15 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			btnCmdVersion: '0.10.03',
+			tmpSBCCSet: {},
+			tmpSBCCUsr: {},
+			tmpSBCCDef: {},
+			reloadSBCCSet: false,
+			bSBCCInstalled: false,
+			showSBCCEdit: false,
+			btnCmdVersion: '0.10.05',
 			btnCmd : {
-				btnCmdVersion: '0.10.03',
+				btnCmdVersion: '0.10.05',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -869,7 +894,8 @@ export default {
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0,
 					enableGC_SH_Btn: false,
-					defaultGC_Hidden: false
+					defaultGC_Hidden: false,
+					enableSBCC: false
 				},
 				monitoredEvents: [
 					{
@@ -913,7 +939,8 @@ export default {
 						btnWinHSize: 100,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?'
+						btnConfText: 'Are You Sure?',
+						btnSBCCShowResult: false
 					}
 				],
 				tabs: [
@@ -999,7 +1026,7 @@ export default {
 	},
     methods: {
 		...mapActions('machine', ['sendCode']),
-		...mapActions('machine', {machineDownload: 'download'}),
+		...mapActions('machine', {machineDownload: 'download', getFileList: 'getFileList'}),
         ...mapActions('machine', ['upload']),
 		...mapMutations('machine/settings', ['addCode', 'removeCode']),
 		setupPage(){
@@ -1517,6 +1544,14 @@ export default {
 		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
 			this.toggleTopPanel(true);
 		}
+		//Check if the SBCC service has been installed
+		this.checkSBCCSvs();
+		//load SBCC commands if enabled
+		if(this.btnCmd.globalSettings.enableSBCC && this.bSBCCInstalled){
+			this.loadSBCCSettingsFromFile();
+		}else{
+			this.btnCmd.globalSettings.enableSBCC = false;
+		}
 	},
 	watch: {
 		status: function (val) {
@@ -1552,7 +1587,15 @@ export default {
 				window.document.getElementById("BtnCmdMainTabCard").height = window.innerHeight - 70;
 				this.updateForDesktop();
 			}
-		}	
+		},
+		reloadSBCCSet (val) {
+			//watches for reload  flag for SBCC commands if enabled
+			if(this.btnCmd.globalSettings.enableSBCC && val){
+				//console.log("reloading SBCC Settings");
+				this.loadSBCCSettingsFromFile();
+				this.reloadSBCCSet = false;
+			}
+		}
 	}
 }
 </script>

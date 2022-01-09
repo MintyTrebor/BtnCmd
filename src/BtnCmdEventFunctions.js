@@ -24,7 +24,7 @@ export default {
 						if(this.btnCmd.monitoredEvents[bi].eventHttpType == "POST") {
 							axiosHtpp.post(tmpURL, tmpParent.btnCmd.monitoredEvents[bi].eventHttpData)
 								.then(function (response) {
-									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+									console.log("Event Action : -- Success Result : " + JSON.stringify(response));
 								})
 								.catch(function (error) {
 									console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
@@ -34,7 +34,7 @@ export default {
 							axiosHtpp.get(tmpURL, { headers: {'Content-Type': `application/${tmpParent.btnCmd.monitoredEvents[bi].eventHttpContType}`}})
 								.then(function (response) {
 									// handle success
-									console.log.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+									console.log("Event Action : -- Success Result : " + JSON.stringify(response));
 								})
 								.catch(function (error) {
 									// handle error

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-card :key="'vInput' + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
+		<v-card class="pa-1 ma-0" :key="'vInput' + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
 					<v-row v-if="passedObject.panelHoverText.length >= 1" dense justify="center" align="center">

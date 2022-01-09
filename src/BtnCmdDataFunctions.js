@@ -29,7 +29,8 @@ export default {
 					lastBackupFileName: 'BtnCmdSettings',
 					pluginMinimumHeight: 0,
 					enableGC_SH_Btn: false,
-					defaultGC_Hidden: false
+					defaultGC_Hidden: false,
+					enableSBCC: false
 				},
 				monitoredEvents: [
 					{
@@ -73,7 +74,8 @@ export default {
 						btnWinHSize: 200,
 						btnWinWSize: 200,
 						btnReqConf: false,
-						btnConfText: 'Are You Sure?'
+						btnConfText: 'Are You Sure?',
+						btnSBCCShowResult: false
 					}
 				],
 				tabs: [
@@ -196,18 +198,6 @@ export default {
 				}
 			}
 		},
-		// async importCustomPanelFromFile() {
-		// 	try {
-		// 		const setFileName = Path.combine(this.systemDirectory, `CustPanelName.json`);
-		// 		const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
-		// 		this.btnCmd = response;
-		// 		this.checkDataVersion();
-		// 	} catch (e) {
-		// 		if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
-		// 			console.warn(e);
-		// 		}
-		// 	}
-		// },
 		async validateFileName(){
 			if(this.btnCmd.globalSettings.lastBackupFileName.length !== 0){
 				var newName = this.btnCmd.globalSettings.lastBackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
@@ -299,6 +289,6 @@ export default {
 				this.btnCmd.btnCmdVersion = this.btnCmdVersion;
 				this.saveSettings();
 			}
-		},
+		}
     }
   };

@@ -69,7 +69,7 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http'">
                         <v-col cols="12">
-                            <v-radio-group v-model="passedObject.btnHttpType" row required>
+                            <v-radio-group v-model="passedObject.btnHttpType" row required :key="'htype' + passedObject.btnType + passedObject.btnID">
                                 <v-subheader>Http Type:</v-subheader>
                                 <v-radio v-for="type in radioHttpItems" :key="'BtnHTTP'+type.value" :label="type.text" :value="type.value"></v-radio>
                             </v-radio-group>
@@ -77,7 +77,7 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http'">
                         <v-col cols="12">
-                            <v-select :items="radioHttpItems" class="custom-label-color" item-text="text" item-value="value" label="Http Type" required v-model="passedObject.btnHttpType"></v-select>
+                            <v-select :items="radioHttpItems" class="custom-label-color" :key="'htype' + passedObject.btnType + passedObject.btnID" item-text="text" item-value="value" label="Http Type" required v-model="passedObject.btnHttpType"></v-select>
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
@@ -90,26 +90,48 @@
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
                         <v-col cols="12">
-                            <v-select :items="radioGetItems" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="passedObject.btnHttpContType"></v-select>
+                            <v-select :items="radioGetItems" :key="'gtype' + passedObject.btnType + passedObject.btnID" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="passedObject.btnHttpContType"></v-select>
                         </v-col>
                     </v-row>
                     <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='http' && passedObject.btnHttpType=='POST'">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" class="custom-label-color" required label="Post Data*" v-model="passedObject.btnHttpData" placeholder="{}"></v-text-field>
+                                    <v-text-field v-bind="attrs" v-on="on" :key="'pdata' + passedObject.btnType + passedObject.btnID" class="custom-label-color" required label="Post Data*" v-model="passedObject.btnHttpData" placeholder="{}"></v-text-field>
                                 </template>
                                 <span>Data to send with Post</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType!='SBCC'" :key="'adr' + passedObject.btnType + passedObject.btnID">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" :label="actionLabel()" v-model="passedObject.btnActionData"></v-text-field>
+                                    <v-text-field class="custom-label-color" :key="'ad' + passedObject.btnType + passedObject.btnID" v-bind="attrs" v-on="on" :label="actionLabel()" v-model="passedObject.btnActionData"></v-text-field>
                                 </template>
                                 <span>{{ actionHover() }}</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType == 'SBCC'" :key="'sbcctype' + passedObject.btnType + passedObject.btnID">
+                        <v-col cols="12">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-select v-bind="attrs" v-on="on" :items="SBCCmdListItems" item-text="text" item-value="value" label="Select Command" value="value" required v-model="passedObject.btnActionData" @change="setSBCCVales($event)"></v-select>
+                                </template>
+                                <span>Select Command</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType == 'SBCC'" :key="'sbcctyper' + passedObject.btnType + passedObject.btnID">
+                        <v-col cols="12">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Select Command:" v-model="passedObject.btnActionData" row required>
+                                        <v-radio v-for="type in SBCCmdListItems" :key="'SBCC'+type.value" :label="type.text" :value="type.value" @change="setSBCCVales(type.value)"></v-radio>
+                                    </v-radio-group>
+                                </template>
+                                <span>Select Command</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -170,7 +192,9 @@
                 type: Object
             },
             bMQTT: Boolean,
-            enableSelects: Boolean
+            enableSelects: Boolean,
+            enableSBCC: Boolean,
+            SBCCCombinedJson: Object,
         },
         computed: {
             show: {
@@ -187,7 +211,8 @@
                     {text: 'http', value: 'http', disabled: false},
                     {text: 'gcode', value: 'gcode', disabled: false},
                     {text: 'MQTT', value: 'MQTT', disabled: !this.bMQTT},
-                    {text: 'Window', value: 'window', disabled: false}
+                    {text: 'Window', value: 'window', disabled: false},
+                    {text: 'SBC Cmd', value: 'SBCC', disabled: !this.enableSBCC}
                 ]
             },
             radioItems() {
@@ -204,6 +229,19 @@
                     {text: 'Text', value: 'text', disabled: false},
                     {text: 'JSON', value: 'json', disabled: false}
                 ]
+            },
+            SBCCmdListItems() {
+                var SBCCItem = null;
+                var tmpItems = [];
+                var tmpItem = null;
+                for (SBCCItem in this.SBCCCombinedJson.SBCC_Cmds) {
+                    tmpItem = {
+                        text: this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_Name,
+                        value: this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_ID
+                    };
+                    tmpItems.push(tmpItem);
+                }
+                return tmpItems;
             }
         },
         data: function () {
@@ -255,6 +293,16 @@
                 this.alertReqVal = true;
                 await this.sleep(2000);
                 this.alertReqVal = false;
+            },
+            setSBCCVales(e) {
+                var SBCCItem = null;
+                for (SBCCItem in this.SBCCCombinedJson.SBCC_Cmds) {
+                    if(this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_ID == e) {
+                        this.passedObject.btnActionData = e;
+                        this.passedObject.btnEnableWhileJob = this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].Enable_In_Job;
+                        this.passedObject.btnSBCCShowResult = this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_ShowResult;
+                    }
+                }
             }
         }
 
