@@ -8,7 +8,7 @@ sudo chmod a+rw /opt/dsf/sd/sys/SBCC_Config.json
 #copy MQTT4DSF python file to duet plugins folder
 sudo mkdir /opt/dsf/plugins/SBCC
 sudo chmod a+rw /opt/dsf/plugins/SBCC
-sudo https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCC_Main.py -O /opt/dsf/plugins/SBCC/SBCC_Main.py
+sudo wget https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCC_Main.py -O /opt/dsf/plugins/SBCC/SBCC_Main.py
 #give permissions to rw
 sudo chmod a+rwx /opt/dsf/plugins/SBCC/SBCC_Main.py
 #create the service
