@@ -16,7 +16,7 @@ if [ -f /etc/systemd/system/SBCCSvs.service ]; then
  sudo systemctl stop SBCCSvs.service
  sudo systemctl disable SBCCSvs.service
 else
- sudo cp -f SBCCSvs.service /etc/systemd/system/SBCCSvs.service
+ sudo wget https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCCSvs.service -O /etc/systemd/system/SBCCSvs.service
 fi
 sudo systemctl enable SBCCSvs.service
 sudo systemctl daemon-reload
