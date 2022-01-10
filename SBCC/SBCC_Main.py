@@ -40,7 +40,7 @@ class SBCC_Startup():
 
     def startListening(self):
         self.serverPort = int(SBCC_Settings_json["HTTP_Port"])
-        self.httpd = HTTPServer(('localhost', self.serverPort), SBCC_RequestHandler)
+        self.httpd = HTTPServer(('', self.serverPort), SBCC_RequestHandler)
         self.httpd.serve_forever()
 
 class SBCC_RequestHandler(BaseHTTPRequestHandler):
