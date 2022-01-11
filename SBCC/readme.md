@@ -14,7 +14,7 @@ Make the script executable
 ```
 chmod u+x SBCCSetup.sh
 ```  
-Run the script 
+Run the script (may need sudo?)
 ```
 ./SBCCSetup.sh
 ```
