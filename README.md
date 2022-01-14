@@ -8,10 +8,12 @@ Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how
 In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may also choose to display a selection of panels including:  
 * Standard DWC information & control panels
 * Standard DWC webcam
-* Alternatve webcam
-* Remote Source (Web service from your LAN)
+* Alternative webcam
+* Remote Source (eg. A web service from your LAN)
 * Machine Model Values  
-* Static Text Panel
+* Text/Label Panel  
+* User Created Custom Panels  
+* Global Variable Input Panels (Change/update the value of global variables)  
 
 ![BtnCmd Edit Mode](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
 
@@ -20,7 +22,8 @@ The custom buttons can be configured to trigger one of five types of actions:
 * Run a Macro  
 * Send a simple HTTP request.
 * Send a MQTT Message  
-* Open a URL in a pop-up window
+* Open a URL in a pop-up window  
+* Run a SBC command (If SBCC is enabled)
 
 BtnCmd also offers the ability to monitor the status of the Duet Board and trigger an event when the status matches the event parameters. An event can perform the following actions:  
 * Send a Telegram Message (via a telegram bot) useful to get alerted to a status change via your smartphone.
