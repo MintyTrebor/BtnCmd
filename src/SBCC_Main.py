@@ -6,34 +6,29 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 import os
 import subprocess
+import ipaddress
 
 SBCC_Settings_json = {}
-SBCC_Cmds_json = {}
-SBCC_Def_Cmds = {}
-SBCC_API_KEY = "0"
+SBCC_API_KEY = 1
+SBCC_SubNet = '0.0.0.0'
 
 
 class SBCC_Startup():
-    #SETTINGS_FILE = "/opt/dsf/sd/sys/SBCC_Config.json"
-    SETTINGS_FILE = "/home/minty/dev/SBC/SBCC/SBCC_Config.json"
-    #DEF_CMDS_FILE = "/opt/dsf/sd/sys/SBCC_Default_Cmds.json"
-    DEF_CMDS_FILE = "/home/minty/dev/SBC/SBCC/SBCC_Default_Cmds.json"
+    SETTINGS_FILE = "/opt/dsf/sd/sys/SBCC_Config.json"
+    
 
     def __init__(self):
         self._load_settings()
         
     def _load_settings(self):
-        with open(self.DEF_CMDS_FILE) as json_settings2:
-            global SBCC_Def_Cmds
-            SBCC_Def_Cmds = json.load(json_settings2)
         with open(self.SETTINGS_FILE) as json_settings:
             global SBCC_Settings_json
-            global SBCC_Cmds_json
             global SBCC_API_KEY
-            SBCC_Cmds_json = json.load(json_settings)        
-            SBCC_Settings_json = SBCC_Cmds_json["SBCC_Settings"]
+            global SBCC_SubNet        
+            SBCC_Settings_json = json.load(json_settings)
             SBCC_API_KEY = str(SBCC_Settings_json["API_KEY"])
-        self.startListening()
+            SBCC_SubNet = str(SBCC_Settings_json["SUBNET"])
+            self.startListening()
 
     def _init_worker(self):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -51,16 +46,27 @@ class SBCC_RequestHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "x-api-key,Content-Type")
 
     def do_OPTIONS(self):
-        self.send_response(200)
-        self._send_cors_headers()
-        self.end_headers()
+        if SBCC_SubNet == "0.0.0.0":
+            self.send_response(200)
+            self._send_cors_headers()
+            self.end_headers()
+        else:
+            cliIPAdd = ipaddress.ip_address(self.client_address[0])
+            subNetAdd = ipaddress.ip_network(SBCC_SubNet, False)
+            if(cliIPAdd in subNetAdd):
+                self.send_response(200)
+                self._send_cors_headers()
+                self.end_headers()
+            else:
+                self.send_response(404)
+                self.end_headers()
     
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         #Execute the cmd and create the response body
         try:
-            tmpBodyStr = body.decode('utf8').replace("'", '"')
+            tmpBodyStr = body.decode('utf8')
             tmpjson = json.loads(tmpBodyStr)
             #Check if API Key Matches - Do nothing if it does not (no response)
             if str(tmpjson["SBCCAPI"]) == str(SBCC_API_KEY):
@@ -77,9 +83,9 @@ class SBCC_RequestHandler(BaseHTTPRequestHandler):
                         'Cmd_Response': 'Restarting SBCC Service'
                         }
                     self.wfile.write(response.getvalue())
-                    tmpExecuted = self.executeSBCC_Cmd(int(tmpjson["SBCCID"]))
+                    tmpExecuted = self.exeSBCC_Cmd('systemctl restart SBCCSvs.service', 30)
                 else:
-                    tmpExecuted = self.executeSBCC_Cmd(int(tmpjson["SBCCID"]))
+                    tmpExecuted = self.exeSBCC_Cmd(tmpjson["SBCCCmd"], int(tmpjson["SBCCTimeout"]))
                     tmpCmdID = str(tmpjson["SBCCID"])
                     response = BytesIO()
                     tmpRespJson = {
@@ -113,31 +119,14 @@ class SBCC_RequestHandler(BaseHTTPRequestHandler):
         if stream.returncode:
             errno = stream.returncode
             error = stream.stderr
-            msg = "Command '{}' returned non-zero exit status {}\n{}"
+            msg = "Command '{}' returned non-zero exit status: {}\n{}"
             return msg.format(CmdText, errno, error)
         elif stream.stdout == "":
             msg = "The command returned no data: {}"
             return msg.format(stream.stderr)    
         else: 
             return str(stream.stdout)
-    
-    def executeSBCC_Cmd(self, cmdIDRecieved):
-        if cmdIDRecieved < 1000:
-            #this is a pre-defined inbuilt cmd
-            if cmdIDRecieved == 0:
-                self.exeSBCC_Cmd("systemctl restart SBCCSvs.service", 30)
-                return
-            else:
-                for attrs in SBCC_Def_Cmds["SBCC_Cmds"]:
-                    if int(attrs["SBCC_Cmd_ID"]) == cmdIDRecieved:
-                        return self.exeSBCC_Cmd(attrs["SBCC_Cmd_CmdText"], int(attrs["SBCC_Cmd_Timeout"]))
-                return "Command ID is invalid"    
-        else:
-            #this is a user defined cmd
-            for attrs in SBCC_Cmds_json["SBCC_Cmds"]:
-                if int(attrs["SBCC_Cmd_ID"]) == cmdIDRecieved:
-                    return self.exeSBCC_Cmd(attrs["SBCC_Cmd_CmdText"], int(attrs["SBCC_Cmd_Timeout"]))
-            return "Command ID is invalid"    
+        
                 
     
 
