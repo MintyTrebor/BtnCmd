@@ -153,7 +153,7 @@ export default {
 				var btnWindow = window.open(btnJSONOb.btnActionData, "BtnCmd", `menubar=0, resizable=0, status=0, toolbar=0, location=0, directories=0, scrollbars=1, width=${btnJSONOb.btnWinWSize}, height=${btnJSONOb.btnWinHSize}`);
 				btnWindow.moveTo(e.clientX, e.clientY-210);
 			}else if(btnJSONOb.btnType == "SBCC"){
-				if(!tmpParent.mainData.globalSettings.enableSBCC){
+				if(!tmpParent.mainData.globalSettings.enableSBCC || !tmpParent.systemDSFVer){
 					tmpParent.setActionResponse("This button has been configured as SBCC, but SBCC is disabled. No Action Taken. Please re-enable SBCC.");
 					return;
 				}else{

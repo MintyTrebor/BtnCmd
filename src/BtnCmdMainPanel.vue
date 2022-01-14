@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpSBCCSet }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ systemDSFVer }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -74,7 +74,7 @@
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -810,10 +810,10 @@ export default {
 			return tmpCmdsObj
 		},
 		systemDSFVer(){
-			if(this.systemDSFVerStr === ""){
-				return false;
-			}else{
+			if(this.systemDSFVerStr !== null && this.systemDSFVerStr !== ''){
 				return true;
+			}else{
+				return false;
 			}
 		}
 	},

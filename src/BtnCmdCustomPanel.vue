@@ -121,7 +121,8 @@
                 type: Object
             },
             tmpSBCCSet: Array,
-            LZIndex: Number
+            LZIndex: Number,
+            systemDSFVer: Boolean
         },
         computed: {
             ...mapState('machine/model', {
