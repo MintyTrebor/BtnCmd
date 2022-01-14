@@ -7,7 +7,7 @@ Install python3 on SBC if not already installed (normally already installed on m
 sudo apt install python3  
 ```  
 
-Download the svs
+Download the svs (optional below) or create the service manually (use the SBCCSvs.service file as reference)
 ```
 sudo wget https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCCSvs.service -O /etc/systemd/system/SBCCSvs.service
 ```
