@@ -230,6 +230,30 @@ export default {
 				}
 			}
 		},
+		async loadDefSBCCmds() {
+			//trys to load the default sbcc commands file. if its not there it creates a single command.
+			//This file is used by distro maintainers to ship prebuilt commands with distro
+			try {
+				const setFileName = Path.combine(this.systemDirectory, 'SBCC_Default_Cmds.json');
+				const response = await this.machineDownload({ filename: setFileName, type: 'json', showProgress: false, showSuccess: false, showError: false});
+				//console.log("Status = " + response.status)
+				this.tmpSBCCDef = response;
+			} catch (e) {
+				var tmpSBC = {
+					SBCC_Cmds: [
+						{
+							SBCC_Cmd_ID: 1,
+							SBCC_Cmd_Name: "SBCC Default Test",
+							SBCC_Cmd_CmdText : "echo 'SBCC is working!'",
+							Enable_In_Job: true,
+							SBCC_Cmd_Timeout : 30,
+							SBCC_ShowResult: true            
+						}
+					]
+				}
+				this.tmpSBCCDef = tmpSBC;
+			}
+		},
 		async validateFileName(){
 			if(this.btnCmd.globalSettings.lastBackupFileName.length !== 0){
 				var newName = this.btnCmd.globalSettings.lastBackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");

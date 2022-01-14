@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ systemDSFVer }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpSBCCDef }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -746,7 +746,6 @@ import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js'
-import SBCCDefCmds from './SBCC_Default_Cmds.json'
 
 export default {
     components: {
@@ -815,7 +814,7 @@ export default {
 			}else{
 				return false;
 			}
-		}
+		}		
 	},
 	mixins: [
 		BtnCmdDataFunctions,
@@ -880,10 +879,10 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			tmpSBCCDef: SBCCDefCmds,
 			reloadSBCCSet: false,
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
+			tmpSBCCDef: {},
 			btnCmdVersion: '0.10.06',
 			btnCmd : {
 				btnCmdVersion: '0.10.06',
@@ -1053,7 +1052,7 @@ export default {
 			this.updateForMobile();
 		}else{
 			this.updateForDesktop();
-		}	
+		}					
 	},
     methods: {
 		...mapActions('machine', ['sendCode']),
@@ -1575,6 +1574,8 @@ export default {
 		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
 			this.toggleTopPanel(true);
 		}
+		//trys to load the default sbcc commands file
+		this.loadDefSBCCmds();
 	},
 	watch: {
 		status: function (val) {
