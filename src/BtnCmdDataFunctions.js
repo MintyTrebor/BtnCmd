@@ -295,7 +295,15 @@ export default {
 				//merge globalSettings
 				this.newData.globalSettings = merge(refData.globalSettings, this.btnCmd.globalSettings);
 				//merge SBCCSettings
-				this.newData.SBCCSettings = merge(refData.SBCCSettings, this.btnCmd.SBCCSettings);
+				//as this is a new key in 0.10.6 we need to just add the default if it does not already exist
+				var tmpPropCheckObj = Object.prototype.hasOwnProperty.call(this.btnCmd, "SBCCSettings");
+				if(tmpPropCheckObj){
+					for(ni in this.btnCmd.SBCCSettings){
+						this.newData.SBCCSettings = merge(refData.SBCCSettings, this.btnCmd.SBCCSettings);
+					}
+				}else{
+					this.newData.SBCCSettings = refData.SBCCSettings;
+				}				
 				//merge events
 				for(ni in this.btnCmd.monitoredEvents){
 					this.newData.monitoredEvents.push(merge(refData.monitoredEvents[0], this.btnCmd.monitoredEvents[ni]))
@@ -322,7 +330,7 @@ export default {
 				ni = null;
 				//merge SBCC_Cmds
 				//as this is a new key we need to just add the default if it does not already exist
-				var tmpPropCheckObj = Object.prototype.hasOwnProperty.call(this.btnCmd, "SBCC_Cmds");
+				tmpPropCheckObj = Object.prototype.hasOwnProperty.call(this.btnCmd, "SBCC_Cmds");
 				//console.log(tmpPropCheckObj)
 				if(tmpPropCheckObj){
 					for(ni in this.btnCmd.SBCC_Cmds){
