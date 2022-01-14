@@ -78,7 +78,7 @@
                                                     <template v-slot:activator="{ on, attrs }">
                                                         <span v-bind="attrs" v-on="on"><v-switch label="Enable In Job" v-model="editItem.Enable_In_Job"></v-switch></span>
                                                     </template>
-                                                    <span>Enale In Job</span>
+                                                    <span>Enable In Job</span>
                                                 </v-tooltip>    
                                             </v-col>
                                             <v-col cols="6" class="ma-0 pa-0">
@@ -113,7 +113,7 @@
                                             <v-col cols="10">
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on, attrs }">
-                                                        <v-text-field v-bind="attrs" v-on="on" required label="API Key*" v-model="tmpSBCCUsr.SBCC_Settings['API_KEY']"></v-text-field>
+                                                        <v-text-field v-bind="attrs" v-on="on" number required label="API Key*" v-model="tmpSBCCUsr.SBCCSettings['API_KEY']"></v-text-field>
                                                     </template>
                                                     <span>API Key</span>
                                                 </v-tooltip>    
@@ -131,9 +131,19 @@
                                             <v-col cols="11" >
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on, attrs }">
-                                                        <v-text-field v-bind="attrs" number required v-on="on" label="Port*" v-model="tmpSBCCUsr.SBCC_Settings['HTTP_Port']"></v-text-field>
+                                                        <v-text-field v-bind="attrs" number required v-on="on" label="Port*" v-model="tmpSBCCUsr.SBCCSettings['HTTP_Port']"></v-text-field>
                                                     </template>
                                                     <span>Specifiy the port the SBCC service listens on</span>
+                                                </v-tooltip>    
+                                            </v-col>
+                                        </v-row>
+                                        <v-row align="center" justify="center">
+                                            <v-col cols="11" >
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-text-field v-bind="attrs" number required v-on="on" label="Subnet*" v-model="tmpSBCCUsr.SBCCSettings['SUBNET']"></v-text-field>
+                                                    </template>
+                                                    <span>Specifiy the subnet the SBCC service will accept commands from eg 192.168.0.1/24 (0.0.0.0 = any)</span>
                                                 </v-tooltip>    
                                             </v-col>
                                         </v-row>
@@ -254,8 +264,8 @@
                 this.confirmDelEvents = true;
             },
             newSBCCmd(){
-                var newID = this.tmpSBCCUsr.SBCC_Settings.Last_SBCC_Cmd_ID + 1;
-                this.tmpSBCCUsr.SBCC_Settings.Last_SBCC_Cmd_ID = newID;
+                var newID = this.tmpSBCCUsr.systemSettings.last_SBCC_Cmd_ID + 1;
+                this.tmpSBCCUsr.systemSettings.last_SBCC_Cmd_ID = newID;
                 var newSBCCObj ={
                     SBCC_Cmd_ID: newID,
                     SBCC_Cmd_Name: "New SBCC",
@@ -268,11 +278,11 @@
                 this.editSBCCmd(newSBCCObj);
             },
             newAPI(){
-                this.tmpSBCCUsr.SBCC_Settings['API_KEY'] = Math.floor((Math.random() * 1000000000000) + 1);
+                this.tmpSBCCUsr.SBCCSettings['API_KEY'] = Math.floor((Math.random() * 1000000000000) + 1);
             },
             closeSBCCSettings(){
                 this.dialog2 = false;
-                //this.$emit('exit', true);
+                this.$emit('updateSettings', true);
             },
             closeMainSBCCDialog(){
                 this.$emit('exit', true);

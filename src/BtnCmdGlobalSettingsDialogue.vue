@@ -70,17 +70,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <!-- <v-row>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-col cols="12" v-bind="attrs" v-on="on">
-                                    <v-slider  min="-100" max="100" label="% Height Mod" step="1" thumb-label="always" v-model="tmpPluginMinimumHeight"></v-slider>
-                                </v-col>
-                            </template>
-                            <span>Modify the available vertical layout size</span>
-                        </v-tooltip>
-                    </v-row> -->
-                    <v-row dense v-if="bSBCCInstalled">
+                    <v-row dense v-if="systemDSFVer">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -89,6 +79,26 @@
                                 <span>SBC Commands require a python service to be installed on the SBC. </span>
                             </v-tooltip>
                             <confirm-dialog :shown.sync="confirmEnableSBCC" title="Confirm Enabling SBCC" :prompt="event2Text" @dismissed="passedObject.enableSBCC = false" @confirmed="triggerSBCCReload()"></confirm-dialog>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable AutoBackup" v-model="passedObject.enableAutoBackup"></v-switch></span>
+                                </template>
+                                <span>Automatically saves BtnCmd's configuration to a file when its changed. (Does not replace the manual backup/restore functions)</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableAutoBackup" dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="Auto Backup file name*" v-model="passedObject.ABackupFileName" required placeholder="BtnCmdABMyPc"></v-text-field>
+                                </template>
+                                <span>Choose a unique filename per browser/device. The .json suffix will automatically be appened to the file name</span>
+                            </v-tooltip>
                         </v-col>
                     </v-row>
                     <v-row dense>
@@ -147,7 +157,7 @@
             },
             value: Boolean,
             mobileActive: Boolean,
-            bSBCCInstalled: Boolean           
+            systemDSFVer: Boolean           
         },
         computed: {
             show: {
@@ -166,7 +176,7 @@
                 confirmEnableSBCC: false,
                 tmpPluginMinimumHeight: 0,
                 eventText: "Event based monitoring relies on your browsers settings and the plugin being loaded in the window. If you run DWC in a browser tab, and DWC does not remain as the active tab then Event monitoring may fail. You sould not use event monitoring as part of any critical function. By clicking yes you are confirming that you understand and agree with the above statement.",
-                event2Text: "SBC Command requires a Python Service to be installed on the SBC. BtnCmd sends command requests to the SBCC service, which executes them without further checks on job status or other environmental variables. Whilst the service implments a rudimentory API key check, for security reasons it is not reccomended to use this feature if your SBC is exposed to the internet. By clicking yes you are confirming that you understand and accept the risks of enabling this feature.",
+                event2Text: "SBC Command requires a Python Service to be running on the SBC. Please refer to the BtnCmd Wiki for more info. For security reasons it is not reccomended to use this feature if your SBC is exposed to the internet. This feature is for advanced users only - by clicking yes you are confirming that you understand and accept the risks of enabling this feature.",
             }
         },
         methods: {
@@ -174,6 +184,12 @@
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
             async validateData() {
+                if(this.enableAutoBackup && this.ABackupFileName.length < 1){
+                    this.alertReqVal = true;
+                    await this.sleep(2000);
+                    this.alertReqVal = false;
+                    return
+                }
                 if(!this.passedObject.enableMQTT){
                     this.passedObject.pluginMinimumHeight = this.tmpPluginMinimumHeight;
                     this.$emit('exit', true);
@@ -202,7 +218,7 @@
             triggerSBCCReload(){
                 //tell the main window to reload the SBCC settings
                 this.$emit('rldSBCCSet', true);                
-            }            
+            }          
         },
         mounted() {
             this.tmpPluginMinimumHeight = this.passedObject.pluginMinimumHeight;

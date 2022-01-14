@@ -1,0 +1,12 @@
+{
+    "SBCC_Cmds": [
+        {
+            "SBCC_Cmd_ID": 1,
+            "SBCC_Cmd_Name": "SBCC Default Test",
+            "SBCC_Cmd_CmdText" : "echo 'SBCC is working!'",
+            "Enable_In_Job": true,
+            "SBCC_Cmd_Timeout" : 30,
+            "SBCC_ShowResult": true            
+        }
+    ]
+}

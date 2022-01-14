@@ -40,7 +40,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpDebgug }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ tmpSBCCSet }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -74,7 +74,7 @@
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex" :tmpSBCCSet="tmpSBCCSet"></BtnCmdCustomPanel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -403,9 +403,9 @@
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
-				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :bSBCCInstalled="bSBCCInstalled"></BtnCmdGlobalSettingsDialogue>
+				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
-				<BtnCmdSBCCSettingsDialogue @exit="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="tmpSBCCUsr"></BtnCmdSBCCSettingsDialogue>
+				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
 				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>
@@ -502,7 +502,7 @@
 						<span>Configure Status Event Monitoring</span>
 					</v-tooltip>
 				</div>
-				<div class="mx-2" v-if="btnCmd.globalSettings.enableSBCC && bSBCCInstalled">
+				<div class="mx-2" v-if="btnCmd.globalSettings.enableSBCC && systemDSFVer">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showSBCCEdit = !showSBCCEdit">
@@ -746,6 +746,7 @@ import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js'
+import SBCCDefCmds from './SBCC_Default_Cmds.json'
 
 export default {
     components: {
@@ -770,7 +771,9 @@ export default {
 		...mapState('machine/model', {
 			status: state => state.state.status,
 			macrosDirectory: state => state.directories.macros,
-			systemDirectory: state => state.directories.system
+			systemDirectory: state => state.directories.system,
+			systemCurrIP: state => state.network.interfaces[0].actualIP,
+			systemDSFVerStr: state => state.state.dsfVersion
 		}),
 		...mapGetters('machine/model', ['jobProgress']),
 		...mapState('machine/settings', ['codes']),
@@ -799,6 +802,18 @@ export default {
 				}
 			}else{
 				return '';
+			}
+		},
+		tmpSBCCSet(){
+			const sbbcMerge = deepmerge;
+			var tmpCmdsObj = sbbcMerge(this.tmpSBCCDef.SBCC_Cmds, this.btnCmd.SBCC_Cmds);
+			return tmpCmdsObj
+		},
+		systemDSFVer(){
+			if(this.systemDSFVerStr === ""){
+				return false;
+			}else{
+				return true;
 			}
 		}
 	},
@@ -865,21 +880,20 @@ export default {
 			getCurrTabIndex: "tab-1",
 			currBtnPromptTxt: 'Are You Sure?',
 			currHideTopPanel: false,
-			tmpSBCCSet: {},
-			tmpSBCCUsr: {},
-			tmpSBCCDef: {},
+			tmpSBCCDef: SBCCDefCmds,
 			reloadSBCCSet: false,
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
-			btnCmdVersion: '0.10.05',
+			btnCmdVersion: '0.10.06',
 			btnCmd : {
-				btnCmdVersion: '0.10.05',
+				btnCmdVersion: '0.10.06',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
 					lastEventID: 1,
 					lastPanelID: 1,
-					lastInputID: 1
+					lastInputID: 1,
+					last_SBCC_Cmd_ID: 1002,
 				},
 				globalSettings: {
 					enableActionMsg: true,
@@ -895,7 +909,14 @@ export default {
 					pluginMinimumHeight: 0,
 					enableGC_SH_Btn: false,
 					defaultGC_Hidden: false,
-					enableSBCC: false
+					enableSBCC: false,
+					enableAutoBackup: false,
+					ABackupFileName: ''
+				},
+				SBCCSettings: {					
+					HTTP_Port: "8091",
+					API_KEY: 1234567890234,
+					SUBNET: "0.0.0.0"
 				},
 				monitoredEvents: [
 					{
@@ -1013,6 +1034,16 @@ export default {
 						inputLastVal: '',
 						inputVarName: ''
 					}
+				],
+				SBCC_Cmds: [
+					{
+						SBCC_Cmd_ID: 1001,
+						SBCC_Cmd_Name: "Echo Test",
+						SBCC_Cmd_CmdText: "echo 'If you see this Msg SBCC is working'",
+						Enable_In_Job: true,
+						SBCC_Cmd_Timeout: 30,
+						SBCC_ShowResult: true
+					},
 				]
 			}
 		}
@@ -1543,14 +1574,6 @@ export default {
 		//Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
 		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
 			this.toggleTopPanel(true);
-		}
-		//Check if the SBCC service has been installed
-		this.checkSBCCSvs();
-		//load SBCC commands if enabled
-		if(this.btnCmd.globalSettings.enableSBCC && this.bSBCCInstalled){
-			this.loadSBCCSettingsFromFile();
-		}else{
-			this.btnCmd.globalSettings.enableSBCC = false;
 		}
 	},
 	watch: {

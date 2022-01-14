@@ -120,16 +120,15 @@
             mainData: {
                 type: Object
             },
-            tmpSBCCSet: {
-                type: Object
-            },
+            tmpSBCCSet: Array,
             LZIndex: Number
         },
         computed: {
             ...mapState('machine/model', {
                 status: state => state.state.status,
                 macrosDirectory: state => state.directories.macros,
-                systemDirectory: state => state.directories.system
+                systemDirectory: state => state.directories.system,
+                systemCurrIP: state => state.network.interfaces[0].actualIP
             }),
             ...mapGetters('machine/model', ['jobProgress']),
             ...mapState('machine/settings', ['codes']),

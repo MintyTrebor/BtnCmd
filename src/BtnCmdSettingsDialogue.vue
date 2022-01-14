@@ -22,6 +22,7 @@
                 <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
 			</v-card-title>
             <v-card-text>
+                <!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ SBCCCombinedJson }}</span></v-col></v-row> -->
                 <v-form lazy-validation class="mx-2">
                     <v-row class="mx-2 my-n4" dense v-if="!enableSelects">
                         <v-col cols="12">
@@ -117,7 +118,7 @@
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-select v-bind="attrs" v-on="on" :items="SBCCmdListItems" item-text="text" item-value="value" label="Select Command" value="value" required v-model="passedObject.btnActionData" @change="setSBCCVales($event)"></v-select>
+                                    <v-select v-bind="attrs" v-on="on" :items="SBCCmdListItems" item-text="text" item-value="value" label="Select Command" value="value" required v-model="passedObject.btnActionData" @change="setSBCCValues($event)"></v-select>
                                 </template>
                                 <span>Select Command</span>
                             </v-tooltip>
@@ -128,7 +129,7 @@
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-radio-group v-bind="attrs" v-on="on" label="Select Command:" v-model="passedObject.btnActionData" row required>
-                                        <v-radio v-for="type in SBCCmdListItems" :key="'SBCC'+type.value" :label="type.text" :value="type.value" @change="setSBCCVales(type.value)"></v-radio>
+                                        <v-radio v-for="type in SBCCmdListItems" :key="'SBCC'+type.value" :label="type.text" :value="type.value" @change="setSBCCValues(type.value)"></v-radio>
                                     </v-radio-group>
                                 </template>
                                 <span>Select Command</span>
@@ -171,6 +172,16 @@
                             <v-text-field class="custom-label-color" label="Confirmation Text*" v-model="passedObject.btnConfText" required placeholder="Are You Sure?"></v-text-field>
                         </v-col>
                     </v-row>
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='http' || passedObject.btnType == 'SBCC'">
+                        <v-col cols="6" class="ma-0 pa-0">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Show Result" v-model="passedObject.btnSBCCShowResult"></v-switch></span>
+                                </template>
+                                <span>Show a msgbox with the action results</span>
+                            </v-tooltip>    
+                        </v-col>
+                    </v-row>
                     <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <div class="btnCmd-container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.btnColour"></v-color-picker></div>
@@ -194,7 +205,7 @@
             bMQTT: Boolean,
             enableSelects: Boolean,
             enableSBCC: Boolean,
-            SBCCCombinedJson: Object,
+            SBCCCombinedJson: Array,
         },
         computed: {
             show: {
@@ -234,10 +245,10 @@
                 var SBCCItem = null;
                 var tmpItems = [];
                 var tmpItem = null;
-                for (SBCCItem in this.SBCCCombinedJson.SBCC_Cmds) {
+                for (SBCCItem in this.SBCCCombinedJson) {
                     tmpItem = {
-                        text: this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_Name,
-                        value: this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_ID
+                        text: this.SBCCCombinedJson[SBCCItem].SBCC_Cmd_Name,
+                        value: this.SBCCCombinedJson[SBCCItem].SBCC_Cmd_ID
                     };
                     tmpItems.push(tmpItem);
                 }
@@ -294,13 +305,13 @@
                 await this.sleep(2000);
                 this.alertReqVal = false;
             },
-            setSBCCVales(e) {
+            setSBCCValues(e) {
                 var SBCCItem = null;
-                for (SBCCItem in this.SBCCCombinedJson.SBCC_Cmds) {
-                    if(this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_Cmd_ID == e) {
+                for (SBCCItem in this.SBCCCombinedJson) {
+                    if(this.SBCCCombinedJson[SBCCItem].SBCC_Cmd_ID == e) {
                         this.passedObject.btnActionData = e;
-                        this.passedObject.btnEnableWhileJob = this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].Enable_In_Job;
-                        this.passedObject.btnSBCCShowResult = this.SBCCCombinedJson.SBCC_Cmds[SBCCItem].SBCC_ShowResult;
+                        this.passedObject.btnEnableWhileJob = this.SBCCCombinedJson[SBCCItem].Enable_In_Job;
+                        this.passedObject.btnSBCCShowResult = this.SBCCCombinedJson[SBCCItem].SBCC_ShowResult;
                     }
                 }
             }

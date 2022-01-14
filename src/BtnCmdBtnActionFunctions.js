@@ -86,21 +86,45 @@ export default {
 				if(btnJSONOb.btnHttpType == "POST") {
 					axiosHtpp.post(btnJSONOb.btnActionData, btnJSONOb.btnHttpData)
 						.then(function (response) {
-							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-						})
-						.catch(function (error) {
-							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
-						});
+						//tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+						if(btnJSONOb.btnSBCCShowResult){
+							try{
+								var tmpTxt = response.data
+								tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+								tmpParent.showBtnSBCCDialog = true;}
+							catch{
+								console.log(response);
+								tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+							}
+						}
+					})
+					.catch(function (error) {
+						console.log(error);
+						tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+						tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+					});
 				}
 				if(btnJSONOb.btnHttpType == "GET") {
 						axiosHtpp.get(btnJSONOb.btnActionData, { headers: {'Content-Type': `application/${btnJSONOb.btnHttpContType}`}})
 						.then(function (response) {
-							// handle success
-							tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
+							if(btnJSONOb.btnSBCCShowResult){
+								try{
+									var tmpTxt = response.data
+									tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+									tmpParent.showBtnSBCCDialog = true;}
+								catch{
+									console.log(response);
+									tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+								}
+							}
 						})
 						.catch(function (error) {
 							// handle error
-							console.log("Event Action : -- Returned Result : " + JSON.stringify(error));
+							console.log(error);
+							tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
 						});
 				}
 			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
@@ -121,29 +145,28 @@ export default {
 					return;
 				}else{
 					tmpParent.setActionResponse("Last Action :  -- SBCC -- ID: " + btnJSONOb.btnActionData);
-					var tmpHttpData = {"SBCCID": btnJSONOb.btnActionData, "SBCCAPI": tmpParent.tmpSBCCSet.SBCC_Settings["API_KEY"]};
-					var tmpRes = location.host.indexOf(':');
-					var tmpLoc = "";
-					if(tmpRes > 0){
-						tmpLoc = location.host.substring(0, tmpRes);
-					}else{
-						tmpLoc = location.host;
+					var ni = 0
+					for(ni in tmpParent.tmpSBCCSet){
+						if(btnJSONOb.btnActionData == tmpParent.tmpSBCCSet[ni].SBCC_Cmd_ID){
+							var tmpHttpData = {"SBCCID": tmpParent.tmpSBCCSet[ni].SBCC_Cmd_ID, "SBCCAPI": tmpParent.btnCmd.SBCCSettings["API_KEY"], "SBCCCmd": tmpParent.tmpSBCCSet[ni].SBCC_Cmd_CmdText, "SBCCTimeout": tmpParent.tmpSBCCSet[ni].SBCC_Cmd_Timeout};
+							//console.log(tmpHttpData);
+							axiosHtpp.post(`http://${tmpParent.systemCurrIP}:${tmpParent.btnCmd.SBCCSettings["HTTP_Port"]}`, tmpHttpData)
+								.then(function (response) {
+									var tmpTxt
+									//console.log(response.data);
+									if(btnJSONOb.btnSBCCShowResult){
+										tmpTxt = response.data["Cmd_Response"]
+										tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+										//tmpParent.currBtnPromptTxt = response.data["Cmd_Response"];
+										tmpParent.showBtnSBCCDialog = true;
+									}
+								})
+								.catch(function (error) {
+									console.log(error);
+									tmpParent.$makeNotification('error', 'SBCC Encountered an error. Response:', `${error}`);
+								});
+						}
 					}
-					axiosHtpp.post(`http://${tmpLoc}:${tmpParent.tmpSBCCSet.SBCC_Settings["HTTP_Port"]}`, tmpHttpData)
-						.then(function (response) {
-							var tmpSBCCmd
-							for(tmpSBCCmd in tmpParent.tmpSBCCSet.SBCC_Cmds){
-								if(tmpParent.tmpSBCCSet.SBCC_Cmds[tmpSBCCmd].SBCC_Cmd_ID === btnJSONOb.btnActionData && tmpParent.tmpSBCCSet.SBCC_Cmds[tmpSBCCmd].SBCC_ShowResult){
-									tmpParent.currBtnPromptTxt = response.data["Cmd_Response"];
-									tmpParent.showBtnSBCCDialog = true;
-								}
-							}
-						})
-						.catch(function (error) {
-							console.log(error);
-							tmpParent.$makeNotification('error', 'SBCC Encountered an error. Response:', `${error}`);
-						});
-					
 				}
 			}
 		},

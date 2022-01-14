@@ -14,7 +14,8 @@ export default {
 					lastTabID: 2,
 					lastEventID: 1,
 					lastPanelID: 1,
-					lastTxtIconID: 1
+					lastTxtIconID: 1,
+					last_SBCC_Cmd_ID: 1001,
 				},
 				globalSettings: {
 					enableActionMsg: true,
@@ -30,7 +31,14 @@ export default {
 					pluginMinimumHeight: 0,
 					enableGC_SH_Btn: false,
 					defaultGC_Hidden: false,
-					enableSBCC: false
+					enableSBCC: false,
+					enableAutoBackup: false,
+					ABackupFileName: ''
+				},
+				SBCCSettings: {					
+					HTTP_Port: "8091",
+					API_KEY: 1234567890234,
+					SUBNET: "0.0.0.0"
 				},
 				monitoredEvents: [
 					{
@@ -148,11 +156,24 @@ export default {
 						inputLastVal: '',
 						inputVarName: ''
 					}
+				],
+				SBCC_Cmds: [
+					{
+						SBCC_Cmd_ID: 1001,
+						SBCC_Cmd_Name: "Echo Test",
+						SBCC_Cmd_CmdText: "echo 'If you see this Msg SBCC is working'",
+						Enable_In_Job: true,
+						SBCC_Cmd_Timeout: 30,
+						SBCC_ShowResult: true
+					},
 				]
 			};
 		},
 		saveSettings() {
 			localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
+			if(this.btnCmd.globalSettings.enableAutoBackup){
+				this.autoBackupToFile();
+			}
 		},
 		loadSettings() {
 			var btnString = localStorage.getItem('btnCmdsettings');
@@ -177,6 +198,16 @@ export default {
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 			this.saveSettings();			
 		},
+		async autoBackupToFile() {
+			const content = new Blob([JSON.stringify(this.btnCmd)]);
+			var tmpFName = this.btnCmd.globalSettings.ABackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
+			const setFileName = Path.combine(this.systemDirectory, `${tmpFName}.json`);
+			try {
+				await this.upload({ filename: setFileName, content, showSuccess: false });
+			} catch (e) {
+				console.warn(e);
+			}
+		},
 		async saveSettingsToFile() {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);
 			const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
@@ -192,6 +223,7 @@ export default {
 				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
 				this.btnCmd = response;
 				this.checkDataVersion();
+				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
 			} catch (e) {
 				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
 					console.warn(e);
@@ -247,10 +279,12 @@ export default {
 					btnCmdVersion: null,
 					systemSettings: null,
 					globalSettings: null,
+					SBCCSettings: null,
 					monitoredEvents: [],
 					btns: [],
 					tabs: [],
-					panels: []
+					panels: [],
+					SBCC_Cmds: []
 				};				
 				var refData = this.getRefData();
 				var ni = null;
@@ -260,6 +294,8 @@ export default {
 				this.newData.systemSettings = merge(refData.systemSettings, this.btnCmd.systemSettings);
 				//merge globalSettings
 				this.newData.globalSettings = merge(refData.globalSettings, this.btnCmd.globalSettings);
+				//merge SBCCSettings
+				this.newData.SBCCSettings = merge(refData.SBCCSettings, this.btnCmd.SBCCSettings);
 				//merge events
 				for(ni in this.btnCmd.monitoredEvents){
 					this.newData.monitoredEvents.push(merge(refData.monitoredEvents[0], this.btnCmd.monitoredEvents[ni]))
@@ -282,6 +318,18 @@ export default {
 				//merge panels
 				for(ni in this.btnCmd.panels){
 					this.newData.panels.push(merge(refData.panels[0], this.btnCmd.panels[ni]))
+				}
+				ni = null;
+				//merge SBCC_Cmds
+				//as this is a new key we need to just add the default if it does not already exist
+				var tmpPropCheckObj = Object.prototype.hasOwnProperty.call(this.btnCmd, "SBCC_Cmds");
+				//console.log(tmpPropCheckObj)
+				if(tmpPropCheckObj){
+					for(ni in this.btnCmd.SBCC_Cmds){
+						this.newData.SBCC_Cmds.push(merge(refData.SBCC_Cmds[0], this.btnCmd.SBCC_Cmds[ni]))
+					}
+				}else{
+					this.newData.SBCC_Cmds.push(refData.SBCC_Cmds[0]);
 				}
 				this.setActionResponse('Configuration Data Upgraded from :' + this.btnCmd.btnCmdVersion + ' to : ' + this.btnCmdVersion);
 				this.btnCmd = this.newData;

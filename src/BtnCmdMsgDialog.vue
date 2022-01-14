@@ -7,8 +7,7 @@
 				</span>
 			</v-card-title>
 
-			<v-card-text>
-				{{ prompt }}
+			<v-card-text v-html="prompt">
 			</v-card-text>
 
 			<v-card-actions>
