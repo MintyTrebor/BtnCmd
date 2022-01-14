@@ -3,9 +3,9 @@ Description=SBCCSvs
 After=multi-user.target
 [Service]
 User=root
-WorkingDirectory=/opt/dsf/plugins/SBCC
+WorkingDirectory=/opt/dsf/plugins/BtnCmd/dwc
 Type=idle
-ExecStart=/usr/bin/python3 /opt/dsf/plugins/SBCC/SBCC_Main.py &> /dev/null
+ExecStart=/usr/bin/python3 /opt/dsf/plugins/BtnCmd/dwc/SBCC_Main.py &> /dev/null
 Restart=always
 [Install]
 WantedBy=multi-user.target
