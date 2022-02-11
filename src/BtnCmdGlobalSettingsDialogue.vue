@@ -97,7 +97,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="Auto Backup file name*" v-model="passedObject.ABackupFileName" required placeholder="BtnCmdABMyPc"></v-text-field>
                                 </template>
-                                <span>Choose a unique filename per browser/device. The .json suffix will automatically be appened to the file name</span>
+                                <span>Choose a unique filename per browser/device. The .json suffix will automatically be appended to the file name</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
