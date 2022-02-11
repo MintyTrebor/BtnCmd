@@ -50,7 +50,7 @@
                             <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!mobileActive">
+                    <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -60,7 +60,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!mobileActive">
+                    <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -157,7 +157,8 @@
             },
             value: Boolean,
             mobileActive: Boolean,
-            systemDSFVer: Boolean           
+            systemDSFVer: Boolean,
+            showBottomNavigation: Boolean           
         },
         computed: {
             show: {
@@ -167,8 +168,18 @@
                 set (value) {
                     this.$emit('input', value)
                 }
-            }
-        },
+            },
+            showToggButt(){
+                if(this.mobileActive && this.showBottomNavigation && this.$vuetify.breakpoint.smAndDown){
+                    return false;
+                }else if(this.mobileActive && !this.showBottomNavigation){
+                    return false;
+                }
+                else{
+                    return true;
+                }
+			}
+		},
         data: function () {
             return {
                 alertReqVal: false,

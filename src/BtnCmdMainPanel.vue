@@ -1,39 +1,48 @@
 <style>
-	.v-navigation-drawer {
-		z-index: 99997 !important;
-	}
-	.v-bottom-navigation {
+	/* .v-navigation-drawer {
 		z-index: 99996 !important;
 	}
+	.v-bottom-navigation {
+		z-index: 99995 !important;
+	}*/
 	.iziToast-wrapper {
 		z-index: 99999 !important;
 	}
 	.v-snack {
 		z-index: 99999 !important;
-	}
+	}/*
 	.v-tool-bar {
-		z-index: 99998 !important;
+		z-index: 99997 !important;
 	}
 	.v-app-bar {
-		z-index: 99998 !important;
-	}
+		z-index: 99997 !important;
+	}*/
 	.btncmd-footer {
-		z-index: 99995 !important;
-	}
-	.tab-item-wrapper {
+		position: fixed !important;
+	} 
+	.mytab-item-wrapper {
 		width: 100%;
 	}
-	.div-main-wrapper {
-		width: 100%;
-		/* overflow-y: auto; */
-	}
-	.tabs-default {
+	.mytabs-default {
+		/* position: sticky !important; */
 		height: 100%;
 		width: 100%;
 	}
-	.tabs-card {
+	.mytabs-card {
+		/* position: sticky !important; */
 		height: 100%;
 		width: 100%;
+	}
+	.mydiv{
+		position: sticky !important;
+		height: 100%;
+		width: 100%;
+		overflow-y: hidden;
+		overflow-x: hidden;
+	}
+	.myflex {
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 	.vdr{touch-action:none;border:0px #000}
 	.handle,
@@ -54,7 +63,9 @@
 	.drag-button:hover {cursor: move !important}
 </style>
 <template>
-    <div :height="tabCardHeight()" id="BtnCmdMainDiv" class="div-main-wrapper pa-0 ma-0">
+    <div id="BtnCmdMainDiv">
+	<v-flex :height="tabCardHeight()" class="myflex">
+		<div class="mydiv">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
 				<!--<v-row mt-0>
@@ -63,39 +74,39 @@
 				</v-row>-->
 				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ isBottomBarVis }}</span></v-col></v-row> -->
 				<v-row>
-					<v-tabs class="elevation-2 pa-0 ma-0 tabs-default" v-model="getCurrTabIndex">
+					<v-tabs class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
 						<v-tab v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
 							<v-icon v-if="tab.icon" class="mr-1" :style="'color:' + getMainBackgroundColor">{{ tab.icon }}</v-icon><span :style="'color:' + getMainBackgroundColor">{{ tab.caption }}</span>
 						</v-tab>
 						<v-tabs-items v-model="getCurrTabIndex">
 							<v-tab-item v-for="(tab) in getTabs" :key="tab.tabID" :value="`tab-${tab.tabID}`">
-								<v-card class="tab-item-wrapper" id="BtnCmdMainTabCard" :height="tabCardHeight()" :key="'maincard' + tab.tabID" >
-									<v-container fluid class="pa-0 ma-0 tabs-default">
-										<v-row class="pa-0 ma-0 tabs-default">
+								<v-card class="mytab-item-wrapper" id="BtnCmdMainTabCard" :height="tabCardHeight()" :key="'maincard' + tab.tabID" >
+									<v-container fluid class="pa-0 ma-0 mytabs-default">
+										<v-row class="pa-0 ma-0 mytabs-default">
 											<v-col cols="12">
 												<!--this div is here to constrain draggle items within the window-->
-												<div class="tabs-card" v-if="tab.lastZIndex">
-													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
-														<v-card align="center" :flat="panel.borderless" justify="center" class="tabs-card ma-0 pa-0">
-															<v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<td class="tabs-card">
-																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-info-panel>
-																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></layer-chart>
-																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
-																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
-																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
-																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
-																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
-																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
-																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrusion-factors-panel>
-																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></z-babystep-panel>
-																	<status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></status-panel>
-																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
-																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
-																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
-																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
-																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="tabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
+												<div class="mytabs-card" v-if="tab.lastZIndex">
+													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
+														<v-card align="center" :flat="panel.borderless" justify="center" class="mytabs-card ma-0 pa-0">
+															<v-row dense  align="center" justify="center" class="mytabs-card ma-0 pa-0">
+																<td class="mytabs-card">
+																	<job-info-panel v-if="panel.panelType == 'jobinfo'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-info-panel>
+																	<layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></layer-chart>
+																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
+																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
+																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
+																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
+																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
+																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
+																	<extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrusion-factors-panel>
+																	<z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></z-babystep-panel>
+																	<status-panel v-if="panel.panelType == 'status-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></status-panel>
+																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
+																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
+																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
+																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
+																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="mytabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -158,15 +169,15 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="getZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
-														<v-card align="center" justify="center" flat class="tabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
-															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
-																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
-																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
-																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
-																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
-																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="tabs-card pa-0 ma-0">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class=" ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+														<v-card align="center" justify="center" flat class="mytabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
+															<v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
+																<td class="mytabs-card ma-0 pa-0" align="center" justify="center">
+																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
+																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
+																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
+																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="mytabs-card pa-0 ma-0">
 																		<tbody>
 																			<tr class="pa-0 ma-0">
 																				<v-spacer></v-spacer>
@@ -261,10 +272,10 @@
 														</v-card>
 													</vue-draggable-resizable>
 													<!--Draw buttons Last-->
-													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="getZidx(btn.btnZIndex)" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
+													<vue-draggable-resizable v-for="(btn) in getTabBtns(tab.tabID)" :key="'btn' + btn.btnID + btn.autoSize" :z="btn.btnZIndex" :grid="tab.tabGridSize" @activated="onDragClick(btn)" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="!btn.autoSize" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastBtnMovePosition" @resizestop="onBtnResizestop">
 														<v-card align="center" justify="center" style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-															<v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
-																<td class="tabs-card ma-0 pa-0" align="center" justify="center">
+															<v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
+																<td class="mytabs-card ma-0 pa-0" align="center" justify="center">
 																	<!--tooltip buttons-->
 																	<div v-if="btn.btnGroupIdx==tab.tabID && !editMode && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
 																		<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+1}`">
@@ -424,7 +435,7 @@
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
-				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
+				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
 				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
@@ -433,17 +444,19 @@
 				<BtnCmdMsgDialog :shown.sync="showBtnSBCCDialog" title="Command Response" :prompt="currBtnPromptTxt" @confirmed="showBtnSBCCDialog = !showBtnSBCCDialog"></BtnCmdMsgDialog>	
 			</v-col>
 		</v-row>
+		</div>
+	</v-flex>
 		<!-- Normal Footer with action messages-->
-		<v-footer app v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0 btncmd-footer" :style="`bottom: ${getBottomPixels()}px; width: auto !important`">
+		<v-footer app v-if="!settingsMode && !editMode && !createMode && btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0 btncmd-footer" :style="`width: auto !important`">
 			<v-row class="pa-0 ma-0">	
 				<div>
 					<span v-if="!mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
 				</div>
 				<v-spacer></v-spacer>
-				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
+				<div class="mx-2" v-if="showToggButt">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
 								<v-icon v-if="!currHideTopPanel" class="mr-0" >mdi-eye-off</v-icon>
 								<v-icon v-if="currHideTopPanel" class="mr-0" >mdi-eye</v-icon>
 							</v-btn>
@@ -464,13 +477,13 @@
 			</v-row>
 		</v-footer>
 		<!-- Normal Footer No action messages-->
-		<v-footer app v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0 btncmd-footer" :style="`bottom: ${getBottomPixels()}px; background-color: #FFFFFF00; width: auto !important`">
+		<v-footer app v-if="!settingsMode && !editMode && !createMode && !btnCmd.globalSettings.enableActionMsg" height="37" fixed inset class="pa-0 ma-0 btncmd-footer" :style="`background-color: #FFFFFF00; width: auto !important`">
 			<v-row class="pa-0 ma-0">	
 				<v-spacer></v-spacer>
-				<div class="mx-2" v-if="!backupMode && !editMode && btnCmd.globalSettings.enableGC_SH_Btn && !mobileActive">
+				<div class="mx-2" v-if="showToggButt">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
+							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :elevation="1" @click="toggleTopPanelBtn()">
 								<v-icon v-if="!currHideTopPanel" class="mr-1" >mdi-eye-off</v-icon>
 								<v-icon v-if="currHideTopPanel" class="mr-1" >mdi-eye</v-icon>
 							</v-btn>
@@ -491,7 +504,7 @@
 			</v-row>
 		</v-footer>
 		<!--Settings Footer -->
-		<v-footer app v-if="settingsMode && !editMode && !createMode" height="37" fixed inset class="pa-0 ma-0 btncmd-footer" :style="`bottom: ${getBottomPixels()}px;`">
+		<v-footer app v-if="settingsMode && !editMode && !createMode" height="37" fixed inset class="pa-0 ma-0 btncmd-footer">
 			<v-row class="pa-0 ma-0">
 				<div class="mx-2">
 					<v-tooltip top>
@@ -612,7 +625,7 @@
 			</v-row>
 		</v-footer>
 		<!-- Edit Mode Footer -->
-		<v-footer app v-if="editMode" height="37" fixed inset :style="`bottom: ${getBottomPixels()}px;`" class="pa-0 ma-0 btncmd-footer">
+		<v-footer app v-if="editMode" height="37" fixed inset class="pa-0 ma-0 btncmd-footer">
 			<v-row class="pa-0 ma-0">
 				<v-spacer></v-spacer>
 				<div class="mx-1">
@@ -739,6 +752,7 @@
 			</v-card>
 		</v-dialog>
 	</div>
+	
 </template>
 
 <script>
@@ -817,6 +831,20 @@ export default {
 		},
 		getTabs(){
 			return this.btnCmd.tabs.filter(item => item.embedTab === this.createMode);
+		},
+		showToggButt(){
+			if(!this.backupMode && !this.editMode && this.btnCmd.globalSettings.enableGC_SH_Btn){
+				if(this.mobileActive && this.showBottomNavigation && this.$vuetify.breakpoint.smAndDown){
+					return false;
+				}else if(this.mobileActive && !this.showBottomNavigation){
+					return false;
+				}
+				else{
+					return true;
+				}
+			}else{
+				return false;
+			}
 		},
 		getMainBackgroundColor(){
 			if(this.editMode){
@@ -1152,13 +1180,6 @@ export default {
 				this.currHideTopPanel = false;
 			}
 		},		
-		getZidx(idxVal) {
-			if(this.mobileActive && !this.editMode){
-				return null;
-			}else {
-				return idxVal;
-			}
-		},
 		getBottomPixels() {
 			if(this.showBottomNavigation) {
 				try{

@@ -5,46 +5,46 @@
             <v-row class="pa-0 ma-0 tabs-default">
                 <v-col cols="12">
                     <!--this div is here to constrain draggle items within the window-->
-                    <div class="tabs-card" v-if="passedObject.panelZIndex">
-                        <vue-draggable-resizable v-for="(panel) in getTabPanels(passedObject.customPanelID)" :z="getCustPanZidx(panel.panelZIndex)" :key="'dwcpan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
-                            <v-card align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                <v-row dense  align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                    <td class="tabs-card">
-                                        <job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-info-panel>
-                                        <layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></layer-chart>
-                                        <temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="tabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
-                                        <job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
-                                        <job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
-                                        <fans-panel v-if="panel.panelType == 'fans'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
-                                        <job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
-                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
-                                        <extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
-                                        <extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrusion-factors-panel>
-                                        <z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></z-babystep-panel>
-                                        <status-panel v-if="panel.panelType == 'status-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></status-panel>
-                                        <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
-                                        <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
-                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
-                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
+                    <div class="mytabs-card" v-if="passedObject.panelZIndex">
+                        <vue-draggable-resizable v-for="(panel) in getTabPanels(passedObject.customPanelID)" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
+                            <v-card align="center" justify="center" class="mytabs-card ma-0 pa-0">
+                                <v-row dense  align="center" justify="center" class="mytabs-card ma-0 pa-0">
+                                    <td class="mytabs-card">
+                                        <job-info-panel v-if="panel.panelType == 'jobinfo'" lign="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-info-panel>
+                                        <layer-chart v-if="panel.panelType == 'layerchart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></layer-chart>
+                                        <temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
+                                        <job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
+                                        <job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
+                                        <fans-panel v-if="panel.panelType == 'fans'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
+                                        <job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
+                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
+                                        <extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
+                                        <extrusion-factors-panel v-if="panel.panelType == 'extrusion-factors-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrusion-factors-panel>
+                                        <z-babystep-panel v-if="panel.panelType == 'z-babystep-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></z-babystep-panel>
+                                        <status-panel v-if="panel.panelType == 'status-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></status-panel>
+                                        <tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
+                                        <movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
+                                        <speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
+                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
                                     </td>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
-                        <vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(passedObject.customPanelID)" :z="getCustPanZidx(panel.panelZIndex)" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
-                            <v-card align="center" justify="center" flat class="tabs-card ma-0 pa-0">
-                                <v-row dense align="center" justify="center" class="tabs-card ma-0 pa-0">
-                                    <td class="tabs-card">
-                                        <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
-                                        <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="tabs-card pa-0 ma-0"></BtnCmdWebPanel>
-                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="tabs-card pa-0 ma-0" style="height: 100%; width: 100%"></BtnCmdMMPanel>                                     
-                                        <BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="tabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="LZIndex"></BtnCmdVInputPanel>
+                        <vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(passedObject.customPanelID)" :z="panel.panelZIndex" :key="'campan'+panel.panelID" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="false" :draggable="false" :drag-handle="'.drag-handle'">
+                            <v-card align="center" justify="center" flat class="mytabs-card ma-0 pa-0">
+                                <v-row dense align="center" justify="center" class="mytabs-card ma-0 pa-0">
+                                    <td class="mytabs-card">
+                                        <altWebCamPanel v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
+                                        <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0"></BtnCmdWebPanel>
+                                        <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="mytabs-card pa-0 ma-0" style="height: 100%; width: 100%"></BtnCmdMMPanel>                                     
+                                        <BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="LZIndex"></BtnCmdVInputPanel>
                                     </td>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
-                        <vue-draggable-resizable v-for="(btn) in getTabBtns(passedObject.customPanelID)" :z="getCustPanZidx(btn.btnZIndex)" :key="'btn' + btn.btnID + btn.autoSize" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="false" :draggable="false">
+                        <vue-draggable-resizable v-for="(btn) in getTabBtns(passedObject.customPanelID)" :z="btn.btnZIndex" :key="'btn' + btn.btnID + btn.autoSize" :parent="true" :w="btn.btnWsize" :h="btn.btnHsize" class="ma-0 pa-0" :x="btn.btnXpos" :y="btn.btnYpos" :resizable="false" :draggable="false">
                             <v-card align="center" justify="center" style="height: 98%; width: 98%" class="ma-0 pa-0" :key="'btnCard' + btn.btnID + btn.autoSize + btn.btnWsize + btn.btnHsize + btn.btnXpos + btn.btnYpos">
-                                <v-row align="center" justify="center" class="tabs-card ma-0 pa-0">
+                                <v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
                                     <div v-if="btn.btnGroupIdx==passedObject.customPanelID && !btn.autoSize && btn.btnHoverText.length>0" class="ma-0 pa-0" style="height: 100%; width: 100%" align="center" justify="center">
                                         <v-tooltip bottom :style="`position: absolute; z-index:${passedObject.panelZIndex+1}`">
                                             <template v-slot:activator="{ on, attrs }">
@@ -194,13 +194,6 @@
                     return true;
                 }else {
                     return false;
-                }
-            },
-            getCustPanZidx(idxVal) {
-                if(this.mobileActive && !this.editMode){
-                    return null;
-                }else {
-                    return idxVal;
                 }
             },
             getDWCPanelBGColor(panBGColor, panUseDWCThemeBGColor){
