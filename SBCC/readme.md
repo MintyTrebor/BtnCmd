@@ -1,11 +1,13 @@
 ***DSF must already installed and working with plugins enabled on the SBC before installing this service***  
-***Requires BtnCmd 0.10.06+ & RRF 3.4b7+***  
+***Requires BtnCmd 0.10.06+ & RRF 3.4RC1***  
 ***You must enable SBCC in BtnCmd global settings, and configure the API key and Subnet before enabling and starting this service***
 
 Install python3 on SBC if not already installed (normally already installed on most pi's). eg:
 ```
 sudo apt install python3  
 ```  
+Download & Copy the .py file into the btncmd plugin folder on the sbc
+Download & Copy the .json file to the sd card folder on the sbc
 
 Download the svs (optional below) or create the service manually (use the SBCCSvs.service file as reference)
 ```
