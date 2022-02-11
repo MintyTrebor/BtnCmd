@@ -6,8 +6,8 @@ Install python3 on SBC if not already installed (normally already installed on m
 ```
 sudo apt install python3  
 ```  
-Download & Copy the .py file into the btncmd plugin folder on the sbc   
-Download & Copy the .json file to the sd card folder on the sbc
+Download & Copy the .py file into the btncmd plugin folder on the sbc (eg /opt/dsf/plugins/BtnCmd/dwc)  
+Download & Copy the .json file to the sd card folder on the sbc (eg /opt/dsf/sd/sys)
 
 Download the svs (optional below) or create the service manually (use the SBCCSvs.service file as reference)
 ```
