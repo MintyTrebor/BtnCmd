@@ -87,7 +87,7 @@
 											<v-col cols="12">
 												<!--this div is here to constrain draggle items within the window-->
 												<div class="mytabs-card" v-if="tab.lastZIndex">
-													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop" >
+													<vue-draggable-resizable v-for="(panel) in getTabPanels(tab.tabID)"  :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'dwcpan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class="ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="true" :draggable="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
 														<v-card align="center" :flat="panel.borderless" justify="center" class="mytabs-card ma-0 pa-0">
 															<v-row dense  align="center" justify="center" class="mytabs-card ma-0 pa-0">
 																<td class="mytabs-card">
@@ -169,7 +169,7 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class=" ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizestop="onPanelResizestop">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class=" ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizing="panel.bPanelActivated = true" @resizestop="onPanelResizestop; panel.bPanelActivated = false">
 														<v-card align="center" justify="center" flat class="mytabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
 																<td class="mytabs-card ma-0 pa-0" align="center" justify="center">
@@ -431,7 +431,7 @@
 				</v-row>
 				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
 				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
-				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" :isFFForUnset="isFFForUnset" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
@@ -766,7 +766,7 @@ import BtnCmdSBCCSettingsDialogue from './BtnCmdSBCCSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
 import Path from '../../utils/path.js';
 import deepmerge from 'deepmerge';
-import { isPrinting, isPaused, StatusType } from '../../store/machine/modelEnums.js';
+import { isPrinting, isPaused, StatusType, MachineMode } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
@@ -781,6 +781,7 @@ import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js'
+import { DashboardMode } from '../../store/settings.js'
 
 export default {
     components: {
@@ -815,12 +816,19 @@ export default {
 			darkTheme: state => state.settings.darkTheme,
 			bottomNavigation: state => state.settings.bottomNavigation,
 			iconMenu: state => state.settings.iconMenu,
+			machineMode: state => state.machine.model.state.machineMode,
 		}),
 		isPrinting() { return isPrinting(this.status); },
 		isPaused() { return isPaused(this.status); },
 		eventStatusText() { return this.status; },
 		showBottomNavigation() {
 			return this.$vuetify.breakpoint.mobile && !this.$vuetify.breakpoint.xsOnly && this.bottomNavigation;
+		},
+		isFFForUnset() {
+			if (this.dashboardMode === DashboardMode.default) {
+				return !this.machineMode || this.machineMode === MachineMode.fff;
+			}
+			return this.dashboardMode === DashboardMode.fff;
 		},
 		mobileActive() {
 			if(this.$vuetify.breakpoint.mobile){
@@ -924,6 +932,8 @@ export default {
 				width: 0,
 				height: 0
 			},
+			resizing: false,
+			sizeKey: 0,
 			tmpDebgug: null,
 			fileAction: 'load',
 			alertReqVal: false,
@@ -937,9 +947,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.06',
+			btnCmdVersion: '0.10.07',
 			btnCmd : {
-				btnCmdVersion: '0.10.06',
+				btnCmdVersion: '0.10.07',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1085,7 +1095,12 @@ export default {
 						inputSuffixText: '',
 						inputEnableClear: false,
 						inputLastVal: '',
-						inputVarName: ''
+						inputVarName: '',
+						inputDispType: '',
+						inputControlVals: [],
+						inputControlRange:[],
+						inputControlSteps: 1,
+						bPanelActivated: false
 					}
 				],
 				SBCC_Cmds: [
@@ -1311,6 +1326,9 @@ export default {
 			this.currPanelObj.panelYpos = y;
 			this.currPanelObj.panelWSize = this.checkGridCompat(width);
 			this.currPanelObj.panelHSize = this.checkGridCompat(height);
+		},
+		updateSizeKey(){
+			this.sizeKey = this.currPanelObj.panelWSize + this.currPanelObj.panelHSize;
 		},
 		bringBtnToFront(tmpBtnObj){
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
@@ -1639,25 +1657,28 @@ export default {
 		//trys to load the default sbcc commands file
 		this.loadDefSBCCmds();
 	},
+	activated(){
+		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
+				this.toggleTopPanel(true);
+				this.updateForDesktop();
+		}
+	},
+
+	deactivated(){
+		if(!this.mobileActive){
+				this.toggleTopPanel(false);
+				this.updateForDesktop();
+		}else{
+			this.updateForMobile();
+		}
+	},
+
 	watch: {
 		status: function (val) {
 			//console.log("Checking Conditions Status change to :" + val);
 			if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
 				//console.log("Conditions Met lauching checkEvents");
 				this.checkEvents('status', val);
-			}
-		},
-		$route (to, from){
-			if(to.path === "/BtnCmd" && this.btnCmd.globalSettings.defaultGC_Hidden && !this.mobileActive){
-				this.toggleTopPanel(true);
-				this.updateForDesktop();
-			}
-			if(from.path === "/BtnCmd" && !this.mobileActive){
-				this.toggleTopPanel(false);
-				this.updateForDesktop();
-			}
-			if(from.path === "/BtnCmd" && this.mobileActive){
-				this.updateForMobile();
 			}
 		},
 		mobileActive (val) {

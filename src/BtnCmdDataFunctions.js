@@ -154,7 +154,12 @@ export default {
 						inputSuffixText: '',
 						inputEnableClear: false,
 						inputLastVal: '',
-						inputVarName: ''
+						inputVarName: '',
+						inputDispType: '',
+						inputControlVals: [],
+						inputControlRange:[],
+						inputControlSteps:1,
+						bPanelActivated: false
 					}
 				],
 				SBCC_Cmds: [
