@@ -1,5 +1,5 @@
 # BtnCmd
-A Duet Web Control (DWC) browser plugin which allows the user to create custom layouts with panels and buttons, which can run Macros and g-code, Post http GET requests, send MQTT messages. BtnCmd also includes a simple status monitoring feature.  
+A Duet Web Control (DWC) plugin which allows the user to create custom layouts with new panels and buttons, which can run Macros, g-code, Post http GET requests, send MQTT messages. 
 
 ![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_1.png)  
 
@@ -24,14 +24,8 @@ The custom buttons can be configured to trigger one of five types of actions:
 * Send a MQTT Message  
 * Open a URL in a pop-up window  
 * Run a SBC command (If SBCC is enabled)
-
-BtnCmd also offers the ability to monitor the status of the Duet Board and trigger an event when the status matches the event parameters. An event can perform the following actions:  
-* Send a Telegram Message (via a telegram bot) useful to get alerted to a status change via your smartphone.
-* Send a simple HTTP request.
-* Send a MQTT Message
-
-
-BtnCmd runs in the browser, and is compatible with both standalone control boards and SBC + control board configurations.
+  
+BtnCmd runs in the browser, and is compatible with both standalone control boards and SBC + control board configurations.  
   
 Short Overview Video Below:  
 [![BtnCmd](http://img.youtube.com/vi/q5bTl3c3n_k/0.jpg)](https://www.youtube.com/watch?v=q5bTl3c3n_k "BtnCmd")  
