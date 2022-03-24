@@ -105,6 +105,7 @@
 																	<tools-panel v-if="panel.panelType == 'tools-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></tools-panel>
 																	<movement-panel v-if="panel.panelType == 'movement-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></movement-panel>
 																	<speed-factor-panel v-if="panel.panelType == 'speed'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></speed-factor-panel>
+																	<console v-if="panel.panelType == 'console'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></console>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="mytabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
@@ -780,8 +781,9 @@ import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
 import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
-import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js'
-import { DashboardMode } from '../../store/settings.js'
+import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js';
+import { DashboardMode } from '../../store/settings.js';
+import console from './BtnCmdConsole.vue';
 
 export default {
     components: {
@@ -800,7 +802,8 @@ export default {
 		BtnCmdVInputDialogue,
 		BtnCmdVInputPanel,
 		BtnCmdMsgDialog,
-		BtnCmdSBCCSettingsDialogue
+		BtnCmdSBCCSettingsDialogue,
+		console
     },
 	computed: {
 		...mapState('machine/model', {
@@ -947,9 +950,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.07',
+			btnCmdVersion: '0.10.08',
 			btnCmd : {
-				btnCmdVersion: '0.10.07',
+				btnCmdVersion: '0.10.08',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,

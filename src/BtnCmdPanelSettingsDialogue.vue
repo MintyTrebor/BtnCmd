@@ -167,7 +167,8 @@
                 {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Global Variable Input', value: 'vInput', disabled: false, hSize: 60, wSize: 300},
-                {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250}
+                {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250},
+                {text: 'Console', value: 'console', disabled: false, hSize: 300, wSize: 380},
             ]},
             panelItems() {
                 return this.panelItemsFull.filter(item => {return item.disabled === false});
