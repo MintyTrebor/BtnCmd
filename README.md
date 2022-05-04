@@ -23,7 +23,7 @@ The custom buttons can be configured to trigger one of five types of actions:
 * Send a simple HTTP request.
 * Send a MQTT Message  
 * Open a URL in a pop-up window  
-* Run a SBC command (If SBCC is enabled)
+
   
 BtnCmd runs in the browser, and is compatible with both standalone control boards and SBC + control board configurations.  
   
