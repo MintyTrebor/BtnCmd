@@ -437,7 +437,7 @@
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
-				<BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue>
+				<!-- <BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue> -->
 				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
@@ -527,7 +527,7 @@
 						<span>Edit Plugin Global Settings</span>
 					</v-tooltip>
 				</div>
-				<div class="mx-2" v-if="btnCmd.globalSettings.enableEvents && !mobileActive">
+				<!-- <div class="mx-2" v-if="btnCmd.globalSettings.enableEvents && !mobileActive">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
@@ -536,7 +536,7 @@
 						</template>
 						<span>Configure Status Event Monitoring</span>
 					</v-tooltip>
-				</div>
+				</div> -->
 				<div class="mx-2" v-if="btnCmd.globalSettings.enableSBCC && systemDSFVer">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
@@ -761,7 +761,7 @@
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
-import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
+//import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import BtnCmdPanelSettingsDialogue from './BtnCmdPanelSettingsDialogue.vue';
 import BtnCmdSBCCSettingsDialogue from './BtnCmdSBCCSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
@@ -775,7 +775,7 @@ import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
 import BtnCmdAWCPanelDialogue from './BtnCmdAWCPanelDialogue.vue';
 import BtnCmdMMPanelDialogue from './BtnCmdMMPanelDialogue.vue';
 import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
-import BtnCmdEventFunctions from './BtnCmdEventFunctions.js';
+//import BtnCmdEventFunctions from './BtnCmdEventFunctions.js';
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
 import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
 import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
@@ -791,7 +791,7 @@ export default {
 		BtnCmdTabSettingsDialogue,
 		BtnCmdGlobalSettingsDialogue,
 		altWebCamPanel,
-		BtnCmdEventSettingsDialogue,
+		//BtnCmdEventSettingsDialogue,
 		VueDraggableResizable,
 		BtnCmdPanelSettingsDialogue,
 		BtnCmdWebPanel,
@@ -883,7 +883,7 @@ export default {
 	},
 	mixins: [
 		BtnCmdDataFunctions,
-		BtnCmdEventFunctions,
+		//BtnCmdEventFunctions,
 		BtnCmdBtnActionFunctions,
 		BtnCmdSCCFunctions
 	],
@@ -1678,13 +1678,13 @@ export default {
 	},
 
 	watch: {
-		status: function (val) {
-			//console.log("Checking Conditions Status change to :" + val);
-			if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
-				//console.log("Conditions Met lauching checkEvents");
-				this.checkEvents('status', val);
-			}
-		},
+		// status: function (val) {
+		// 	//console.log("Checking Conditions Status change to :" + val);
+		// 	if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
+		// 		//console.log("Conditions Met lauching checkEvents");
+		// 		this.checkEvents('status', val);
+		// 	}
+		// },
 		mobileActive (val) {
 			if(val){
 				try{

@@ -39,7 +39,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!mobileActive">
+                    <!-- <v-row dense v-if="!mobileActive">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -49,7 +49,7 @@
                             </v-tooltip>
                             <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
                         </v-col>
-                    </v-row>
+                    </v-row> -->
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>
