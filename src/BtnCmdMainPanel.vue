@@ -170,7 +170,7 @@
 															</v-row>
 														</v-card>
 													</vue-draggable-resizable>
-													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class=" ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizing="panel.bPanelActivated = true" @resizestop="onPanelResizestop; panel.bPanelActivated = false">
+													<vue-draggable-resizable v-for="(panel) in getTabPanelsEditable(tab.tabID)" align="center" justify="center" :grid="tab.tabGridSize" :z="panel.panelZIndex" :key="'campan'+panel.panelID" @activated="onPanelDragClick(panel)" :parent="true" class=" ma-0 pa-0" :w="panel.panelWSize" :h="panel.panelHSize" :x="panel.panelXpos" :y="panel.panelYpos" :resizable="editMode" :draggable="editMode" :disable-user-select="editMode" :drag-handle="'.drag-handle'" @dragstop="lastPanelMovePosition" @resizing="panel.bPanelActivated = true" @resizestop="onPanelResizestop">
 														<v-card align="center" justify="center" flat class="mytabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
 																<td class="mytabs-card ma-0 pa-0" align="center" justify="center">
@@ -950,9 +950,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.08',
+			btnCmdVersion: '0.10.09',
 			btnCmd : {
-				btnCmdVersion: '0.10.08',
+				btnCmdVersion: '0.10.09',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1248,7 +1248,7 @@ export default {
 			}			
 		},
 		//dragging functions
-		lastBtnMovePosition: function (x, y) {
+		lastBtnMovePosition(x, y) {
 			this.editDragging = false;
 			this.dragging = false;
 			var tmpX = x;
@@ -1270,7 +1270,7 @@ export default {
 			this.currButtonObj.btnXpos = xPos;
 			this.currButtonObj.btnYpos = yPos;
 		},
-		onBtnResizestop: function (x, y, width, height){
+		onBtnResizestop(x, y, width, height){
 			this.resizing = false;
 			this.currButtonObj.btnXpos = x;
 			this.currButtonObj.btnYpos = y;
@@ -1301,7 +1301,7 @@ export default {
 				return Math.floor(gridVal);
 			}
 		},
-		lastPanelMovePosition: function (x, y) {
+		lastPanelMovePosition(x, y) {
 			this.editDragging = false;
 			this.dragging = false;
 			var tmpX = x;
@@ -1323,12 +1323,13 @@ export default {
 			this.currPanelObj.panelXpos = xPos;
 			this.currPanelObj.panelYpos = yPos;
 		},
-		onPanelResizestop: function (x, y, width, height){
+		onPanelResizestop(x, y, width, height){
 			this.resizing = false;
 			this.currPanelObj.panelXpos = x;
 			this.currPanelObj.panelYpos = y;
 			this.currPanelObj.panelWSize = this.checkGridCompat(width);
 			this.currPanelObj.panelHSize = this.checkGridCompat(height);
+			this.currPanelObj.bPanelActivated = false;
 		},
 		updateSizeKey(){
 			this.sizeKey = this.currPanelObj.panelWSize + this.currPanelObj.panelHSize;
