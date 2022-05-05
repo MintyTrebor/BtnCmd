@@ -70,7 +70,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="systemDSFVer">
+                    <!-- <v-row dense v-if="systemDSFVer">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -80,7 +80,7 @@
                             </v-tooltip>
                             <confirm-dialog :shown.sync="confirmEnableSBCC" title="Confirm Enabling SBCC" :prompt="event2Text" @dismissed="passedObject.enableSBCC = false" @confirmed="triggerSBCCReload()"></confirm-dialog>
                         </v-col>
-                    </v-row>
+                    </v-row> -->
                     <v-row dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
