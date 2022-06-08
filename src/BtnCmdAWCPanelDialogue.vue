@@ -87,9 +87,9 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Refresh Period (ms)*" v-model="passedObject.altWebCamParams.altWebCamUpdateTimer" placeholder="5000"></v-text-field>
+                                    <v-text-field v-bind="attrs" v-on="on" label="Refresh Period (ms)*" v-model.number="passedObject.altWebCamParams.altWebCamUpdateTimer" placeholder="0"></v-text-field>
                                 </template>
-                                <span>Period in milliseconds to refresh image (min 5000)</span>
+                                <span>Period in milliseconds to refresh image</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -97,7 +97,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamAppndHTTP"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamParams.altWebCamAppndHTTP"></v-switch></span>
                                 </template>
                                 <span>Do not append extra HTTP qualifier when reloading images</span>
                             </v-tooltip>
@@ -107,7 +107,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamiFrame"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamParams.altWebCamiFrame"></v-switch></span>
                                 </template>
                                 <span>Embedd Webcam image in iFrame</span>
                             </v-tooltip>
@@ -170,7 +170,7 @@
             },
             async validateData() {
                 this.passedObject.altWebCamParams.altWebCamURL = this.tmpURL;
-                if(this.passedObject.altWebCamParams.altWebCamURL && this.passedObject.altWebCamParams.altWebCamUpdateTimer >= 5000) {
+                if(this.passedObject.altWebCamParams.altWebCamURL && this.passedObject.altWebCamParams.altWebCamUpdateTimer >= 0) {
                     //req fields met so exit
                     this.$emit('exit', true);
                     this.show = false;

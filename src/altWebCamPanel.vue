@@ -61,16 +61,17 @@ img {
 <template>
 	<v-card>
 		<v-card-title>
-			<!-- {{ $t('panel.webcam.caption') }} -->
+			{{ $t('panel.webcam.caption') }}{{ url }}
 		</v-card-title>
 
-		<v-card-text class="pt-0 img-container">
+		<v-card-text class="pa-0 img-container">
 			<v-responsive v-if="passedObject.altWebCamiFrame" :aspect-ratio="16/9">
 				<iframe :src="passedObject.altWebCamURL"></iframe>
 			</v-responsive>
 
-			<a v-else :href="passedObject.altWebCamClickURL" target="_blank"><img :alt="$t('panel.webcam.alt')" :src="url" :class="imgClasses"></a>
-
+			<a v-else :href="passedObject.altWebCamClickURL ? passedObject.altWebCamClickURL : 'javascript:void(0)'">
+				<img :alt="$t('panel.webcam.alt')" :src="active ? url : ''" :class="imgClasses">
+			</a>
 		</v-card-text>
 	</v-card>
 </template>
@@ -78,16 +79,17 @@ img {
 <script>
 'use strict'
 
-//import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
 	props: {
-            passedObject: {
-                type: Object
-            }
-        },
+		passedObject: {
+			type: Object
+		}
+    },
 	computed: {
-		//...mapState('settings', ['webcam']),
+		...mapState('settings', ['webcam']),
+		...mapGetters('machine', ['connector']),
 		imgClasses() {
 			const classes = [];
 
@@ -111,20 +113,29 @@ export default {
 	},
 	data() {
 		return {
+			active: true,
 			updateTimer: null,
 			url: ''
 		}
 	},
+	activated() {
+		this.active = true;
+	},
+	deactivated() {
+		this.active = false;
+	},
 	methods: {
 		updateWebcam() {
-			let url = this.passedObject.altWebCamURL;
-			if (this.passedObject.altWebCamAppndHTTP) {
-				url += "_" + Math.random();
-			} else {
-				if (url.indexOf("?") === -1) {
-					url += "?dummy=" + Math.random();
+			let url = this.passedObject.altWebCamURL.replace('[HOSTNAME]', this.connector ? this.connector.hostname : location.hostname);
+			if (this.passedObject.altWebCamUpdateTimer > 0) {
+				if (this.passedObject.altWebCamAppndHTTP) {
+					url += "_" + Math.random();
 				} else {
-					url += "&dummy=" + Math.random();
+					if (url.indexOf("?") === -1) {
+						url += "?dummy=" + Math.random();
+					} else {
+						url += "&dummy=" + Math.random();
+					}
 				}
 			}
 			this.url = url;
@@ -133,8 +144,19 @@ export default {
 	mounted() {
 		if (!this.passedObject.altWebCamiFrame) {
 			this.updateWebcam();
-			if (this.passedObject.altWebCamUpdateTimer) {
+			if (this.passedObject.altWebCamUpdateTimer > 0) {
 				this.updateTimer = setInterval(this.updateWebcam, this.passedObject.altWebCamUpdateTimer);
+			}
+		}
+	},
+	watch: {
+		webcam: {
+			deep: true,
+			handler() {
+				if (this.passedObject.altWebCamUpdateTimer === 0) {
+					// For persistent images we need to apply updates independently of the update loop
+					this.updateWebcam();
+				}
 			}
 		}
 	},

@@ -12,7 +12,7 @@
             </v-row> -->
             <v-card-title>
 				<v-toolbar dark dense>
-                    <v-toolbar-title>Edit Panel</v-toolbar-title>
+                    <v-toolbar-title>Edit Panel {{isCNCMode}}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
                         <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue' || passedObject.panelType == 'txtLabel' || passedObject.panelType == 'vInput'">Click to Enter Settings</span>
@@ -119,7 +119,8 @@
                 type: Array
             },
             enableSelects: Boolean,
-            createMode: Boolean
+            createMode: Boolean,
+            isCNCMode: Boolean
         },
         computed: {
             show: {
@@ -147,28 +148,33 @@
                 return tmpItems;
             },
             panelItemsFull(){ return [
-                {text: 'DWC Webcam', value: 'webcam', disabled: false, hSize: 240, wSize: 320},
-                {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 240, wSize: 320},
-                {text: 'Job Info', value: 'jobinfo', disabled: false, hSize: 200, wSize: 200},
-                {text: 'Layer Chart', value: 'layerchart', disabled: false, hSize: 240, wSize: 280},
-                {text: 'Temperature Chart', value: 'temperature-chart', disabled: false, hSize: 240, wSize: 280},
-                {text: 'Collected Data', value: 'collectdata', disabled: false, hSize: 110, wSize: 600},
-                {text: 'Job Estimations', value: 'jobestimates', disabled: false, hSize: 110, wSize: 280},
-                {text: 'Job Control', value: 'job-control-panel', disabled: false, hSize: 200, wSize: 300},
-                {text: 'Speed', value: 'speed', disabled: false, hSize: 230, wSize: 320},
-                {text: 'Fan Control', value: 'fans', disabled: false, hSize: 200, wSize: 300},
-                {text: 'Extrusion Control', value: 'extrude-panel', disabled: false, hSize: 340, wSize: 380},
-                {text: 'Extrusion Factors', value: 'extrusion-factors-panel', disabled: false, hSize: 300, wSize: 320},
+                {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 283, wSize: 354},
+                {text: 'DWC Webcam', value: 'webcam', disabled: false, hSize: 283, wSize: 354},
                 {text: 'Baby-Stepping', value: 'z-babystep-panel', disabled: false, hSize: 200, wSize: 300},
-                {text: 'Status', value: 'status-panel', disabled: false, hSize: 240, wSize: 280},
-                {text: 'Tools', value: 'tools-panel', disabled: false, hSize: 300, wSize: 380},
-                {text: 'Movement', value: 'movement-panel', disabled: false, hSize: 240, wSize: 800},
-                {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 240, wSize: 320},
-                {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
-                {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
+                // {text: 'CNC Axes Position', value: 'cnc-axes-position', disabled: true, hSize: 300, wSize: 380},
+                {text: 'CNC Info Panel', value: 'cnc-container-panel', disabled: !this.isCNCMode, hSize: 400, wSize: 800},
+                {text: 'CNC Movement', value: 'cnc-movement-panel', disabled: !this.isCNCMode, hSize: 530, wSize: 1000},
+                {text: 'CNC Spindle Speed', value: 'spindle-speed-panel', disabled: !this.isCNCMode, hSize: 175, wSize: 700},
+                {text: 'Collected Data', value: 'collectdata', disabled: false, hSize: 110, wSize: 600},
+                {text: 'Console', value: 'console', disabled: false, hSize: 200, wSize: 1100},
+                {text: 'Extrusion Control', value: 'extrude-panel', disabled: this.isCNCMode, hSize: 243, wSize: 524},
+                {text: 'Extrusion Factors', value: 'extrusion-factors-panel', disabled: false, hSize: 160, wSize: 358},
+                {text: 'Fan Control', value: 'fans', disabled: false, hSize: 200, wSize: 300},
                 {text: 'Global Variable Input', value: 'vInput', disabled: false, hSize: 60, wSize: 300},
+                {text: 'Job Control', value: 'job-control-panel', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Job Estimations', value: 'jobestimates', disabled: false, hSize: 110, wSize: 280},
+                {text: 'Job Info Panel', value: 'jobinfo', disabled: false, hSize: 200, wSize: 200},
+                {text: 'Layer Chart', value: 'layerchart', disabled: false, hSize: 240, wSize: 280},
+                {text: 'Movement Panel', value: 'movement-panel', disabled: this.isCNCMode, hSize: 272, wSize: 800},
+                {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
+                {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 145, wSize: 500},
+                {text: 'Speed', value: 'speed', disabled: false, hSize: 230, wSize: 320},
+                {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
+                {text: 'Status Panel', value: 'status-panel', disabled: this.isCNCMode, hSize: 288, wSize: 534},
+                {text: 'Temperature Chart', value: 'temperature-chart', disabled: this.isCNCMode, hSize: 240, wSize: 280}, 
+                {text: 'Tools', value: 'tools-panel', disabled: false, hSize: 235, wSize: 661},
                 {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250},
-                {text: 'Console', value: 'console', disabled: false, hSize: 300, wSize: 380},
+                
             ]},
             panelItems() {
                 return this.panelItemsFull.filter(item => {return item.disabled === false});
