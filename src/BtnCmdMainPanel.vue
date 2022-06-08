@@ -1,22 +1,10 @@
 <style>
-	/* .v-navigation-drawer {
-		z-index: 99996 !important;
-	}
-	.v-bottom-navigation {
-		z-index: 99995 !important;
-	}*/
 	.iziToast-wrapper {
 		z-index: 99999 !important;
 	}
 	.v-snack {
 		z-index: 99999 !important;
-	}/*
-	.v-tool-bar {
-		z-index: 99997 !important;
 	}
-	.v-app-bar {
-		z-index: 99997 !important;
-	}*/
 	.btncmd-footer {
 		position: fixed !important;
 	} 
@@ -24,12 +12,10 @@
 		width: 100%;
 	}
 	.mytabs-default {
-		/* position: sticky !important; */
 		height: 100%;
 		width: 100%;
 	}
 	.mytabs-card {
-		/* position: sticky !important; */
 		height: 100%;
 		width: 100%;
 	}
@@ -421,6 +407,7 @@
 						</v-card>
 					</v-menu>
 					<v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo" :style="`position: absolute; z-index:99999; left: 10px;`">
+						<br>
 						<strong>BtnCmd Beta v{{ btnCmdVersion }}</strong><br>
 						Cobbled together by <a href="https://github.com/MintyTrebor" target="_blank">Minty Trebor</a><br>
 						BtnCmd uses the following libraries/modules:<br>
@@ -428,7 +415,8 @@
 						<a href="https://www.npmjs.com/package/mqtt" target="_blank">MQTT.js</a><span>, </span>
 						<a href="https://www.npmjs.com/package/vue-draggable-resizable" target="_blank">vue-draggable-resizable</a><span>, </span>
 						<a href="https://www.npmjs.com/package/axios" target="_blank">axios</a><span>, </span>
-						<a href="https://www.npmjs.com/package/jsonpath" target="_blank">jsonpath</a><br>
+						<a href="https://www.npmjs.com/package/jsonpath" target="_blank">jsonpath</a><span>, </span>
+						<a href="https://www.npmjs.com/package/vuedraggable" target="_blank">vuedraggable</a><br>
 						Plus re-uses components and code from <strong>DWC</strong>.<br>
 						<a href="https://github.com/MintyTrebor/BtnCmd/wiki" target="_blank">BtnCmd Wiki</a><br>
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
@@ -441,7 +429,6 @@
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
 				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
-				<!-- <BtnCmdEventSettingsDialogue @exit="saveSettings()" v-if="showESEdit" v-model="showESEdit" :bMQTT="btnCmd.globalSettings.enableMQTT" :passedObject="btnCmd" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdEventSettingsDialogue> -->
 				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
@@ -531,16 +518,6 @@
 						<span>Edit Plugin Global Settings</span>
 					</v-tooltip>
 				</div>
-				<!-- <div class="mx-2" v-if="btnCmd.globalSettings.enableEvents && !mobileActive">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="editMode || backupMode" color="primary" @click="showESEdit = !showESEdit">
-								<v-icon>mdi-monitor-eye</v-icon>
-							</v-btn>
-						</template>
-						<span>Configure Status Event Monitoring</span>
-					</v-tooltip>
-				</div> -->
 				<div class="mx-2" v-if="btnCmd.globalSettings.enableSBCC && systemDSFVer">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
@@ -765,7 +742,6 @@
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
-//import BtnCmdEventSettingsDialogue from './BtnCmdEventSettingsDialogue.vue';
 import BtnCmdPanelSettingsDialogue from './BtnCmdPanelSettingsDialogue.vue';
 import BtnCmdSBCCSettingsDialogue from './BtnCmdSBCCSettingsDialogue.vue';
 import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
@@ -779,7 +755,6 @@ import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
 import BtnCmdAWCPanelDialogue from './BtnCmdAWCPanelDialogue.vue';
 import BtnCmdMMPanelDialogue from './BtnCmdMMPanelDialogue.vue';
 import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
-//import BtnCmdEventFunctions from './BtnCmdEventFunctions.js';
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
 import BtnCmdCustomPanel from './BtnCmdCustomPanel.vue';
 import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
@@ -795,7 +770,6 @@ export default {
 		BtnCmdTabSettingsDialogue,
 		BtnCmdGlobalSettingsDialogue,
 		altWebCamPanel,
-		//BtnCmdEventSettingsDialogue,
 		VueDraggableResizable,
 		BtnCmdPanelSettingsDialogue,
 		BtnCmdWebPanel,
