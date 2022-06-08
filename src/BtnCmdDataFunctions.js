@@ -140,7 +140,7 @@ export default {
 							altWebCamURL: 'http://',
 							altWebCamRotation: 0,
 							altWebCamFlip: 'none',
-							altWebCamUpdateTimer:  5000,
+							altWebCamUpdateTimer:  0,
 							altWebCamiFrame: false,
 							altWebCamAppndHTTP: false,
 							altWebCamClickURL: ''					

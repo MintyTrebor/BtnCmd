@@ -148,7 +148,7 @@
                 return tmpItems;
             },
             panelItemsFull(){ return [
-                {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 283, wSize: 354},
+                {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 275, wSize: 489},
                 {text: 'DWC Webcam', value: 'webcam', disabled: false, hSize: 283, wSize: 354},
                 {text: 'Baby-Stepping', value: 'z-babystep-panel', disabled: false, hSize: 200, wSize: 300},
                 // {text: 'CNC Axes Position', value: 'cnc-axes-position', disabled: true, hSize: 300, wSize: 380},

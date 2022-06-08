@@ -60,17 +60,13 @@ img {
 
 <template>
 	<v-card>
-		<v-card-title>
-			{{ $t('panel.webcam.caption') }}{{ url }}
-		</v-card-title>
-
 		<v-card-text class="pa-0 img-container">
 			<v-responsive v-if="passedObject.altWebCamiFrame" :aspect-ratio="16/9">
-				<iframe :src="passedObject.altWebCamURL"></iframe>
+				<iframe :src="passedObject.altWebCamURL" :class="classList"></iframe>
 			</v-responsive>
 
 			<a v-else :href="passedObject.altWebCamClickURL ? passedObject.altWebCamClickURL : 'javascript:void(0)'">
-				<img :alt="$t('panel.webcam.alt')" :src="active ? url : ''" :class="imgClasses">
+				<img :alt="$t('panel.webcam.alt')" :src="active ? url : ''" :class="classList">
 			</a>
 		</v-card-text>
 	</v-card>
@@ -90,25 +86,22 @@ export default {
 	computed: {
 		...mapState('settings', ['webcam']),
 		...mapGetters('machine', ['connector']),
-		imgClasses() {
-			const classes = [];
-
+		classList() {
+			const result = [];
 			if (this.passedObject.altWebCamFlip === 'x' || this.passedObject.altWebCamFlip === 'both') {
-				classes.push('flip-x');
+				result.push('flip-x');
 			}
 			if (this.passedObject.altWebCamFlip === 'y' || this.passedObject.altWebCamFlip === 'both') {
-				classes.push('flip-y');
+				result.push('flip-y');
 			}
-
 			if (this.passedObject.altWebCamRotation === 90) {
-				classes.push('rotate-90');
+				result.push('rotate-90');
 			} else if (this.passedObject.altWebCamRotation === 180) {
-				classes.push('rotate-180');
+				result.push('rotate-180');
 			} else if (this.passedObject.altWebCamRotation === 270) {
-				classes.push('rotate-270');
+				result.push('rotate-270');
 			}
-
-			return classes;
+			return result;
 		}
 	},
 	data() {
