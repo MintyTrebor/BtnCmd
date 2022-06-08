@@ -36,4 +36,5 @@ BtnCmd uses the following libraries/modules:
  - [vue-draggable-resizable](https://www.npmjs.com/package/vue-draggable-resizable)
  - [MQTT.js](https://www.npmjs.com/package/mqtt)
  - [axios](https://www.npmjs.com/package/axios)
- - [jasonpath](https://www.npmjs.com/package/jsonpath)
+ - [jasonpath](https://www.npmjs.com/package/jsonpath)  
+ - [vuedraggable](https://www.npmjs.com/package/vuedraggable)
