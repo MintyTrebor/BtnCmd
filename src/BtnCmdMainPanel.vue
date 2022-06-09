@@ -58,7 +58,7 @@
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
-				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ isFFFMode }}</span></v-col></v-row> -->
+				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ printerMode }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
@@ -812,7 +812,7 @@ export default {
 			return this.dashboardMode === DashboardMode.fff;
 		},
 		isCNCMode(){
-			if(this.machineMode === "CNC" || this.machineMode === "cnc"){
+			if(this.machineMode !== "FFF" && this.machineMode !== "fff"){
 				return true;
 			}else{
 				return false;
@@ -935,9 +935,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.10',
+			btnCmdVersion: '0.10.11',
 			btnCmd : {
-				btnCmdVersion: '0.10.10',
+				btnCmdVersion: '0.10.11',
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
