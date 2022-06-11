@@ -6,7 +6,8 @@ A Duet Web Control (DWC) plugin which allows the user to create custom layouts w
 Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how to install configure and use.
 
 In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may also choose to display a selection of panels including:  
-* Standard DWC information & control panels
+* Standard DWC information & control panels  
+* DWC CNC Panels (Only available if using M452/M453 laser/cnc mode)  
 * Standard DWC webcam
 * Alternative webcam
 * Remote Source (eg. A web service from your LAN)
