@@ -98,13 +98,13 @@
 																	<console v-if="panel.panelType == 'console'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></console>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="mytabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
-																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+1}`">
+																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+100}`">
 																		<tbody>
 																			<tr align="center" justify="center">
 																				<v-spacer></v-spacer>
 																				<td>
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+102}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panelDelete(panel.panelID)">
 																									<v-icon>mdi-delete</v-icon>
@@ -116,7 +116,7 @@
 																				</td>
 																				<td>
 																					<div class="drag-handle pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+102}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small style="cursor: move" fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="onPanelDragClick(panel)">
 																									<v-icon>mdi-drag-variant</v-icon>
@@ -128,7 +128,7 @@
 																				</td>
 																				<td>
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+102}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="bringPanelToFront(panel)">
 																									<v-icon>mdi-arrange-bring-to-front</v-icon>
@@ -140,7 +140,7 @@
 																				</td>
 																				<td v-if="panel.panelType == 'custom'">
 																					<div class="pa-md-1">
-																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+2}`">
+																						<v-tooltip bottom :style="`position: absolute; z-index:${tab.lastZIndex+102}`">
 																							<template v-slot:activator="{ on, attrs }">
 																								<v-btn x-small fab color="info" v-bind="attrs" v-on="on" :elevation="1" @click="panel.borderless = !panel.borderless">
 																									<v-icon v-if="!panel.borderless">mdi-border-none-variant</v-icon>
@@ -434,6 +434,8 @@
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
 				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>
 				<BtnCmdMsgDialog :shown.sync="showBtnSBCCDialog" title="Command Response" :prompt="currBtnPromptTxt" @confirmed="showBtnSBCCDialog = !showBtnSBCCDialog"></BtnCmdMsgDialog>	
+				<BtnCmdExportDialog :shown.sync="bShowExportDialog"  :btnCmd="btnCmd"></BtnCmdExportDialog>
+				<BtnCmdImportDialog :shown.sync="bShowImportDialog" @save="saveAndRefresh()" :btnCmd="btnCmd"></BtnCmdImportDialog>
 			</v-col>
 		</v-row>
 		</div>
@@ -528,51 +530,60 @@
 						<span>Configure SBCC Commands</span>
 					</v-tooltip>
 				</div>				
-				<div class="mx-2" v-if="backupMode">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
-								<v-icon>mdi-backup-restore</v-icon>
-							</v-btn>
-						</template>
-						<span>Restore Config from backup. Warning! This will overwrite current settings.</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2" v-if="backupMode">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
-								<v-icon>mdi-content-save-move</v-icon>
-							</v-btn>
-						</template>
-						<span>Backup Config to system folder. Warning! This will overwrite current backup file.</span>
-					</v-tooltip>
-				</div>
-				<div class="mx-2" v-if="backupMode">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="confirmRstSettings = !confirmRstSettings">
-								<v-icon>mdi-autorenew</v-icon>
-							</v-btn>
-						</template>
-						<span>Reset config to default settings! Warning: this will remove all exisiting buttons and tabs. </span>
-					</v-tooltip>
-				</div>
 				<div class="mx-2">
-					<v-tooltip top>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol" @click="brBtnClick()">
-								<v-icon v-if="!backupMode">mdi-database-arrow-right</v-icon>
-								<v-icon v-if="backupMode">mdi-database-arrow-left</v-icon>
-							</v-btn>
+					<v-speed-dial direction="top" transition="scale-transition">
+						<template #activator>
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+									<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting || editMode" :color="brBtnCol">
+										<v-icon >mdi-database-arrow-up</v-icon>
+									</v-btn>
+								</template>
+								<span>Config Backup/Restore & Export Settings</span>
+							</v-tooltip>
 						</template>
-						<span v-if="!backupMode">Show Backup & Restore Options</span>
-						<span v-if="backupMode">Hide Backup & Restore Options</span>
-					</v-tooltip>
+						<v-tooltip right>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnRestoreSettings()">
+									<v-icon>mdi-backup-restore</v-icon>
+								</v-btn>
+							</template>
+							<span>Restore Config from backup. Warning! This will overwrite current settings.</span>
+						</v-tooltip>
+						<v-tooltip right>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="btnBackupSettings()">
+									<v-icon>mdi-content-save-move</v-icon>
+								</v-btn>
+							</template>
+							<span>Backup Config to system folder. Warning! This will overwrite current backup file.</span>
+						</v-tooltip>
+						<v-tooltip right>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="red" @click="confirmRstSettings = !confirmRstSettings">
+									<v-icon>mdi-autorenew</v-icon>
+								</v-btn>
+							</template>
+							<span>Reset config to default settings! Warning: this will remove all exisiting buttons and tabs. </span>
+						</v-tooltip>
+						<v-tooltip right>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="bShowExportDialog = !bShowExportDialog">
+									<v-icon>mdi-file-export</v-icon>
+								</v-btn>
+							</template>
+							<span>Export Layouts & Custom Panels</span>
+						</v-tooltip>
+						<v-tooltip right>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="isPrinting" color="primary" @click="bShowImportDialog = !bShowImportDialog">
+									<v-icon>mdi-file-import</v-icon>
+								</v-btn>
+							</template>
+							<span>Import Layouts & Custom Panels</span>
+						</v-tooltip>
+					</v-speed-dial>
 				</div>
-				<!-- <div>
-					<span v-if="btnCmd.globalSettings.enableActionMsg && !mobileActive" class="text-caption mx-4">{{ actionResponse }}</span>
-				</div> -->
 				<v-spacer></v-spacer>
 				<div class="mx-2" v-if="!backupMode && !editMode">
 					<v-tooltip top>
@@ -763,6 +774,8 @@ import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js';
 import { DashboardMode } from '../../store/settings.js';
 import console from './BtnCmdConsole.vue';
+import BtnCmdExportDialog from './BtnCmdExportDialog.vue';
+import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
 
 export default {
     components: {
@@ -781,6 +794,8 @@ export default {
 		BtnCmdVInputPanel,
 		BtnCmdMsgDialog,
 		BtnCmdSBCCSettingsDialogue,
+		BtnCmdExportDialog,
+		BtnCmdImportDialog,
 		console
     },
 	computed: {
@@ -891,6 +906,8 @@ export default {
 			showAWCPanelEdit: false,
 			showMMPanelEdit: false,
 			showVInputPanelEdit: false,
+			bShowExportDialog: false,
+			bShowImportDialog: false,
 			objectToPass: null,
 			tabObjectToPass: null,
 			panelObjectToPass: null,
@@ -935,9 +952,10 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.11',
+			btnCmdVersion: '0.10.12',
 			btnCmd : {
-				btnCmdVersion: '0.10.11',
+				btnCmdVersion: '0.10.12',
+				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1158,6 +1176,20 @@ export default {
 			return
 		},
 		/// Main Stuff
+		generateUUID(strType) { 
+			// based on code from Public Domain/MIT
+            var d = new Date().getTime();
+            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                d += performance.now(); //use high-precision timer if available
+            }
+            var tmpMask = `xxxxxxxx-xxxx-${strType}xxx-yxxx-xxxxxxxxxxxx`
+			var newGuid = tmpMask.replace(/[xy]/g, function (c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });            
+            return newGuid;
+        },
 		updateAR(ActionText){
 			this.actionResponse=ActionText;
 		},
@@ -1418,13 +1450,13 @@ export default {
 		},
 		onTabAddBtnClick() {
 			this.setActionResponse('');
-			var tmpTabID = this.btnCmd.systemSettings.lastTabID + 1;
+			var tmpTabID = this.generateUUID('TAB');
 			var newTab_object = this.getRefData().tabs[0];
 			newTab_object.tabID = tmpTabID;
 			newTab_object.lastZIndex = 1;
-			newTab_object.caption = 'Group ' + tmpTabID;
+			newTab_object.caption = 'NEW'
 			newTab_object.embedTab = this.createMode;
-			this.btnCmd.systemSettings.lastTabID = tmpTabID;
+			//this.btnCmd.systemSettings.lastTabID = tmpTabID;
 			this.btnCmd.tabs.push(newTab_object);
 			//var tmpTabInx = this.btnCmd.tabs.filter(item => item.embedTab == this.createMode);
 			this.onChangeTab(tmpTabID);			
@@ -1438,7 +1470,7 @@ export default {
 			var tmpPanel_object = null;
 			var tmpBtnID = null;
 			var tmpPanelID = null;
-			var tmpNextTabID = this.btnCmd.systemSettings.lastTabID + 1;
+			var tmpNextTabID = this.generateUUID('TAB');
 			//get the current tab JSON object
 			var currTabObject = this.btnCmd.tabs.filter(itemTab => itemTab.tabID == tmpTabID);
 			//get the buttons associated with the current tab
@@ -1453,25 +1485,25 @@ export default {
 			newTab_object.caption = tmpNewCaption;
 			//reset grid after merge
 			newTab_object.tabGridSize = currTabObject[0].tabGridSize;
-			this.btnCmd.systemSettings.lastTabID = tmpNextTabID;
+			//this.btnCmd.systemSettings.lastTabID = tmpNextTabID;
 			this.btnCmd.tabs.push(newTab_object);
 			//Now create the clone buttons
 			var bi;
 			for (bi in currTabBtnsObject) {
-				tmpBtnID = this.btnCmd.systemSettings.lastID + 1
+				tmpBtnID = this.generateUUID('BTN');
 				tmpBtn_object = merge(this.getRefData().btns[0], currTabBtnsObject[bi]);
 				tmpBtn_object.btnID = tmpBtnID;
 				tmpBtn_object.btnGroupIdx = tmpNextTabID;
-				this.btnCmd.systemSettings.lastID = tmpBtnID;
+				//this.btnCmd.systemSettings.lastID = tmpBtnID;
 				this.btnCmd.btns.push(tmpBtn_object);
 			}
 			//Now Create the cloned Panels
 			for (bi in currTabPanelsObject) {
-				tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1
+				tmpPanelID = this.generateUUID('PANEL');
 				tmpPanel_object = merge(this.getRefData().panels[0], currTabPanelsObject[bi]);
 				tmpPanel_object.panelID = tmpPanelID;
 				tmpPanel_object.tabID = tmpNextTabID;
-				this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
+				//this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
 				this.btnCmd.panels.push(tmpPanel_object);
 			}
 
@@ -1480,8 +1512,8 @@ export default {
 			this.setActionResponse('');
 			const merge = deepmerge;
 			var tmpPanel_object = merge(this.getRefData().panels[0], panelObj)
-			var tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1;
-			this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
+			var tmpPanelID = this.generateUUID('PANEL');
+			//this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			tmpPanel_object.panelID = tmpPanelID;
 			tmpPanel_object.panelYpos = panelObj.panelYpos + 20;
@@ -1491,8 +1523,8 @@ export default {
 		},
 		onAddPanelClick(tmpTab){					
 			this.setActionResponse('');
-			var tmpPanelID = this.btnCmd.systemSettings.lastPanelID + 1
-			this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
+			var tmpPanelID = this.generateUUID('PANEL');
+			//this.btnCmd.systemSettings.lastPanelID = tmpPanelID;
 			var newPanel_object = this.getRefData().panels[0];
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			newPanel_object.panelID = tmpPanelID;
@@ -1519,8 +1551,8 @@ export default {
 		},
 		onAddBtnClick(tmpTab){					
 			this.setActionResponse('');
-			var tmpBtnID = this.btnCmd.systemSettings.lastID + 1
-			this.btnCmd.systemSettings.lastID = tmpBtnID;
+			var tmpBtnID = this.generateUUID('BTN');
+			//this.btnCmd.systemSettings.lastID = tmpBtnID;
 			var newBtn_object = this.getRefData().btns[0];
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			newBtn_object.btnID = tmpBtnID;
@@ -1548,8 +1580,8 @@ export default {
 		btnClone(srcBtn){
 			this.setActionResponse('');
 			const merge = deepmerge;
-			var tmpBtnID = this.btnCmd.systemSettings.lastID + 1
-			this.btnCmd.systemSettings.lastID = tmpBtnID;
+			var tmpBtnID = this.generateUUID('BTN');
+			//this.btnCmd.systemSettings.lastID = tmpBtnID;
 			var newBtn_object = merge(this.getRefData().btns[0], srcBtn)
 			this.currTabObj.lastZIndex = this.currTabObj.lastZIndex + 1;
 			newBtn_object.btnID = tmpBtnID;

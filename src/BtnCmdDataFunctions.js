@@ -9,6 +9,7 @@ export default {
 			//returns a clean copy of the main data structure, used for resetting config, and config data upgrades
 			return {
 				btnCmdVersion: this.btnCmdVersion,
+				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -60,14 +61,14 @@ export default {
 				],
 				btns: [
 					{
-						btnID: '1',
+						btnID: null,
 						btnLabel: 'Example',
 						btnType: 'Macro',
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
 						btnColour: '#00DBFFFF',
-						btnGroupIdx: 1,
+						btnGroupIdx: null,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
 						btnXpos: 100,
@@ -88,7 +89,7 @@ export default {
 				],
 				tabs: [
 					{
-						tabID: 1,
+						tabID: null,
 						embedTab: false,
 						icon: "mdi-view-module",
 						translated: false,
@@ -101,7 +102,7 @@ export default {
 						lastZIndex: 2
 					},
 					{
-						tabID: 2,
+						tabID: null,
 						embedTab: true,
 						icon: "mdi-view-module",
 						translated: false,
@@ -116,8 +117,8 @@ export default {
 				],
 				panels: [
 					{
-						panelID: 1,
-						tabID: 1,
+						panelID: null,
+						tabID: null,
 						panelType: 'jobinfo',
 						panelYpos: 150,
 						panelXpos: 100,
@@ -180,6 +181,13 @@ export default {
 				this.autoBackupToFile();
 			}
 		},
+		saveAndRefresh() {
+			localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
+			if(this.btnCmd.globalSettings.enableAutoBackup){
+				this.autoBackupToFile();
+			}
+			this.onChangeTab(this.btnCmd.tabs[0].tabID);
+		},
 		loadSettings() {
 			var btnString = localStorage.getItem('btnCmdsettings');
 				if (btnString) {
@@ -199,6 +207,16 @@ export default {
 		},
 		resetSettings(){
 			this.btnCmd = this.getRefData();
+			var defTabID = this.generateUUID('TAB');
+			var defCustTabID = this.generateUUID('TAB');
+			var defPanelID = this.generateUUID('PANEL');
+			var defBtnID = this.generateUUID('BTN');
+			this.btnCmd.btns[0].btnID = defBtnID;
+			this.btnCmd.btns[0].btnGroupIdx = defTabID
+			this.btnCmd.tabs[0].tabID = defTabID;
+			this.btnCmd.tabs[1].tabID = defCustTabID;
+			this.btnCmd.panels[0].panelID = defPanelID;
+			this.btnCmd.panels[0].tabID = defTabID;
 			this.confirmRstSettings = false;
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 			this.saveSettings();			
@@ -302,10 +320,12 @@ export default {
 		checkDataVersion(){
 			//compare the loaded data version with the current plugin verison. If they don't match upgrade the data to the new version
 			if(this.btnCmdVersion != this.btnCmd.btnCmdVersion) {
+				var prevVer = this.btnCmd.btnCmdVersion;
 				//versions are different run the upgrade
 				this.setActionResponse('Running Configuration Data Upgrade to : ' + this.btnCmdVersion);
 				this.newData = {
 					btnCmdVersion: null,
+					btnCmdIDUpdateRun: false,
 					systemSettings: null,
 					globalSettings: null,
 					SBCCSettings: null,
@@ -368,8 +388,60 @@ export default {
 				}else{
 					this.newData.SBCC_Cmds.push(refData.SBCC_Cmds[0]);
 				}
-				this.setActionResponse('Configuration Data Upgraded from :' + this.btnCmd.btnCmdVersion + ' to : ' + this.btnCmdVersion);
+				//finished upgrade update live data
 				this.btnCmd = this.newData;
+				//this check to see if the data has already been migrated from numeric id's to guid's
+				if(!this.btnCmd.btnCmdIDUpdateRun){
+					//this is done hierarchicaly tab - btn - panel
+					ni = null;
+					//update tabs
+					for(ni in this.btnCmd.tabs){
+						//only upgrade if the id is a number assume already done if not - a final safety check
+						if(!isNaN(this.btnCmd.tabs[ni].tabID)){
+							let oldTABID = this.btnCmd.tabs[ni].tabID;
+							let bCustTab = this.btnCmd.tabs[ni].embedTab;
+							let newTABID = this.generateUUID('TAB');
+							this.btnCmd.tabs[ni].tabID = newTABID;
+							let bi = 0;
+							//update tab btns
+							for(bi in this.btnCmd.btns){
+								if(this.btnCmd.btns[bi].btnGroupIdx == oldTABID){
+									this.btnCmd.btns[bi].btnGroupIdx = newTABID;
+								}
+							}
+							//update panels
+							let pi = 0;
+							for(pi in this.btnCmd.panels){
+								if(this.btnCmd.panels[pi].tabID == oldTABID){
+									this.btnCmd.panels[pi].tabID = newTABID
+								}
+								if(this.btnCmd.panels[pi].customPanelID == oldTABID && bCustTab){
+									this.btnCmd.panels[pi].customPanelID = newTABID
+								}
+							}
+						}
+					}
+					//update panels
+					let pi = 0;
+					for(pi in this.btnCmd.panels){
+						//let oldPanelID = this.btnCmd.panels[pi].panelID;
+						let newPanelID = this.generateUUID('PANEL');
+						if(!isNaN(this.btnCmd.panels[pi].panelID)){
+							this.btnCmd.panels[pi].panelID = newPanelID;
+						}
+					}
+					//update buttons
+					let bi = 0;
+					for(bi in this.btnCmd.btns){
+						//let oldPanelID = this.btnCmd.panels[pi].panelID;
+						let newBtnID = this.generateUUID('BTN');
+						if(!isNaN(this.btnCmd.btns[bi].btnID)){
+							this.btnCmd.btns[bi].btnID = newBtnID;
+						}
+					}
+					this.btnCmd.btnCmdIDUpdateRun = true;
+				}
+				this.setActionResponse('Configuration Data Upgraded from :' + prevVer + ' to : ' + this.btnCmdVersion);
 				this.newData = null;
 				this.btnCmd.btnCmdVersion = this.btnCmdVersion;
 				this.saveSettings();
