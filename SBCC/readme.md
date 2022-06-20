@@ -1,4 +1,4 @@
-NOT YET AVAILABLE
+NOT YET AVAILABLE  
 ***DSF must already installed and working with plugins enabled on the SBC before installing this service***  
 ***Release TBC***  
 ***You must enable SBCC in BtnCmd global settings, and configure the API key and Subnet before enabling and starting this service***
