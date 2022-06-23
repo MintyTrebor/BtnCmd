@@ -10,7 +10,7 @@ sudo apt install python3
 ```  
 Download & Copy the .py file into the btncmd plugin folder on the sbc (eg /opt/dsf/plugins/BtnCmd/dwc)  
 ```
-sudo wget https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCC_Main.py -O /opt/dsf/plugins/BtnCmd/dwc
+sudo wget https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/SBCC/SBCC_Main.py -O /opt/dsf/plugins/BtnCmd/dwc/SBCC_Main.py
 ```
 Download the svs (optional below) or create the service manually (use the SBCCSvs.service file as reference)
 ```
