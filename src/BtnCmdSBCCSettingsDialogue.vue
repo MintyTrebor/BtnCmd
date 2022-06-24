@@ -123,7 +123,7 @@
                                                     <template v-slot:activator="{ on, attrs }">
                                                         <v-btn v-bind="attrs" small v-on="on" @click="newAPI()"><v-icon>mdi-lock-reset</v-icon></v-btn>
                                                     </template>
-                                                    <span>Generate a new Key</span>
+                                                    <span>Generate a new Key - !WARNING! A New Key will require a manual re-start of the SBCC service.</span>
                                                 </v-tooltip>    
                                             </v-col>
                                         </v-row>
@@ -278,7 +278,9 @@
                 this.editSBCCmd(newSBCCObj);
             },
             newAPI(){
-                this.tmpSBCCUsr.SBCCSettings['API_KEY'] = Math.floor((Math.random() * 1000000000000) + 1);
+                this.tmpSBCCUsr.SBCCSettings['API_KEY'] = this.generateUUID('SBCC');
+                this.$makeNotification('info', 'API Change:', `Because you have changed the API key, the SBCC Service requires a manual restart.`);
+
             },
             closeSBCCSettings(){
                 this.dialog2 = false;
@@ -287,7 +289,21 @@
             closeMainSBCCDialog(){
                 this.$emit('exit', true);
                 this.show = false;
+            },
+            generateUUID(strType) { 
+			// based on code from Public Domain/MIT
+            var d = new Date().getTime();
+            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                d += performance.now(); //use high-precision timer if available
             }
+            var tmpMask = `xxxxxxxx-xxxx-${strType}xxx-yxxx-xxxxxxxxxxxx`
+			var newGuid = tmpMask.replace(/[xy]/g, function (c) {
+                var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });            
+            return newGuid;
+        },
 		},
     }
 </script>

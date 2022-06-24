@@ -952,9 +952,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.12',
+			btnCmdVersion: '0.10.13',
 			btnCmd : {
-				btnCmdVersion: '0.10.12',
+				btnCmdVersion: '0.10.13',
 				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,

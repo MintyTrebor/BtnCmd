@@ -18,17 +18,19 @@ export default {
 				console.warn(e);
 			}
 			this.reloadSBCCSet = true;
-			this.restartSBCCSvs();
 		},
 		async loadSBCCSettingsFromFile() {
 			//Load the main settings shared with the service
 			try {
 				const setFileName = Path.combine(this.systemDirectory, 'SBCC_Config.json');
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
+				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false, showError: false });
+				//console.log("resp: ", response)
 				this.btnCmd.SBCCSettings = response;
 			} catch (e) {
 				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
 					console.warn(e);
+					console.warn("File Does Not Exist - Creating New Version with default Settings")
+					this.createSBCCSettings()
 				}
 			}
 		},
@@ -46,6 +48,20 @@ export default {
 					console.log(error);
 					//tmpParent.$makeNotification('error', 'SBCC Encountered an error. Response:', `${error}`);
 				});
+		},
+		async createSBCCSettings(){
+			//creates the settings file if it does not exist when SBCC is enabled
+			var tmpJSON = {HTTP_Port: "8091", API_KEY: this.generateUUID('SBCC'), SUBNET: "0.0.0.0"}
+			const content = new Blob([JSON.stringify(tmpJSON)]);
+			const setFileName = Path.combine(this.systemDirectory, 'SBCC_Config.json');
+			try {
+				await this.upload({ filename: setFileName, content, showSuccess: false });
+			} catch (e) {
+				console.warn(e);
+			}
+			this.btnCmd.SBCCSettings = tmpJSON;
+			this.$makeNotification('error', 'SBCC First Run:', `BtnCmd has detected that SBCC has not been run before. You must manually re-start the python service before further use.`);
+
 		}
     }
 }

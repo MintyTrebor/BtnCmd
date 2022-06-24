@@ -206,6 +206,12 @@ export default {
 			}
 		},
 		resetSettings(){
+			
+			//console.log("running auto restore")
+			if(this.autoRestore()){
+				return;
+			}
+
 			this.btnCmd = this.getRefData();
 			var defTabID = this.generateUUID('TAB');
 			var defCustTabID = this.generateUUID('TAB');
@@ -220,6 +226,23 @@ export default {
 			this.confirmRstSettings = false;
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 			this.saveSettings();			
+		},
+		async autoRestore(){
+			try {
+				const setFileName = Path.combine(this.systemDirectory, 'BtnCmdAutoRestore.json');
+				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false, showError: false});
+				this.btnCmd = response;
+				this.checkDataVersion();
+				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
+				this.onChangeTab(this.btnCmd.tabs[0].tabID);
+				this.saveSettings();
+				return true;
+			} catch (e) {
+				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
+					console.warn(e);
+					return false;
+				}
+			}
 		},
 		async autoBackupToFile() {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);

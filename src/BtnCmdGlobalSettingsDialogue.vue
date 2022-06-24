@@ -54,7 +54,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Top Panel Show/Hide button" v-model="passedObject.enableGC_SH_Btn" @change="if(!passedObject.enableGC_SH_Btn){passedObject.defaultGC_Hidden = false}"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Top Panel Show/Hide button" v-model="passedObject.enableGC_SH_Btn" @change="!passedObject.enableGC_SH_Btn ? passedObject.defaultGC_Hidden = false : passedObject.defaultGC_Hidden = passedObject.defaultGC_Hidden"></v-switch></span>
                                 </template>
                                 <span>Enable Button to show hide the default DWC top panel</span>
                             </v-tooltip>
@@ -64,13 +64,13 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Top Panel by default" v-model="passedObject.defaultGC_Hidden" @change="if(passedObject.defaultGC_Hidden){passedObject.enableGC_SH_Btn = true}"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Hide Top Panel by default" v-model="passedObject.defaultGC_Hidden" @change="passedObject.defaultGC_Hidden ? passedObject.enableGC_SH_Btn = true : passedObject.enableGC_SH_Btn = passedObject.enableGC_SH_Btn"></v-switch></span>
                                 </template>
                                 <span>Hide the default DWC top panel by default</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <!-- <v-row dense v-if="systemDSFVer">
+                    <v-row dense v-if="systemDSFVer">
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
@@ -80,7 +80,7 @@
                             </v-tooltip>
                             <confirm-dialog :shown.sync="confirmEnableSBCC" title="Confirm Enabling SBCC" :prompt="event2Text" @dismissed="passedObject.enableSBCC = false" @confirmed="triggerSBCCReload()"></confirm-dialog>
                         </v-col>
-                    </v-row> -->
+                    </v-row>
                     <v-row dense>
                         <v-col cols="12">
                             <v-tooltip bottom>
