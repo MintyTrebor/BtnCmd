@@ -1,6 +1,7 @@
 import mqtt from 'mqtt';
 import axios from 'axios';
 import Path from '../../utils/path.js';
+import jsonpath from 'jsonpath';
 import { mapGetters, mapState} from 'vuex';
 
 
@@ -13,10 +14,42 @@ export default {
 		...mapGetters(['uiFrozen'])
 	},
 	methods: {
-        //mqtt Msg Send Functions
+        getModelValue(mmPath){
+			const jp = jsonpath;
+			if(mmPath){
+				var matchInModel = jp.query(this.model, (`$.${mmPath}`));
+				if(JSON.stringify(matchInModel) != "[]"){
+					return  matchInModel[0];
+				}else{
+					return "###";
+				}
+			}else {
+				return "###";
+			}		
+		},
+		matchModelKeys(textToCheckStr){
+			if(textToCheckStr){
+				var tmpStr = textToCheckStr;
+				var tmpArr = tmpStr.match(/#omv\[(.*?)\]/g);
+				var i = 0;
+                var tmpMMVal = null;
+				for(i in tmpArr){
+					let tmpMatchStr = tmpArr[i];
+					let tmpMMKey = tmpArr[i].slice(5);
+					tmpMMKey = tmpMMKey.slice(0, (tmpMMKey.length -1));
+					tmpMMVal = this.getModelValue(tmpMMKey);
+					if(!tmpMMVal){tmpMMVal = ''}
+					tmpStr = tmpStr.replace(tmpMatchStr, tmpMMVal)				
+				}
+                return tmpStr;
+			}
+			return "";
+		},
+		//mqtt Msg Send Functions
 		sendMQTTMsg(msgStr, topicStr){
 			var mqttOptions;
 			var tmpParent = this;
+			msgStr = this.matchModelKeys(msgStr)
 				
 				if(this.btnCmd.globalSettings.MQTTUserName){
 					mqttOptions = {
@@ -32,32 +65,37 @@ export default {
 					};
 				}
 				
-				var client  = mqtt.connect(this.btnCmd.globalSettings.MQTTServer, mqttOptions);
+				try{
+					var client  = mqtt.connect(this.btnCmd.globalSettings.MQTTServer, mqttOptions);
 				
-				client.on('connect', function () {
-					client.subscribe(topicStr, function (e) {
-						if(!e){
-							client.publish(topicStr, msgStr, function (err) {
-								if (err){
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Failed Result = " + err);
-								}else{
-									client.end();
-									tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Sent = " + msgStr);
-								}
-							});
-						}else{
-							client.end();
-							tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed to Subscribe Topic = " + topicStr + ". Reason = " + e);
-						}
+					client.on('connect', function () {
+						client.subscribe(topicStr, function (e) {
+							if(!e){
+								client.publish(topicStr, msgStr, function (err) {
+									if (err){
+										client.end();
+										tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Failed Result = " + err);
+									}else{
+										client.end();
+										tmpParent.setActionResponse("Last Action :  -- MQTT -- Message Sent = " + msgStr);
+									}
+								});
+							}else{
+								client.end();
+								tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed to Subscribe Topic = " + topicStr + ". Reason = " + e);
+							}
+						});
+						
 					});
-					
-				});
-		
-				client.on('error', function (error) {
-					client.end();
-					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
-				});
+			
+					client.on('error', function (error) {
+						client.end();
+						tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + error);
+					});
+				} catch(e){
+					tmpParent.setActionResponse("Last Action :  -- MQTT -- Failed Result : " + e);
+					tmpParent.$makeNotification('error', 'BtnCmd MQTT encountered an error', `Unable to establish MQTT connection. Check your settings!`);
+				}
 
 		},
 		//functions triggered by custom button click
@@ -84,7 +122,14 @@ export default {
 			}else if(btnJSONOb.btnType == "http"){
 				tmpParent.setActionResponse("Last Action :  -- http -- Sending: " + btnJSONOb.btnActionData);
 				if(btnJSONOb.btnHttpType == "POST") {
-					axiosHtpp.post(btnJSONOb.btnActionData, btnJSONOb.btnHttpData)
+					let tmpStrData = this.matchModelKeys(btnJSONOb.btnHttpData)
+					let tmpJsonData = null
+					try{
+						tmpJsonData = JSON.parse(tmpStrData)
+					}catch{
+						tmpJsonData = tmpStrData
+					}
+					axiosHtpp.post(btnJSONOb.btnActionData, tmpJsonData)
 						.then(function (response) {
 						//tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
 						if(btnJSONOb.btnSBCCShowResult){
@@ -94,15 +139,15 @@ export default {
 								tmpParent.showBtnSBCCDialog = true;}
 							catch{
 								console.log(response);
-								tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+								tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
 							}
 						}
 					})
 					.catch(function (error) {
 						console.log(error);
-						tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-						tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+						tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+						tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
 					});
 				}
 				if(btnJSONOb.btnHttpType == "GET") {
@@ -115,16 +160,16 @@ export default {
 									tmpParent.showBtnSBCCDialog = true;}
 								catch{
 									console.log(response);
-									tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+									tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
 								}
 							}
 						})
 						.catch(function (error) {
 							// handle error
 							console.log(error);
-							tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+							tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
 						});
 				}
 			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
@@ -156,9 +201,14 @@ export default {
 									//console.log(response.data);
 									if(btnJSONOb.btnSBCCShowResult){
 										tmpTxt = response.data["Cmd_Response"]
-										tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
-										//tmpParent.currBtnPromptTxt = response.data["Cmd_Response"];
-										tmpParent.showBtnSBCCDialog = true;
+										if(tmpTxt){
+											tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+											//tmpParent.currBtnPromptTxt = response.data["Cmd_Response"];
+											tmpParent.showBtnSBCCDialog = true;
+										}else {
+											tmpParent.currBtnPromptTxt  = "Command Executed but no data was returned";
+											tmpParent.showBtnSBCCDialog = true;
+										}
 									}
 								})
 								.catch(function (error) {

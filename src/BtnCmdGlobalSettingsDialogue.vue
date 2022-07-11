@@ -39,17 +39,6 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <!-- <v-row dense v-if="!mobileActive">
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Events" v-model="passedObject.enableEvents" @change="cnfrmEnableEvents()"></v-switch></span>
-                                </template>
-                                <span>Enable plugin Event based monitoring</span>
-                            </v-tooltip>
-                            <confirm-dialog :shown.sync="confirmEnableEvents" title="Confirm Enabling Events" :prompt="eventText" @dismissed="passedObject.enableEvents = false"></confirm-dialog>
-                        </v-col>
-                    </v-row> -->
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>

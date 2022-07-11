@@ -20,6 +20,7 @@
                     </v-btn>
                 </v-toolbar>
                 <v-alert style="position: absolute; z-index:99999;" :value="alertReqVal" type="error" transition="scale-transition">Required Values have not been entered!</v-alert>
+                <v-alert style="position: absolute; z-index:99999;" :value="alertBadJSON" type="error" transition="scale-transition">Your Post Data is not valid JSON</v-alert>
 			</v-card-title>
             <v-card-text>
                 <!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ SBCCCombinedJson }}</span></v-col></v-row> -->
@@ -98,7 +99,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" :key="'pdata' + passedObject.btnType + passedObject.btnID" class="custom-label-color" required label="Post Data*" v-model="passedObject.btnHttpData" placeholder="{}"></v-text-field>
+                                    <v-text-field ref="httpPostData" v-bind="attrs" v-on="on" :key="'pdata' + passedObject.btnType + passedObject.btnID" class="custom-label-color" required label="Post Data*" v-model="passedObject.btnHttpData" placeholder="{}" @blur="valJSONTxt()"></v-text-field>
                                 </template>
                                 <span>Data to send with Post</span>
                             </v-tooltip>
@@ -257,7 +258,8 @@
         },
         data: function () {
             return {
-                alertReqVal: false
+                alertReqVal: false,
+                alertBadJSON: false
             }
         },
         methods: {
@@ -277,6 +279,35 @@
                 if (this.passedObject.btnType == "MQTT") {return "Enter the message text to send";}
                 if (this.passedObject.btnType == "gcode") {return "Enter the gcode command to send";}
                 if (this.passedObject.btnType == "window") {return "Enter the Window PopUp URL*";}
+            },
+            replaceModelKeys(textToCheckStr){
+                //this is used to remove global variables so json parse check can work
+                if(textToCheckStr){
+                    var tmpStr = textToCheckStr;
+                    var tmpArr = tmpStr.match(/#omv\[(.*?)\]/g);
+                    var i = 0;
+                    var tmpMMVal = null;
+                    for(i in tmpArr){
+                        let tmpMatchStr = tmpArr[i];
+                        let tmpMMKey = tmpArr[i].slice(5);
+                        tmpMMKey = tmpMMKey.slice(0, (tmpMMKey.length -1));
+                        tmpMMVal = 0;
+                        tmpStr = tmpStr.replace(tmpMatchStr, tmpMMVal)				
+                    }
+                    return tmpStr;
+                }
+                return "";
+            },
+            async valJSONTxt(){
+                try{
+                    JSON.parse(this.replaceModelKeys(this.passedObject.btnHttpData))
+                }catch{
+                    this.alertBadJSON = true;
+                    await this.sleep(2000);
+                    this.alertBadJSON = false;
+                    //this.$refs.httpPostData.$el.focus()
+                }
+                return;
             },
             async validateData() {
                 if (this.passedObject.btnActionData) {
