@@ -21,11 +21,20 @@ class SBCC_Startup():
         self._load_settings()
         
     def _load_settings(self):
-        with open(self.SETTINGS_FILE) as json_settings:
+        gotFile = False
+        while gotFile == False:
+            try:
+                jFile = open(self.SETTINGS_FILE)
+                gotFile = True
+            except OSError:
+                time.sleep(10)
+                gotFile = False
+        
+        with jFile:
             global SBCC_Settings_json
             global SBCC_API_KEY
             global SBCC_SubNet        
-            SBCC_Settings_json = json.load(json_settings)
+            SBCC_Settings_json = json.load(jFile)
             SBCC_API_KEY = str(SBCC_Settings_json["API_KEY"])
             SBCC_SubNet = str(SBCC_Settings_json["SUBNET"])
             self.startListening()
