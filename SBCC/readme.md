@@ -1,4 +1,6 @@
-***NOTE: REQUIRES BtnCmd 0.10.13+*** This service allows shell commands to be sent to the SBC from a BtnCmd button. 
+***NOTE: REQUIRES BtnCmd 0.10.13+***  
+  
+This service allows shell commands to be sent to the SBC from a BtnCmd button. 
 
 ***DSF must already installed and working with plugins enabled on the SBC before installing this service***  
 
