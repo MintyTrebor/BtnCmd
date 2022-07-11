@@ -7,6 +7,7 @@ from io import BytesIO
 import os
 import subprocess
 import ipaddress
+import time
 
 SBCC_Settings_json = {}
 SBCC_API_KEY = 1
@@ -26,7 +27,7 @@ class SBCC_Startup():
             try:
                 jFile = open(self.SETTINGS_FILE)
                 gotFile = True
-            except OSError:
+            except:
                 time.sleep(10)
                 gotFile = False
         
