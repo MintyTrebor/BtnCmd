@@ -11,7 +11,7 @@ In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may
 * Standard DWC webcam
 * Alternative webcam
 * Remote Source (eg. A web service from your LAN)
-* Machine Model Values  
+* Object Model Values  
 * Text/Label Panel  
 * User Created Custom Panels  
 * Global Variable Input Panels (Change/update the value of global variables)  
