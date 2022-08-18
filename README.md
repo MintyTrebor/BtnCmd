@@ -1,7 +1,7 @@
 # BtnCmd
 A Duet Web Control (DWC) plugin which allows the user to create custom layouts with new panels and buttons, which can run Macros, g-code, Post http GET requests, send MQTT messages. 
 
-![BtnCmd Main Screen](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_1.png)  
+![BtnCmd Main Screen](https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/wikires/v0.8.13_BtnCmd_MainWindow_1.png)  
 
 Read the [Wiki](https://github.com/MintyTrebor/BtnCmd/wiki) for more info on how to install configure and use.
 
@@ -16,7 +16,7 @@ In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may
 * User Created Custom Panels  
 * Global Variable Input Panels (Change/update the value of global variables)  
 
-![BtnCmd Edit Mode](https://github.com/MintyTrebor/BtnCmd/blob/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
+![BtnCmd Edit Mode](https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
 
 The custom buttons can be configured to trigger one of five types of actions:  
 * Send a gcode command to the Duet Board  
