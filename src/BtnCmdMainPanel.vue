@@ -95,7 +95,7 @@
 																	<cnc-container-panel v-if="panel.panelType == 'cnc-container-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></cnc-container-panel>
 																	<cnc-movement-panel v-if="panel.panelType == 'cnc-movement-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></cnc-movement-panel>
 																	<spindle-speed-panel v-if="panel.panelType == 'spindle-speed-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></spindle-speed-panel>
-																	<console v-if="panel.panelType == 'console'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></console>
+																	<BtnCmdConsole v-if="panel.panelType == 'console'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdConsole>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="mytabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+100}`">
@@ -427,7 +427,7 @@
 				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" :isFFForUnset="isFFForUnset" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode" :isCNCMode="isCNCMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
-				<BtnCmdVInputDialogue @exit="saveSettings()" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
+				<BtnCmdVInputDialogue @exit="updatePanObject" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
@@ -773,7 +773,7 @@ import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js';
 import { DashboardMode } from '../../store/settings.js';
-import console from './BtnCmdConsole.vue';
+import BtnCmdConsole from './BtnCmdConsole.vue';
 import BtnCmdExportDialog from './BtnCmdExportDialog.vue';
 import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
 
@@ -796,7 +796,7 @@ export default {
 		BtnCmdSBCCSettingsDialogue,
 		BtnCmdExportDialog,
 		BtnCmdImportDialog,
-		console
+		BtnCmdConsole
     },
 	computed: {
 		...mapState('machine/model', {
@@ -952,9 +952,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.13',
+			btnCmdVersion: '0.10.14',
 			btnCmd : {
-				btnCmdVersion: '0.10.13',
+				btnCmdVersion: '0.10.14',
 				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,

@@ -49,11 +49,11 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-col cols="12" v-bind="attrs" v-on="on">
-                                    <v-radio-group v-if="!enableSelects" v-model="passedObject.inputType" row required :disabled="bToggleExInp" @change="clearConfig()">
+                                    <v-radio-group v-if="!enableSelects" v-model="tmpPassedObject.inputType" row required :disabled="bToggleExInp" @change="clearConfig()">
                                         <v-subheader>Variable Type:</v-subheader>
                                         <v-radio v-for="type in radioVarTypeItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
-                                    <v-select @change="clearConfig()" v-if="enableSelects" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="passedObject.inputType"></v-select>
+                                    <v-select @change="clearConfig()" v-if="enableSelects" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="tmpPassedObject.inputType"></v-select>
                                 </v-col>
                             </template>
                             <span>Note: Changing this value can clear existing configuration data</span>
@@ -63,11 +63,11 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-col cols="11" v-bind="attrs" v-on="on">
-                                    <v-radio-group v-if="!enableSelects && passedObject.inputType" v-model="passedObject.inputDispType" row required :disabled="bToggleExInp" @change="clearConfig()">
+                                    <v-radio-group v-if="!enableSelects && tmpPassedObject.inputType" v-model="tmpPassedObject.inputDispType" row required :disabled="bToggleExInp" @change="clearConfig()">
                                         <v-subheader>Input Control Type:</v-subheader>
                                         <v-radio v-for="type in dispTypeList()" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
                                     </v-radio-group>
-                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" v-if="enableSelects && passedObject.inputType" :items="dispTypeList()" class="custom-label-color" item-text="text" item-value="value" label="Input Control Type" required v-model="passedObject.inputDispType"></v-select>
+                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" v-if="enableSelects && tmpPassedObject.inputType" :items="dispTypeList()" class="custom-label-color" item-text="text" item-value="value" label="Input Control Type" required v-model="tmpPassedObject.inputDispType"></v-select>
                                 </v-col>
                             </template>
                             <span>Note: Changing this value can clear existing configuration data</span>
@@ -77,12 +77,12 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn v-bind="attrs" v-on="on" :disabled="bICTType" @click="bToggleExInp = !bToggleExInp"><v-icon>{{!bToggleExInp ? 'mdi-arrow-expand-down' : 'mdi-arrow-expand-up'}}</v-icon></v-btn>
                                 </template>
-                                <span>{{!bToggleExInp ? `Open ${passedObject.inputDispType} Config` : `Close ${passedObject.inputDispType} Config` }}</span>
+                                <span>{{!bToggleExInp ? `Open ${tmpPassedObject.inputDispType} Config` : `Close ${tmpPassedObject.inputDispType} Config` }}</span>
                         </v-tooltip>
                         </v-col>
                     </v-row>
                     <div v-if="bToggleExInp">
-                        <div v-if="passedObject.inputDispType == 'selection'">
+                        <div v-if="tmpPassedObject.inputDispType == 'selection'">
                             <v-row dense align="center">
                                 <v-col cols="9" offset="1">
                                     <v-text-field label="New List Item" v-model="tmpListItem"></v-text-field>
@@ -94,8 +94,8 @@
                             <v-row dense>
                                 <v-col cols="12">
                                     <v-card outlined class="VInp-cardRLM__text" id="listtarget" :style="`background-color: ${cardColor} !important;`">
-                                        <draggable v-model="passedObject.inputControlVals" group="people" @start="drag=true" @end="drag=false">
-                                            <v-card class="list-group-item ma-1" v-for="(element, i) in passedObject.inputControlVals" :key="i" :id="`listcontent${i}`">                                        
+                                        <draggable v-model="tmpPassedObject.inputControlVals" group="people" @start="drag=true" @end="drag=false">
+                                            <v-card class="list-group-item ma-1" v-for="(element, i) in tmpPassedObject.inputControlVals" :key="i" :id="`listcontent${i}`">                                        
                                                 <v-row dense class="ma-1" align="center">
                                                     <v-col cols="11">
                                                         <span>{{element}}</span>
@@ -110,7 +110,7 @@
                                 </v-col>
                             </v-row>
                         </div>
-                        <div v-if="passedObject.inputDispType == 'slider'">
+                        <div v-if="tmpPassedObject.inputDispType == 'slider'">
                             <v-row dense align="center">
                                 <v-col cols="4" offset="1">
                                     <v-text-field :rules="[rules.number]" label="Min Value" v-model="tmpFromItem" @change="setRangeVals()"></v-text-field>
@@ -121,7 +121,7 @@
                             </v-row>
                             <v-row dense align="center">
                                 <v-col cols="8" offset="1">
-                                    <v-text-field :rules="[rules.divisable]" label="Step Value" v-model="passedObject.inputControlSteps"></v-text-field>
+                                    <v-text-field :rules="[rules.divisable]" label="Step Value" v-model="tmpPassedObject.inputControlSteps"></v-text-field>
                                 </v-col>
                             </v-row>                              
                         </div>
@@ -129,15 +129,15 @@
                     <div v-if="!bToggleExInp">
                         <v-row dense>
                             <v-col cols="6">
-                                <v-text-field :label="getPrefixLabel()" v-model="passedObject.inputPrefixText"></v-text-field>
+                                <v-text-field :label="getPrefixLabel()" v-model="tmpPassedObject.inputPrefixText"></v-text-field>
                             </v-col>
-                            <v-col cols="6" v-if="passedObject.inputDispType != 'slider' && passedObject.inputDispType != 'selection'">
-                                <v-text-field :label="getSuffixLabel()" v-model="passedObject.inputSuffixText"></v-text-field>
+                            <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType != 'selection'">
+                                <v-text-field :label="getSuffixLabel()" v-model="tmpPassedObject.inputSuffixText"></v-text-field>
                             </v-col>
                         </v-row>
                         <v-row dense>
                             <v-col cols="12">
-                                <v-text-field label="Hover Text" v-model="passedObject.panelHoverText"></v-text-field>
+                                <v-text-field label="Hover Text" v-model="tmpPassedObject.panelHoverText"></v-text-field>
                             </v-col>
                         </v-row>
                         <v-row dense>
@@ -154,7 +154,7 @@
                             <v-col cols="12">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="passedObject.panelMMTextSize" row required>
+                                        <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="tmpPassedObject.panelMMTextSize" row required>
                                             <v-radio v-for="type in textSizeItems" :key="'MMTS'+type.value" :label="type.text" :value="type.value"></v-radio>
                                         </v-radio-group>
                                     </template>
@@ -170,15 +170,15 @@
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-row dense>
-                                            <v-col v-bind="attrs" v-on="on" @click="setColor('panelColor')" :style="'background-color: ' + passedObject.panelColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit color</div></v-col>
-                                            <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelColor = ''">Reset</v-btn></div></v-col>
+                                            <v-col v-bind="attrs" v-on="on" @click="setColor('panelColor')" :style="'background-color: ' + tmpPassedObject.panelColor" align-self="center"><div align="center" style="cursor:pointer">Click to edit color</div></v-col>
+                                            <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="tmpPassedObject.panelColor = ''">Reset</v-btn></div></v-col>
                                         </v-row>
                                     </template>
                                     <span>Click to edit panel colour</span>
                                 </v-tooltip>
                             </v-col>
                         </v-row>
-                        <v-row v-if="passedObject.inputDispType != 'selection'">
+                        <v-row v-if="tmpPassedObject.inputDispType != 'selection'">
                             <v-col>
                                 <v-row dense><v-col><span style="font-weight: bold">{{txtColorLabel}}</span></v-col></v-row>
                             </v-col>
@@ -186,8 +186,8 @@
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-row dense>
-                                            <v-col v-bind="attrs" v-on="on" @click="setColor('MMPrefixColor')" :style="'background-color: ' + passedObject.panelColor" align-self="center"><div align="center" style="cursor:pointer"><span :style="'color: ' + passedObject.panelMMPrefixColor">{{txtColorHover}}</span></div></v-col>
-                                            <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.panelMMPrefixColor = ''">Reset</v-btn></div></v-col>
+                                            <v-col v-bind="attrs" v-on="on" @click="setColor('MMPrefixColor')" :style="'background-color: ' + tmpPassedObject.panelColor" align-self="center"><div align="center" style="cursor:pointer"><span :style="'color: ' + tmpPassedObject.panelMMPrefixColor">{{txtColorHover}}</span></div></v-col>
+                                            <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="tmpPassedObject.panelMMPrefixColor = ''">Reset</v-btn></div></v-col>
                                         </v-row>
                                     </template>
                                     <span>{{txtColorHover}}</span>
@@ -198,15 +198,15 @@
                             <v-col cols="6">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <span v-bind="attrs" v-on="on"><v-switch label="Hide Panel Border" v-model="passedObject.borderless"></v-switch></span>
+                                        <span v-bind="attrs" v-on="on"><v-switch label="Hide Panel Border" v-model="tmpPassedObject.borderless"></v-switch></span>
                                     </template>
                                     <span>Hide the panel border</span>
                                 </v-tooltip>
                             </v-col>
-                            <v-col cols="6" v-if="passedObject.inputType !='boolean' && passedObject.inputDispType != 'slider' && passedObject.inputDispType != 'selection'">
+                            <v-col cols="6" v-if="tmpPassedObject.inputType !='boolean' && tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType != 'selection'">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <span v-bind="attrs" v-on="on"><v-switch label="Clear Button" v-model="passedObject.inputEnableClear"></v-switch></span>
+                                        <span v-bind="attrs" v-on="on"><v-switch label="Clear Button" v-model="tmpPassedObject.inputEnableClear"></v-switch></span>
                                     </template>
                                     <span>Enables a clear button next to input</span>
                                 </v-tooltip>
@@ -220,7 +220,7 @@
                     </v-alert>
                 </tbody>
             </v-card-text>
-            <BtnCmdColPickerDialogue v-if="showColPicker" v-model="showColPicker" :passedObject="passedObject" :colField="colField"></BtnCmdColPickerDialogue>
+            <BtnCmdColPickerDialogue v-if="showColPicker" v-model="showColPicker" :tmpPassedObject="tmpPassedObject" :colField="colField"></BtnCmdColPickerDialogue>
         </v-card>
     </v-dialog>
 </template>
@@ -257,14 +257,14 @@
             bAddButtonDisabled(){
                 if(this.tmpListItem){
                     if(this.tmpListItem.length > 0){
-                        if(isNaN(this.tmpListItem) && this.passedObject.inputType == 'number'){
+                        if(isNaN(this.tmpListItem) && this.tmpPassedObject.inputType == 'number'){
                             return true;
                         }else{return false}
                     }else{return true}
                 }else{return true}
             },
             bICTType(){
-                if(this.passedObject.inputDispType == 'selection' || this.passedObject.inputDispType == 'slider'){
+                if(this.tmpPassedObject.inputDispType == 'selection' || this.tmpPassedObject.inputDispType == 'slider'){
                     return false;
                 }else{return true}
             },
@@ -276,10 +276,10 @@
                 }
             },
             txtColorLabel(){
-                if(this.passedObject.inputDispType == 'slider'){return "Slider Color"}else{return "Prefix/Suffix Text Colour"}
+                if(this.tmpPassedObject.inputDispType == 'slider'){return "Slider Color"}else{return "Prefix/Suffix Text Colour"}
             },
             txtColorHover(){
-                if(this.passedObject.inputDispType == 'slider'){return "Click to edit Slider Color"}else{return "Click to edit text colour"}
+                if(this.tmpPassedObject.inputDispType == 'slider'){return "Click to edit Slider Color"}else{return "Click to edit text colour"}
             }
         },
         data: function () {
@@ -303,6 +303,7 @@
                 tmpListItem: null,
                 tmpToItem: 100,
                 tmpFromItem: 0,
+                tmpPassedObject: {},
                 rules:{
                     number: value => {
                         const pattern = /^[0-9]*$/;
@@ -315,7 +316,8 @@
                             return true
                         }
                     }
-                }
+                },
+                
             }
         },
         methods: {
@@ -323,10 +325,10 @@
                 return new Promise(resolve => setTimeout(resolve, ms));
             },
             async validateData() {
-                if(this.tmpModelPath && this.passedObject.inputType && this.passedObject.inputDispType) {
+                if(this.tmpModelPath && this.tmpPassedObject.inputType && this.tmpPassedObject.inputDispType) {
                     //req fields met so exit
-                    this.passedObject.inputVarName = this.tmpModelPath;
-                    this.$emit('exit', true);
+                    this.tmpPassedObject.inputVarName = this.tmpModelPath;
+                    this.$emit('exit', this.tmpPassedObject);
                     this.show = false;
                     return;
                 } else {
@@ -336,22 +338,22 @@
                 }  
             },
             setRangeVals(){
-                this.passedObject.inputControlRange = [this.tmpFromItem, this.tmpToItem];
+                this.tmpPassedObject.inputControlRange = [this.tmpFromItem, this.tmpToItem];
             },
             clearConfig(){
                 //clear selected fields when user changes key values
-                this.passedObject.inputControlVals = [],
-				this.passedObject.inputControlRange = [0,100],
-				this.passedObject.inputControlSteps = 1
+                this.tmpPassedObject.inputControlVals = [],
+				this.tmpPassedObject.inputControlRange = [0,100],
+				this.tmpPassedObject.inputControlSteps = 1
             },
             setColor(colorField){
                 this.colField = colorField;
                 this.showColPicker = true;
             },
             getPrefixLabel(){
-                if(this.passedObject.inputType == 'boolean'){
+                if(this.tmpPassedObject.inputType == 'boolean'){
                     return "False Label"
-                }if(this.passedObject.inputDispType == 'slider' || this.passedObject.inputDispType == 'selection'){
+                }if(this.tmpPassedObject.inputDispType == 'slider' || this.tmpPassedObject.inputDispType == 'selection'){
                     return "Label"
                 }else {
                     return "Prefix Text"
@@ -359,28 +361,28 @@
             },
             addListItem(){
                 if(this.tmpListItem){
-                    this.passedObject.inputControlVals.push(this.tmpListItem);
+                    this.tmpPassedObject.inputControlVals.push(this.tmpListItem);
                     this.tmpListItem = null;
                     process.nextTick(() => {
-                        let elem = document.getElementById(`listcontent${this.passedObject.inputControlVals.length - 1}`);
+                        let elem = document.getElementById(`listcontent${this.tmpPassedObject.inputControlVals.length - 1}`);
                         elem.scrollIntoView();
                     })
                 }
             },
             delListItem(arrIndex){
-                this.passedObject.inputControlVals.splice(arrIndex,1);
+                this.tmpPassedObject.inputControlVals.splice(arrIndex,1);
             },
             dispTypeList(){
-                if(this.passedObject.inputType){
-                    let tmpArr = this.radioVarTypeItems.filter(item => item.value == this.passedObject.inputType);
-                    if(tmpArr[0].inputDispType.length === 1){this.passedObject.inputDispType = tmpArr[0].inputDispType[0].value}
+                if(this.tmpPassedObject.inputType){
+                    let tmpArr = this.radioVarTypeItems.filter(item => item.value == this.tmpPassedObject.inputType);
+                    if(tmpArr[0].inputDispType.length === 1){this.tmpPassedObject.inputDispType = tmpArr[0].inputDispType[0].value}
                     return tmpArr[0].inputDispType;
                 }else{
                     return [];
                 }
             },
             getSuffixLabel(){
-                if(this.passedObject.inputType == 'boolean'){
+                if(this.tmpPassedObject.inputType == 'boolean'){
                     return "True Label"
                 }else {
                     return "Suffix Text"
@@ -388,7 +390,8 @@
             }
         },
         mounted() {
-            this.tmpModelPath = this.passedObject.inputVarName;
+            this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
+            this.tmpModelPath = this.tmpPassedObject.inputVarName;
         }
     }
 </script>

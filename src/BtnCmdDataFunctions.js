@@ -188,6 +188,11 @@ export default {
 			}
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
+		updatePanObject(panObject){
+			var tmpIdx = this.btnCmd.panels.findIndex(itemPanel => itemPanel.panelID == panObject.panelID);
+			this.btnCmd.panels[tmpIdx] = panObject;
+			this.saveSettings()
+		},
 		loadSettings() {
 			var btnString = localStorage.getItem('btnCmdsettings');
 				if (btnString) {
