@@ -82,6 +82,7 @@
 																	<temperature-chart v-if="panel.panelType == 'temperature-chart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></temperature-chart>
 																	<job-estimations-panel v-if="panel.panelType == 'jobestimates'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-estimations-panel>
 																	<job-data-panel v-if="panel.panelType == 'collectdata'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-data-panel>
+																	<BtnCmdListPanel v-if="panel.panelType == 'joblist' || panel.panelType == 'filamentlist' || panel.panelType == 'macrolist' || panel.panelType == 'eventlist'" :listType="panel.panelType" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdListPanel>
 																	<job-control-panel v-if="panel.panelType == 'job-control-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-control-panel>
 																	<fans-panel v-if="panel.panelType == 'fans'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></fans-panel>
 																	<extrude-panel v-if="panel.panelType == 'extrude-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></extrude-panel>
@@ -776,6 +777,7 @@ import { DashboardMode } from '../../store/settings.js';
 import BtnCmdConsole from './BtnCmdConsole.vue';
 import BtnCmdExportDialog from './BtnCmdExportDialog.vue';
 import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
+import BtnCmdListPanel from './BtnCmdListPanel.vue';
 
 export default {
     components: {
@@ -796,7 +798,8 @@ export default {
 		BtnCmdSBCCSettingsDialogue,
 		BtnCmdExportDialog,
 		BtnCmdImportDialog,
-		BtnCmdConsole
+		BtnCmdConsole,
+		BtnCmdListPanel
     },
 	computed: {
 		...mapState('machine/model', {
@@ -879,7 +882,10 @@ export default {
 			}else{
 				return false;
 			}
-		},		
+		},
+		// monConnDiag(){
+		// 	return this.$vuetify
+		// }		
 	},
 	mixins: [
 		BtnCmdDataFunctions,
@@ -952,9 +958,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.14',
+			btnCmdVersion: '0.10.15',
 			btnCmd : {
-				btnCmdVersion: '0.10.14',
+				btnCmdVersion: '0.10.15',
 				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,
