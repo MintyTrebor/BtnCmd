@@ -39,6 +39,24 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-col cols="9">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Webcam Config URL" v-model="passedObject.altWebCamParams.altWebCamConfigURL" placeholder="http://"></v-text-field>
+                                </template>
+                                <span>URL to open on click of the Config Button</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Open in New Tab" v-model="passedObject.altWebCamParams.altWebCamConfigNewWin"></v-switch></span>
+                                </template>
+                                <span>Open Config Page in new browser tab</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="!enableSelects">
                         <v-col cols="12">
                             <v-tooltip top>

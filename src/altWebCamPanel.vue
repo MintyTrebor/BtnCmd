@@ -15,6 +15,14 @@ img {
 	overflow: hidden;
 }
 
+.iframe-dialog {
+		position: relative;
+		/* overflow: auto; */
+		background-color: transparent;
+		width: 100%;
+		height: 99%;
+	}
+
 .flip-x {
 	-moz-transform: scaleX(-1);
 	-o-transform: scaleX(-1);
@@ -61,6 +69,7 @@ img {
 <template>
 	<v-card>
 		<v-card-text class="pa-0 img-container">
+			<v-btn v-if="showConfigBtn" right app fixed inset top fab small @click="showConfig()" style="background-color: transparent; opacity: 0.4;"><v-icon color="#F5F5F5">mdi-cog</v-icon></v-btn>
 			<v-responsive v-if="passedObject.altWebCamiFrame" :aspect-ratio="16/9">
 				<iframe :src="passedObject.altWebCamURL" :class="classList"></iframe>
 			</v-responsive>
@@ -69,6 +78,15 @@ img {
 				<img :alt="$t('panel.webcam.alt')" :src="active ? url : ''" :class="classList">
 			</a>
 		</v-card-text>
+		<v-dialog v-model="showConfigDialog" width="80vw">
+			<v-card height="80vh">
+				<div class="iframe-dialog" width="100%" height="95%">
+					<iframe :src="this.passedObject.altWebCamConfigURL" width="100%" height="95%" frameborder="0">
+						<span>Your browser does not support iFrames</span>
+					</iframe>
+				</div>		
+			</v-card>
+		</v-dialog>
 	</v-card>
 </template>
 
@@ -102,13 +120,21 @@ export default {
 				result.push('rotate-270');
 			}
 			return result;
+		},
+		showConfigBtn() {
+			if(this.passedObject.altWebCamConfigURL){
+				return true;
+			}else{
+				return false;
+			}
 		}
 	},
 	data() {
 		return {
 			active: true,
 			updateTimer: null,
-			url: ''
+			url: '',
+			showConfigDialog: false
 		}
 	},
 	activated() {
@@ -132,6 +158,13 @@ export default {
 				}
 			}
 			this.url = url;
+		},
+		showConfig(){
+			if(this.passedObject.altWebCamConfigNewWin){
+				window.open(this.passedObject.altWebCamConfigURL, '_blank').focus();
+			}else{
+				this.showConfigDialog = true;
+			}
 		}
 	},
 	mounted() {

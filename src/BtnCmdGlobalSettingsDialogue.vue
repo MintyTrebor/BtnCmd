@@ -94,6 +94,31 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable AutoStart" v-model="passedObject.enableLaunchAtLoad"></v-switch></span>
+                                </template>
+                                <span>Automatically Switch to BtnCmd on Start</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="6">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Change Top Bar Color" v-model="passedObject.enableChangeTopBar" @change="doChangeColor()"></v-switch></span>
+                                </template>
+                                <span>Change the top bar color to aid in identification</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.enableChangeTopBar" dense>
+                        <v-col cols="12">
+                            <div class="btnCmd-container"><v-color-picker class="ma-2" dot-size="30" v-model="passedObject.TopBarColor"></v-color-picker></div>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-switch label="Enable MQTT" v-model="passedObject.enableMQTT"></v-switch></span>
                                 </template>
                                 <span>MQTT commands will only work with MQTT brokers using the websockets protocol. It does not support SSL/TLS. </span>
@@ -167,7 +192,10 @@
                 else{
                     return true;
                 }
-			}
+			},
+            currTopBarCol(){
+                return this.passedObject.TopBarColor
+            }
 		},
         data: function () {
             return {
@@ -218,10 +246,23 @@
             triggerSBCCReload(){
                 //tell the main window to reload the SBCC settings
                 this.$emit('rldSBCCSet', true);                
-            }          
+            },
+            doChangeColor(){
+                let aptb = document.getElementsByClassName("v-app-bar")
+                if(!this.passedObject.enableChangeTopBar || !this.passedObject.TopBarColor){
+                    aptb[0].style.backgroundColor = "";
+                }else{
+                    aptb[0].style.backgroundColor = this.passedObject.TopBarColor;
+                }
+            }
         },
         mounted() {
             this.tmpPluginMinimumHeight = this.passedObject.pluginMinimumHeight;
+        },
+        watch:{
+            currTopBarCol(){
+                this.doChangeColor();
+            }
         }
     }
 </script>

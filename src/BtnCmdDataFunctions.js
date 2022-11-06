@@ -15,8 +15,8 @@ export default {
 					lastTabID: 2,
 					lastEventID: 1,
 					lastPanelID: 1,
-					lastTxtIconID: 1,
-					last_SBCC_Cmd_ID: 1001,
+					lastInputID: 1,
+					last_SBCC_Cmd_ID: 1002,
 				},
 				globalSettings: {
 					enableActionMsg: true,
@@ -34,7 +34,10 @@ export default {
 					defaultGC_Hidden: false,
 					enableSBCC: false,
 					enableAutoBackup: false,
-					ABackupFileName: ''
+					ABackupFileName: '',
+					enableLaunchAtLoad: false,
+					enableChangeTopBar: false,
+					TopBarColor: ''
 				},
 				SBCCSettings: {					
 					HTTP_Port: "8091",
@@ -61,14 +64,14 @@ export default {
 				],
 				btns: [
 					{
-						btnID: null,
+						btnID: '1',
 						btnLabel: 'Example',
 						btnType: 'Macro',
 						btnActionData: 'MacroName.g',
 						btnTopicData: '',
 						btnEnableWhileJob : false,
 						btnColour: '#00DBFFFF',
-						btnGroupIdx: null,
+						btnGroupIdx: 1,
 						btnIcon: 'mdi-polymer',
 						btnHoverText: 'This is hover text',
 						btnXpos: 100,
@@ -80,7 +83,7 @@ export default {
 						btnHttpData: null,
 						btnHttpContType: 'text',
 						btnZIndex: 1,
-						btnWinHSize: 200,
+						btnWinHSize: 100,
 						btnWinWSize: 200,
 						btnReqConf: false,
 						btnConfText: 'Are You Sure?',
@@ -89,7 +92,7 @@ export default {
 				],
 				tabs: [
 					{
-						tabID: null,
+						tabID: 1,
 						embedTab: false,
 						icon: "mdi-view-module",
 						translated: false,
@@ -102,7 +105,7 @@ export default {
 						lastZIndex: 2
 					},
 					{
-						tabID: null,
+						tabID: 2,
 						embedTab: true,
 						icon: "mdi-view-module",
 						translated: false,
@@ -117,8 +120,8 @@ export default {
 				],
 				panels: [
 					{
-						panelID: null,
-						tabID: null,
+						panelID: 1,
+						tabID: 1,
 						panelType: 'jobinfo',
 						panelYpos: 150,
 						panelXpos: 100,
@@ -141,10 +144,12 @@ export default {
 							altWebCamURL: 'http://',
 							altWebCamRotation: 0,
 							altWebCamFlip: 'none',
-							altWebCamUpdateTimer:  0,
+							altWebCamUpdateTimer:  5000,
 							altWebCamiFrame: false,
 							altWebCamAppndHTTP: false,
-							altWebCamClickURL: ''					
+							altWebCamClickURL: '',
+							altWebCamConfigURL: '',
+							altWebCamConfigNewWin: false					
 						},
 						MMParams: {
 
@@ -159,7 +164,7 @@ export default {
 						inputDispType: '',
 						inputControlVals: [],
 						inputControlRange:[],
-						inputControlSteps:1,
+						inputControlSteps: 1,
 						bPanelActivated: false
 					}
 				],

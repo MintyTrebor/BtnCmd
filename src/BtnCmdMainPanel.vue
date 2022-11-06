@@ -958,9 +958,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.15',
+			btnCmdVersion: '0.10.16',
 			btnCmd : {
-				btnCmdVersion: '0.10.15',
+				btnCmdVersion: '0.10.16',
 				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,
@@ -986,7 +986,10 @@ export default {
 					defaultGC_Hidden: false,
 					enableSBCC: false,
 					enableAutoBackup: false,
-					ABackupFileName: ''
+					ABackupFileName: '',
+					enableLaunchAtLoad: false,
+					enableChangeTopBar: false,
+					TopBarColor: ''
 				},
 				SBCCSettings: {					
 					HTTP_Port: "8091",
@@ -1096,7 +1099,9 @@ export default {
 							altWebCamUpdateTimer:  5000,
 							altWebCamiFrame: false,
 							altWebCamAppndHTTP: false,
-							altWebCamClickURL: ''					
+							altWebCamClickURL: '',
+							altWebCamConfigURL: '',
+							altWebCamConfigNewWin: false					
 						},
 						MMParams: {
 
