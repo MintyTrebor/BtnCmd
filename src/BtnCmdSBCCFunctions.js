@@ -1,6 +1,7 @@
-import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
-import Path from '../../utils/path.js';
+import { DisconnectedError, OperationCancelledError } from '@/utils/errors';
+import Path from '@/utils/path';
 import axios from 'axios';
+import store from "@/store";
 
 export default {
     methods: {
@@ -13,7 +14,7 @@ export default {
 			const content = new Blob([JSON.stringify(this.btnCmd.SBCCSettings)]);
 			const setFileName = Path.combine(this.systemDirectory, 'SBCC_Config.json');
 			try {
-				await this.upload({ filename: setFileName, content, showSuccess: false });
+				await store.dispatch("machine/upload", { filename: setFileName, content, showSuccess: false });
 			} catch (e) {
 				console.warn(e);
 			}
@@ -23,7 +24,7 @@ export default {
 			//Load the main settings shared with the service
 			try {
 				const setFileName = Path.combine(this.systemDirectory, 'SBCC_Config.json');
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false, showError: false });
+				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false, showError: false });
 				//console.log("resp: ", response)
 				this.btnCmd.SBCCSettings = response;
 			} catch (e) {
@@ -55,7 +56,7 @@ export default {
 			const content = new Blob([JSON.stringify(tmpJSON)]);
 			const setFileName = Path.combine(this.systemDirectory, 'SBCC_Config.json');
 			try {
-				await this.upload({ filename: setFileName, content, showSuccess: false });
+				await store.dispatch("machine/upload", { filename: setFileName, content, showSuccess: false });
 			} catch (e) {
 				console.warn(e);
 			}

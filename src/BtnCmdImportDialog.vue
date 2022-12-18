@@ -101,9 +101,7 @@
 </template>
 
 <script>
-"use strict";
-import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
-//import Path from '../../utils/path.js';
+import store from "@/store";
 
 export default {
   props: {
@@ -114,16 +112,18 @@ export default {
     btnCmd: Object
   },
   computed: {
-    ...mapState('machine/model', {
-        status: state => state.state.status,
-        macrosDirectory: state => state.directories.macros,
-        systemDirectory: state => state.directories.system
-    }),
-    ...mapGetters('machine/model', ['jobProgress']),
-    ...mapState('machine/settings', ['codes']),
-    ...mapState({
-        darkTheme: state => state.settings.darkTheme,
-    }),
+    status() {
+      return store.state.machine.model.state.status;
+    },
+    macrosDirectory() {
+        return store.state.machine.model.directories.macros;
+    },
+    systemDirectory() {
+        return store.state.machine.model.directories.system;
+    },
+    darkTheme() {
+        return store.state.settings.darkTheme;
+    },
     internalShown: {
       get() {
         return this.shown;
@@ -223,10 +223,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions('machine', ['sendCode']),
-		...mapActions('machine', {machineDownload: 'download', getFileList: 'getFileList'}),
-    ...mapActions('machine', ['upload']),
-		...mapMutations('machine/settings', ['addCode', 'removeCode']),
+
     clearData(){
       this.tmpExportIndex = [];
       this.tmpExportCPIndex = [],

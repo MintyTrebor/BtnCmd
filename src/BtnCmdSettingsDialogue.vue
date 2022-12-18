@@ -25,15 +25,7 @@
             <v-card-text>
                 <!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ SBCCCombinedJson }}</span></v-col></v-row> -->
                 <v-form lazy-validation class="mx-2">
-                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects">
-                        <v-col cols="12">
-                            <v-radio-group v-model="passedObject.btnType" row required>
-                                <v-subheader>Type:</v-subheader>
-                                <v-radio v-for="type in radioItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="enableSelects">
+                    <v-row class="mx-2 my-n4" dense>
                         <v-col cols="12">
                             <v-select :items="radioItems" class="custom-label-color" item-text="text" item-value="value" label="Type*" required v-model="passedObject.btnType"></v-select>
                         </v-col>
@@ -69,28 +61,12 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http'">
-                        <v-col cols="12">
-                            <v-radio-group v-model="passedObject.btnHttpType" row required :key="'htype' + passedObject.btnType + passedObject.btnID">
-                                <v-subheader>Http Type:</v-subheader>
-                                <v-radio v-for="type in radioHttpItems" :key="'BtnHTTP'+type.value" :label="type.text" :value="type.value"></v-radio>
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http'">
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='http'">
                         <v-col cols="12">
                             <v-select :items="radioHttpItems" class="custom-label-color" :key="'htype' + passedObject.btnType + passedObject.btnID" item-text="text" item-value="value" label="Http Type" required v-model="passedObject.btnHttpType"></v-select>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
-                        <v-col cols="12">
-                            <v-radio-group v-model="passedObject.btnHttpContType" row required>
-                                <v-subheader>Get Type:</v-subheader>
-                                <v-radio v-for="type in radioGetItems" :key="'BtnGT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                            </v-radio-group>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType=='http' && passedObject.btnHttpType=='GET'">
                         <v-col cols="12">
                             <v-select :items="radioGetItems" :key="'gtype' + passedObject.btnType + passedObject.btnID" class="custom-label-color" item-text="text" item-value="value" label="Get Type*" required v-model="passedObject.btnHttpContType"></v-select>
                         </v-col>
@@ -115,23 +91,11 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="enableSelects && passedObject.btnType == 'SBCC'" :key="'sbcctype' + passedObject.btnType + passedObject.btnID">
+                    <v-row class="mx-2 my-n4" dense v-if="passedObject.btnType == 'SBCC'" :key="'sbcctype' + passedObject.btnType + passedObject.btnID">
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-select v-bind="attrs" v-on="on" :items="SBCCmdListItems" item-text="text" item-value="value" label="Select Command" value="value" required v-model="passedObject.btnActionData" @change="setSBCCValues($event)"></v-select>
-                                </template>
-                                <span>Select Command</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row class="mx-2 my-n4" dense v-if="!enableSelects && passedObject.btnType == 'SBCC'" :key="'sbcctyper' + passedObject.btnType + passedObject.btnID">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Select Command:" v-model="passedObject.btnActionData" row required>
-                                        <v-radio v-for="type in SBCCmdListItems" :key="'SBCC'+type.value" :label="type.text" :value="type.value" @change="setSBCCValues(type.value)"></v-radio>
-                                    </v-radio-group>
                                 </template>
                                 <span>Select Command</span>
                             </v-tooltip>
@@ -204,7 +168,6 @@
                 type: Object
             },
             bMQTT: Boolean,
-            enableSelects: Boolean,
             enableSBCC: Boolean,
             SBCCCombinedJson: Array,
         },

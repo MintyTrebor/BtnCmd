@@ -1,7 +1,8 @@
 
-import { DisconnectedError, OperationCancelledError } from '../../utils/errors.js';
-import Path from '../../utils/path.js';
+import { DisconnectedError, OperationCancelledError } from '@/utils/errors';
+import Path from '@/utils/path';
 import deepmerge from 'deepmerge';
+import store from "@/store";
 
 export default {
     methods: {
@@ -240,7 +241,7 @@ export default {
 		async autoRestore(){
 			try {
 				const setFileName = Path.combine(this.systemDirectory, 'BtnCmdAutoRestore.json');
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false, showError: false});
+				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false, showError: false});
 				this.btnCmd = response;
 				this.checkDataVersion();
 				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
@@ -259,7 +260,7 @@ export default {
 			var tmpFName = this.btnCmd.globalSettings.ABackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
 			const setFileName = Path.combine(this.systemDirectory, `${tmpFName}.json`);
 			try {
-				await this.upload({ filename: setFileName, content, showSuccess: false });
+				await store.dispatch("machine/upload", { filename: setFileName, content, showSuccess: false });
 			} catch (e) {
 				console.warn(e);
 			}
@@ -268,7 +269,7 @@ export default {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);
 			const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
 			try {
-				await this.upload({ filename: setFileName, content, showSuccess: false });
+				await store.dispatch("machine/upload", { filename: setFileName, content, showSuccess: false });
 			} catch (e) {
 				console.warn(e);
 			}
@@ -276,7 +277,7 @@ export default {
 		async loadSettingsFromFile() {
 			try {
 				const setFileName = Path.combine(this.systemDirectory, `${this.btnCmd.globalSettings.lastBackupFileName}.json`);
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showSuccess: false });
+				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false });
 				this.btnCmd = response;
 				this.checkDataVersion();
 				localStorage.setItem('btnCmdsettings', JSON.stringify(this.btnCmd));
@@ -291,7 +292,7 @@ export default {
 			//This file is used by distro maintainers to ship prebuilt commands with distro
 			try {
 				const setFileName = Path.combine(this.systemDirectory, 'SBCC_Default_Cmds.json');
-				const response = await this.machineDownload({ filename: setFileName, type: 'json', showProgress: false, showSuccess: false, showError: false});
+				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showProgress: false, showSuccess: false, showError: false});
 				//console.log("Status = " + response.status)
 				this.tmpSBCCDef = response;
 			} catch (e) {

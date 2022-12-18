@@ -29,16 +29,6 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense>
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Selections in Settings" v-model="passedObject.enableSelects"></v-switch></span>
-                                </template>
-                                <span>Use selections instead of radio buttons in settings windows</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
                     <v-row dense v-if="showToggButt">
                         <v-col cols="12">
                             <v-tooltip bottom>

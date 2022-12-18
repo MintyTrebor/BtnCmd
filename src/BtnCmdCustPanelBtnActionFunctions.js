@@ -1,17 +1,13 @@
-import mqtt from 'mqtt';
+import mqtt from 'precompiled-mqtt';
 import axios from 'axios';
-import Path from '../../utils/path.js';
-import { mapGetters, mapState} from 'vuex';
+import Path from '../../utils/path';
 import jsonpath from 'jsonpath';
+import store from "@/store";
 
 //needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
 
 export default {
-    computed: {
-		...mapState('machine', ['model']),
-		...mapGetters(['uiFrozen'])
-	},
 	methods: {
         //mqtt Msg Send Functions
 		sendMQTTMsg(msgStr, topicStr){
@@ -60,19 +56,32 @@ export default {
 				});
 
 		},
+		
 		getModelValue(gVarName){
 			const jp = jsonpath;
 			if(gVarName){
-				var matchInModel = jp.query(this.model, (`$.global.${gVarName}`));
-				if(JSON.stringify(matchInModel) != "[]"){
-					return  matchInModel[0];
+				if(gVarName.startsWith("global.")){
+					let tmpStr = gVarName.replace("global.", "");
+					if(store.state.machine.model.global.has(tmpStr)){
+						return store.state.machine.model.global.get(tmpStr);
+					}else{
+						return "###";
+					}
+				}else if(gVarName.startsWith("plugins.")){
+					return "plugins Object cannot be used here";
 				}else{
-					return "###";
+					var matchInModel = jp.query(store.state.machine.model, (`$.${gVarName}`));
+					if(JSON.stringify(matchInModel) != "[]"){
+						return  matchInModel[0];
+					}else{
+						return "###";
+					}
 				}
 			}else {
 				return "###";
 			}		
 		},
+
 		//functions triggered by custom button click
 		onBtnClick(e, btnJSONOb){
 			this.currButtonObj = btnJSONOb;
@@ -105,16 +114,20 @@ export default {
 									tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
 									tmpParent.showBtnSBCCDialog = true;}
 								catch{
-									console.log(response);
-									tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+									// console.log(response);
+									// tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+									// tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
 								}
 							}
 						})
 						.catch(function (error) {
-							console.log(error);
-							tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+							if(!error.contains("has been blocked by CORS policy")){
+								console.log("Post Error:", error);
+								tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+							}else {
+								tmpParent.setActionResponse("Event Action : -- CORS Error. post may still have worked - Check Browser Console for more details");
+							}
 						});
 				}
 				if(btnJSONOb.btnHttpType == "GET") {
@@ -127,17 +140,20 @@ export default {
 									tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
 									tmpParent.showBtnSBCCDialog = true;}
 								catch{
-									console.log(response);
-									tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+									// console.log(response);
+									// tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
+									// tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
 								}
 							}
 						})
 						.catch(function (error) {
-							// handle error
-							console.log(error);
-							tmpParent.setActionResponse("Event Action : -- Error. Check Console for more details");
-							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Console for more details`);
+							if(!error.contains("has been blocked by CORS policy")){
+								console.log("Post Error:", error);
+								tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+							}else {
+								tmpParent.setActionResponse("Event Action : -- CORS Error. get may still have worked - Check Browser Console for more details");
+							}
 						});
 				}
 			}else if(btnJSONOb.btnType == "MQTT" && this.mainData.globalSettings.enableMQTT){
@@ -196,7 +212,7 @@ export default {
 		async send() {
 			this.mainData.showItems = false;
 
-			const code = (!this.code || this.code.constructor === String) ? this.code : this.code.value;
+			const code = (this.code instanceof Object) ?this.code.value : this.code;
 			if (code && code.trim() !== '' && !this.doingCode) {
 				let codeToSend = '', bareCode = '', inQuotes = false, inExpression = false, inWhiteSpace = false, inComment = false;
 				if (!this.hasUnprecedentedParameters(codeToSend) &&
@@ -253,12 +269,16 @@ export default {
 				// Send the code and wait for completion
 				this.doingCode = true;
 				try {
-					const reply = await this.sendCode({ code: codeToSend, fromInput: true });
-					if (!inQuotes && !reply.startsWith('Error: ') && !reply.startsWith('Warning: ') &&
-						bareCode.indexOf('M587') === -1 && bareCode.indexOf('M589') === -1 &&
-						!this.disableAutoComplete && this.codes.indexOf(codeToSend.trim()) === -1) {
+					const reply = await store.dispatch("machine/sendCode", {
+						code: codeToSend,
+						fromInput: true
+					});
+
+					if (!inQuotes && !store.state.settings.disableAutoComplete &&
+						!reply.startsWith("Error: ") && !reply.startsWith("Warning: ") &&
+						bareCode.indexOf("M587") === -1 && bareCode.indexOf("M589") === -1) {
 						// Automatically remember successful codes
-						//this.addCode(codeToSend.trim());
+						//store.commit("machine/cache/addLastSentCode", codeToSend.trim());
 					}
 				} catch {
 					// handled before we get here

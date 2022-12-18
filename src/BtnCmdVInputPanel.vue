@@ -144,9 +144,8 @@
 
 <script>
 'use strict'
-import { mapGetters, mapState, mapActions} from 'vuex';
-import jsonpath from 'jsonpath';
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
+import store from "@/store";
 
 export default {
 	props: {
@@ -157,8 +156,6 @@ export default {
 		finResize: Boolean
     },
 	computed: {
-		...mapState('machine', ['model']),
-		...mapGetters(['uiFrozen']),
 		matchedVarVal() {return this.getModelValue();},
 		currHSize() {return this.passedObject.panelHSize},
 		currWSize() {return this.passedObject.panelWSize},
@@ -201,14 +198,11 @@ export default {
 			}
 	},
 	methods: {
-		...mapActions('machine', ['sendCode']),
 		getModelValue(){
-			const jp = jsonpath;
 			if(this.passedObject.inputVarName){
-				var matchInModel = jp.query(this.model, (`$.global.${this.passedObject.inputVarName}`));
-				if(JSON.stringify(matchInModel) != "[]"){
+				if(store.state.machine.model.global.has(this.passedObject.inputVarName)){
 					this.doRightALign();
-					return  matchInModel[0];
+					return store.state.machine.model.global.get(this.passedObject.inputVarName);
 				}else{
 					return "###";
 				}

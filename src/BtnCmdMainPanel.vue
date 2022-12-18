@@ -409,7 +409,7 @@
 					</v-menu>
 					<v-alert dense color="#C5C4C6" border="left" dismissible v-model="showInfo" close-text="Close Info" transition="scale-transition" @close="showInfo=!showInfo" :style="`position: absolute; z-index:99999; left: 10px;`">
 						<br>
-						<strong>BtnCmd Beta v{{ btnCmdVersion }}</strong><br>
+						<strong>BtnCmd v{{ btnCmdVersion }}</strong><br>
 						Cobbled together by <a href="https://github.com/MintyTrebor" target="_blank">Minty Trebor</a><br>
 						BtnCmd uses the following libraries/modules:<br>
 						<a href="https://www.npmjs.com/package/deepmerge" target="_blank">DeepMerge</a><span>, </span>
@@ -423,14 +423,14 @@
 						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
-				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSelects="btnCmd.globalSettings.enableSelects" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
-				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdTabSettingsDialogue>
-				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" :isFFForUnset="isFFForUnset" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects" :createMode="createMode" :isCNCMode="isCNCMode"></BtnCmdPanelSettingsDialogue>
-				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdAWCPanelDialogue>
-				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdMMPanelDialogue>
-				<BtnCmdVInputDialogue @exit="updatePanObject" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" :enableSelects="btnCmd.globalSettings.enableSelects"></BtnCmdVInputDialogue>
+				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
+				<BtnCmdTabSettingsDialogue v-if="showTabEdit" v-model="showTabEdit" :passedObject="tabObjectToPass[0]"></BtnCmdTabSettingsDialogue>
+				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :createMode="createMode" :isCNCMode="isCNCMode"></BtnCmdPanelSettingsDialogue>
+				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdAWCPanelDialogue>
+				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdMMPanelDialogue>
+				<BtnCmdVInputDialogue @exit="updatePanObject" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" ></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
-				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :enableSelects="btnCmd.globalSettings.enableSelects" :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
+				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
 				<confirm-dialog :shown.sync="confirmRstSettings" title="Reset Settings" prompt="Are you sure?" @confirmed="resetSettings()"></confirm-dialog>
 				<confirm-dialog :shown.sync="confirmDelTab" title="Delete" prompt="Delete with all content?" @confirmed="doTabDelete()"></confirm-dialog>
 				<confirm-dialog :shown.sync="showBtnConfDialog" title="Confirmation Required" :prompt="currBtnPromptTxt" @confirmed="onBtnConf()"></confirm-dialog>
@@ -751,17 +751,20 @@
 
 <script>
 
+
+import Path from '@/utils/path';
+import store from "@/store";
+import { isPrinting } from "@/utils/enums";
+
+import deepmerge from 'deepmerge';
+import VueDraggableResizable from 'vue-draggable-resizable';
+
 import BtnCmdSettingsDialogue from './BtnCmdSettingsDialogue.vue';
 import BtnCmdTabSettingsDialogue from './BtnCmdTabSettingsDialogue.vue';
 import BtnCmdGlobalSettingsDialogue from './BtnCmdGlobalSettingsDialogue.vue';
 import BtnCmdPanelSettingsDialogue from './BtnCmdPanelSettingsDialogue.vue';
 import BtnCmdSBCCSettingsDialogue from './BtnCmdSBCCSettingsDialogue.vue';
-import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
-import Path from '../../utils/path.js';
-import deepmerge from 'deepmerge';
-import { isPrinting, isPaused, StatusType, MachineMode } from '../../store/machine/modelEnums.js';
 import altWebCamPanel from './altWebCamPanel.vue';
-import VueDraggableResizable from 'vue-draggable-resizable';
 import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
 import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
 import BtnCmdAWCPanelDialogue from './BtnCmdAWCPanelDialogue.vue';
@@ -773,11 +776,11 @@ import BtnCmdVInputDialogue from './BtnCmdVInputDialogue.vue';
 import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
 import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 import BtnCmdSCCFunctions from './BtnCmdSBCCFunctions.js';
-import { DashboardMode } from '../../store/settings.js';
 import BtnCmdConsole from './BtnCmdConsole.vue';
 import BtnCmdExportDialog from './BtnCmdExportDialog.vue';
 import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
 import BtnCmdListPanel from './BtnCmdListPanel.vue';
+
 
 export default {
     components: {
@@ -802,32 +805,38 @@ export default {
 		BtnCmdListPanel
     },
 	computed: {
-		...mapState('machine/model', {
-			status: state => state.state.status,
-			macrosDirectory: state => state.directories.macros,
-			systemDirectory: state => state.directories.system,
-			systemCurrIP: state => state.network.interfaces[0].actualIP,
-			systemDSFVerStr: state => state.state.dsfVersion
-		}),
-		...mapGetters('machine/model', ['jobProgress']),
-		...mapState('machine/settings', ['codes']),
-		...mapState({
-			darkTheme: state => state.settings.darkTheme,
-			bottomNavigation: state => state.settings.bottomNavigation,
-			iconMenu: state => state.settings.iconMenu,
-			machineMode: state => state.machine.model.state.machineMode,
-		}),
-		isPrinting() { return isPrinting(this.status); },
-		isPaused() { return isPaused(this.status); },
-		eventStatusText() { return this.status; },
+		status() {
+			return store.state.machine.model.state.status;
+		},
+		macrosDirectory() {
+			return store.state.machine.model.directories.macros;
+		},
+		systemDirectory() {
+			return store.state.machine.model.directories.system;
+		},
+		systemCurrIP() {
+			return store.state.machine.model.network.interfaces[0].actualIP;
+		},
+		systemDSFVerStr() {
+			return store.state.machine.model.state.dsfVersion;
+		},
+		darkTheme() {
+			return store.state.settings.darkTheme;
+		}, 
+		isPrinting() {
+			return isPrinting(store.state.machine.model.state.status);
+		},
+		bottomNavigation() {
+			return store.state.settings.bottomNavigation;
+		},
+		iconMenu() {
+			return store.state.settings.iconMenu;
+		},
+		machineMode() {
+			return store.state.machine.model.state.machineMode;
+		},
 		showBottomNavigation() {
 			return this.$vuetify.breakpoint.mobile && !this.$vuetify.breakpoint.xsOnly && this.bottomNavigation;
-		},
-		isFFForUnset() {
-			if (this.dashboardMode === DashboardMode.default) {
-				return !this.machineMode || this.machineMode === MachineMode.fff;
-			}
-			return this.dashboardMode === DashboardMode.fff;
 		},
 		isCNCMode(){
 			if(this.machineMode !== "FFF" && this.machineMode !== "fff"){
@@ -882,14 +891,10 @@ export default {
 			}else{
 				return false;
 			}
-		},
-		// monConnDiag(){
-		// 	return this.$vuetify
-		// }		
+		}		
 	},
 	mixins: [
 		BtnCmdDataFunctions,
-		//BtnCmdEventFunctions,
 		BtnCmdBtnActionFunctions,
 		BtnCmdSCCFunctions
 	],
@@ -928,7 +933,6 @@ export default {
 			confirmRstSettings: false,
 			code: '',
 			doingCode: false,
-			isSimulating: false,
 			newData: null,
 			currButtonObj: {},
 			currButtonEventObj: {},
@@ -958,10 +962,10 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '0.10.16',
+			btnCmdVersion: '01.01.01',
 			btnCmd : {
-				btnCmdVersion: '0.10.16',
-				btnCmdIDUpdateRun: false,
+				btnCmdVersion: '01.01.01',
+				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1139,16 +1143,13 @@ export default {
 		}else{
 			this.updateForDesktop();
 		}
-		window.addEventListener("resize", this.onResize);					
+		window.addEventListener("resize", this.onResize);
 	},
 	destroyed() {
 		window.removeEventListener("resize", this.onResize);
 	},
     methods: {
-		...mapActions('machine', ['sendCode']),
-		...mapActions('machine', {machineDownload: 'download', getFileList: 'getFileList'}),
-        ...mapActions('machine', ['upload']),
-		...mapMutations('machine/settings', ['addCode', 'removeCode']),
+		
 		setupPage(){
 			this.onChangeTab(this.btnCmd.tabs[0].tabID);
 		},
@@ -1681,7 +1682,6 @@ export default {
 		this.initSettings();
 		this.checkDataVersion();
 		this.setupPage();
-		this.isSimulating = (this.status === StatusType.simulating);
 		//Hide the top panel if set in global plugin settings and not on mobile device - this is needed for first load only
 		if(this.btnCmd.globalSettings.defaultGC_Hidden && !this.$vuetify.breakpoint.mobile){
 			this.toggleTopPanel(true);
@@ -1706,13 +1706,6 @@ export default {
 	},
 
 	watch: {
-		// status: function (val) {
-		// 	//console.log("Checking Conditions Status change to :" + val);
-		// 	if(this.btnCmd.globalSettings.enableEvents && !this.isSimulating && !this.mobileActive){
-		// 		//console.log("Conditions Met lauching checkEvents");
-		// 		this.checkEvents('status', val);
-		// 	}
-		// },
 		mobileActive (val) {
 			if(val){
 				try{

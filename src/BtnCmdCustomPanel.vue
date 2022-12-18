@@ -96,15 +96,15 @@
 </template>
 
 <script>
-    import { mapGetters, mapState, mapActions, mapMutations } from 'vuex';
-    import { isPrinting, isPaused } from '../../store/machine/modelEnums.js';
+    import { isPrinting } from "@/utils/enums";
+    import Path from '@/utils/path';
+    import store from "@/store";
     import altWebCamPanel from './altWebCamPanel.vue';
     import VueDraggableResizable from 'vue-draggable-resizable';
     import BtnCmdWebPanel from './BtnCmdWebPanel.vue';
     import BtnCmdMMPanel from './BtnCmdMMPanel.vue';
-    import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
-    import BtnCmdCustPanelBtnActionFunctions from './BtnCmdCustPanelBtnActionFunctions.js';
-    import Path from '../../utils/path.js';
+    import BtnCmdDataFunctions from './BtnCmdDataFunctions';
+    import BtnCmdCustPanelBtnActionFunctions from './BtnCmdCustPanelBtnActionFunctions';    
     import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
     import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
 
@@ -129,20 +129,24 @@
             systemDSFVer: Boolean
         },
         computed: {
-            ...mapState('machine/model', {
-                status: state => state.state.status,
-                macrosDirectory: state => state.directories.macros,
-                systemDirectory: state => state.directories.system,
-                systemCurrIP: state => state.network.interfaces[0].actualIP
-            }),
-            ...mapGetters('machine/model', ['jobProgress']),
-            ...mapState('machine/settings', ['codes']),
-            ...mapState({
-                darkTheme: state => state.settings.darkTheme
-            }),
-            isPrinting() { return isPrinting(this.status); },
-            isPaused() { return isPaused(this.status); },
-            eventStatusText() { return this.status; },
+            status() {
+			    return store.state.machine.model.state.status;
+            },
+            macrosDirectory() {
+                return store.state.machine.model.directories.macros;
+            },
+            systemDirectory() {
+                return store.state.machine.model.directories.system;
+            },
+            systemCurrIP() {
+                return store.state.machine.model.network.interfaces[0].actualIP;
+            },
+            darkTheme() {
+                return store.state.settings.darkTheme;
+            }, 
+            isPrinting() {
+                return isPrinting(store.state.machine.model.state.status);
+            },
             mobileActive() {
                 if(this.$vuetify.breakpoint.smAndDown){
                     return true;
@@ -174,10 +178,6 @@
             }
         },
         methods: {
-            ...mapActions('machine', ['sendCode']),
-            ...mapActions('machine', {machineDownload: 'download'}),
-            ...mapActions('machine', ['upload']),
-            ...mapMutations('machine/settings', ['addCode', 'removeCode']),
             getTabBtns(tabID){
                 var result = this.mainData.btns.filter(item => item.btnGroupIdx === tabID);
                 // var result = tabID;

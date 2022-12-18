@@ -1,7 +1,5 @@
-'use strict'
-
 import BtnCmdMainPanel from './BtnCmdMainPanel.vue';
-import router, { registerRoute } from '../../routes';
+import router, { registerRoute } from '@/routes';
 import Vue from 'vue';
 import VueRouter from 'vue-router'
 
@@ -16,7 +14,6 @@ registerRoute(BtnCmdMainPanel, {
 		}
 	}
 });
-
 
 Vue.use(VueRouter);
 
@@ -55,7 +52,7 @@ function runStartup(){
 	}
 	if(tmpSession.globalSettings.enableChangeTopBar && tmpSession.globalSettings.TopBarColor){
 		let aptb = document.getElementsByClassName("v-app-bar")
-		//console.log(aptb[0].style.backgroundColor)
+		//console.log("curr color", aptb[0].style.backgroundColor)
 		aptb[0].style.backgroundColor = tmpSession.globalSettings.TopBarColor;
 		//aptb[0].style.backgroundColor = "";
 	}

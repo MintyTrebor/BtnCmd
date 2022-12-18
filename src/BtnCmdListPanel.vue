@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex';
+    import store from "@/store";
     export default {
         props: {
             listType: String
@@ -19,9 +19,9 @@
             }        
 	    },
         computed:{
-            ...mapState({
-			darkTheme: state => state.settings.darkTheme
-		}),
+            darkTheme() {
+                return store.state.settings.darkTheme;
+            }, 
             getCalGridH(){
                 return `overflow: auto; max-height: ${this.calcGridHeight}px; background-color: ${this.getDWCPanelBGColor()} !important`
             }

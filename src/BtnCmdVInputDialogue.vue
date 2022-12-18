@@ -49,11 +49,7 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-col cols="12" v-bind="attrs" v-on="on">
-                                    <v-radio-group v-if="!enableSelects" v-model="tmpPassedObject.inputType" row required :disabled="bToggleExInp" @change="clearConfig()">
-                                        <v-subheader>Variable Type:</v-subheader>
-                                        <v-radio v-for="type in radioVarTypeItems" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                    <v-select @change="clearConfig()" v-if="enableSelects" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="tmpPassedObject.inputType"></v-select>
+                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="tmpPassedObject.inputType"></v-select>
                                 </v-col>
                             </template>
                             <span>Note: Changing this value can clear existing configuration data</span>
@@ -63,11 +59,7 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-col cols="11" v-bind="attrs" v-on="on">
-                                    <v-radio-group v-if="!enableSelects && tmpPassedObject.inputType" v-model="tmpPassedObject.inputDispType" row required :disabled="bToggleExInp" @change="clearConfig()">
-                                        <v-subheader>Input Control Type:</v-subheader>
-                                        <v-radio v-for="type in dispTypeList()" :key="'BtnT'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" v-if="enableSelects && tmpPassedObject.inputType" :items="dispTypeList()" class="custom-label-color" item-text="text" item-value="value" label="Input Control Type" required v-model="tmpPassedObject.inputDispType"></v-select>
+                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" v-if="tmpPassedObject.inputType" :items="dispTypeList()" class="custom-label-color" item-text="text" item-value="value" label="Input Control Type" required v-model="tmpPassedObject.inputDispType"></v-select>
                                 </v-col>
                             </template>
                             <span>Note: Changing this value can clear existing configuration data</span>
@@ -229,7 +221,7 @@
 <script>
     import BtnCmdColPickerDialogue from './BtnCmdColPickDialogue.vue';
     import draggable from 'vuedraggable';
-    import { mapState } from 'vuex';
+    import store from "@/store";
     export default {
         components: {
             BtnCmdColPickerDialogue,
@@ -239,13 +231,12 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            },
-            enableSelects: Boolean
+            }
         },
         computed: {
-            ...mapState({
-                darkTheme: state => state.settings.darkTheme
-            }),
+            darkTheme() {
+                return store.state.settings.darkTheme;
+            }, 
             show: {
                 get () {
                     return this.value
@@ -362,10 +353,12 @@
             addListItem(){
                 if(this.tmpListItem){
                     this.tmpPassedObject.inputControlVals.push(this.tmpListItem);
-                    this.tmpListItem = null;
-                    process.nextTick(() => {
-                        let elem = document.getElementById(`listcontent${this.tmpPassedObject.inputControlVals.length - 1}`);
-                        elem.scrollIntoView();
+                    this.tmpListItem = null;                    
+                    this.$nextTick(() => {
+                        try{
+                            let elem = document.getElementById(`listcontent${this.tmpPassedObject.inputControlVals.length - 1}`);
+                            elem.scrollIntoView();
+                        }catch{}
                     })
                 }
             },

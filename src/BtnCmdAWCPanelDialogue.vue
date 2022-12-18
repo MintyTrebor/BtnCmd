@@ -57,19 +57,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!enableSelects">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Webcam Rotation:" v-model="passedObject.altWebCamParams.altWebCamRotation" row required>
-                                        <v-radio v-for="type in rotateItems" :key="'WR'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                </template>
-                                <span>Rotation Angle</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="enableSelects">
+                    <v-row dense>
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
@@ -79,19 +67,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!enableSelects">
-                        <v-col cols="12">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Flip Webcam Img:" v-model="passedObject.altWebCamParams.altWebCamFlip" row required>
-                                        <v-radio v-for="type in flipItems" :key="'FW'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                </template>
-                                <span>Flip Webcam Image</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="enableSelects">
+                    <v-row dense>
                         <v-col cols="12">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
@@ -149,8 +125,7 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            },
-            enableSelects: Boolean
+            }
         },
         computed: {
             show: {

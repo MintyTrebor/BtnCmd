@@ -20,32 +20,17 @@
 	</v-container>
 </template>
 
-<script>
-'use strict'
+<script lang="ts">
+	import Vue from "vue";
 
-import { mapMutations } from 'vuex'
+	import store from "@/store";
 
-//import { registerRoute } from '../../routes'
-
-export default {
-	// install() {
-	// 	// Register a route via Control -> Console
-	// 	registerRoute(this, {
-	// 		Control: {
-	// 			Console: {
-	// 				icon: 'mdi-code-tags',
-	// 				caption: 'menu.control.console',
-	// 				path: '/Console'
-	// 			}
-	// 		}
-	// 	});
-	// },
-	methods: mapMutations(['hideCodeReplyNotifications', 'showCodeReplyNotifications']),
-	activated() {
-		this.hideCodeReplyNotifications();
-	},
-	deactivated() {
-		this.showCodeReplyNotifications();
-	}
-}
+	export default Vue.extend({
+		activated() {
+			store.commit("hideCodeReplyNotifications");
+		},
+		deactivated() {
+			store.commit("showCodeReplyNotifications");
+		}
+	});
 </script>

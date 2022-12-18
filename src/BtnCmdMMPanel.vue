@@ -60,9 +60,8 @@
 </template>
 
 <script>
-'use strict'
-import { mapGetters, mapState} from 'vuex';
 import jsonpath from 'jsonpath';
+import store from "@/store";
 
 export default {
 	props: {
@@ -71,19 +70,28 @@ export default {
 		}
     },
 	computed: {
-		...mapState('machine', ['model']),
-		...mapGetters(['uiFrozen']),
 		matchedMMVal() {return this.getModelValue();}
 	},
 	methods: {
 		getModelValue(){
 			const jp = jsonpath;
 			if(this.passedObject.panelMMPath){
-				var matchInModel = jp.query(this.model, (`$.${this.passedObject.panelMMPath}`));
-				if(JSON.stringify(matchInModel) != "[]"){
-					return  matchInModel[0];
+				if(this.passedObject.panelMMPath.startsWith("global.")){
+					let tmpStr = this.passedObject.panelMMPath.replace("global.", "");
+					if(store.state.machine.model.global.has(tmpStr)){
+						return store.state.machine.model.global.get(tmpStr);
+					}else{
+						return "###";
+					}
+				}else if(this.passedObject.panelMMPath.startsWith("plugins.")){
+					return "plugins Object cannot be used here";
 				}else{
-					return "###";
+					var matchInModel = jp.query(store.state.machine.model, (`$.${this.passedObject.panelMMPath}`));
+					if(JSON.stringify(matchInModel) != "[]"){
+						return  matchInModel[0];
+					}else{
+						return "###";
+					}
 				}
 			}else {
 				return "###";

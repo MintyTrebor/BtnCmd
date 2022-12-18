@@ -41,31 +41,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row dense v-if="!enableSelects && passedObject.panelType == 'mmValue'">
-                        <v-col class="d-flex flex-column">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Text Orientation :" v-model="passedObject.panelMMOrientation" row required>
-                                        <v-radio v-for="type in orientationItems" :key="'MMOr'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                </template>
-                                <span>Change the text orientation</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense> 
-                        <v-col cols="12">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="passedObject.panelMMTextSize" row required>
-                                        <v-radio v-for="type in textSizeItems" :key="'MMTS'+type.value" :label="type.text" :value="type.value"></v-radio>
-                                    </v-radio-group>
-                                </template>
-                                <span>Modify the font size</span>
-                            </v-tooltip>
-                        </v-col>
-                    </v-row>
-                    <v-row dense v-if="enableSelects && passedObject.panelType == 'mmValue'">
+                    <v-row dense v-if="passedObject.panelType == 'mmValue'">
                         <v-col class="d-flex flex-column">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
@@ -157,8 +133,7 @@
             value: Boolean,
             passedObject: {
                 type: Object
-            },
-            enableSelects: Boolean
+            }
         },
         computed: {
             show: {

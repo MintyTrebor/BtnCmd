@@ -1,32 +1,41 @@
-import mqtt from 'mqtt';
+import mqtt from 'precompiled-mqtt';
 import axios from 'axios';
-import Path from '../../utils/path.js';
+import Path from '@/utils/path';
 import jsonpath from 'jsonpath';
-import { mapGetters, mapState} from 'vuex';
+import store from "@/store";
 
 
 //needed to run gcode commands
 const conditionalKeywords = ['abort', 'echo', 'if', 'elif', 'else', 'while', 'break', 'var', 'set'];
 
 export default {
-    computed: {
-		...mapState('machine', ['model']),
-		...mapGetters(['uiFrozen'])
-	},
+    
 	methods: {
-        getModelValue(mmPath){
+		getModelValue(mmPath){
 			const jp = jsonpath;
 			if(mmPath){
-				var matchInModel = jp.query(this.model, (`$.${mmPath}`));
-				if(JSON.stringify(matchInModel) != "[]"){
-					return  matchInModel[0];
+				if(mmPath.startsWith("global.")){
+					let tmpStr = mmPath.replace("global.", "");
+					if(store.state.machine.model.global.has(tmpStr)){
+						return store.state.machine.model.global.get(tmpStr);
+					}else{
+						return "###";
+					}
+				}else if(mmPath.startsWith("plugins.")){
+					return "plugins Object cannot be used here";
 				}else{
-					return "###";
+					var matchInModel = jp.query(store.state.machine.model, (`$.${mmPath}`));
+					if(JSON.stringify(matchInModel) != "[]"){
+						return  matchInModel[0];
+					}else{
+						return "###";
+					}
 				}
 			}else {
 				return "###";
 			}		
 		},
+
 		matchModelKeys(textToCheckStr){
 			if(textToCheckStr){
 				var tmpStr = textToCheckStr;
@@ -45,6 +54,7 @@ export default {
 			}
 			return "";
 		},
+
 		//mqtt Msg Send Functions
 		sendMQTTMsg(msgStr, topicStr){
 			var mqttOptions;
@@ -116,7 +126,6 @@ export default {
 			var tmpParent = this;
 			const axiosHtpp = axios;
 			if(btnJSONOb.btnType == "Macro"){
-				//tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 				tmpParent.runFile(btnJSONOb.btnActionData);
 				tmpParent.setActionResponse("Last Action :  -- Macro -- " + btnJSONOb.btnActionData);
 			}else if(btnJSONOb.btnType == "http"){
@@ -131,24 +140,28 @@ export default {
 					}
 					axiosHtpp.post(btnJSONOb.btnActionData, tmpJsonData)
 						.then(function (response) {
-						//tmpParent.setActionResponse("Event Action : -- Success Result : " + JSON.stringify(response));
-						if(btnJSONOb.btnSBCCShowResult){
-							try{
-								var tmpTxt = response.data
-								tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
-								tmpParent.showBtnSBCCDialog = true;}
-							catch{
-								console.log(response);
+							if(btnJSONOb.btnSBCCShowResult){
+								try{
+									var tmpTxt = response.data
+									tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
+									tmpParent.showBtnSBCCDialog = true;
+								}
+								catch{
+									// console.log(response);
+									// tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+									// tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+								}
+							}
+						})
+						.catch(function (error) {
+							if(!error.contains("has been blocked by CORS policy")){
+								console.log("Post Error:", error);
 								tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
 								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+							}else {
+								tmpParent.setActionResponse("Event Action : -- CORS Error. post may still have worked - Check Browser Console for more details");
 							}
-						}
-					})
-					.catch(function (error) {
-						console.log(error);
-						tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
-						tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
-					});
+						});
 				}
 				if(btnJSONOb.btnHttpType == "GET") {
 						axiosHtpp.get(btnJSONOb.btnActionData, { headers: {'Content-Type': `application/${btnJSONOb.btnHttpContType}`}})
@@ -159,17 +172,20 @@ export default {
 									tmpParent.currBtnPromptTxt = tmpTxt.replace(/(?:\r\n|\r|\n)/g, '<br>');
 									tmpParent.showBtnSBCCDialog = true;}
 								catch{
-									console.log(response);
-									tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
-									tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+									// console.log(response);
+									// tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+									// tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
 								}
 							}
 						})
 						.catch(function (error) {
-							// handle error
-							console.log(error);
-							tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
-							tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+							if(!error.contains("has been blocked by CORS policy")){
+								console.log("Post Error:", error);
+								tmpParent.setActionResponse("Event Action : -- Error. Check Browser Console for more details");
+								tmpParent.$makeNotification('error', 'BtnCmd HTTP encountered an error', `Check Browser Console for more details`);
+							}else {
+								tmpParent.setActionResponse("Event Action : -- CORS Error. get may still have worked - Check Browser Console for more details");
+							}
 						});
 				}
 			}else if(btnJSONOb.btnType == "MQTT" && this.btnCmd.globalSettings.enableMQTT){
@@ -225,15 +241,16 @@ export default {
 			this.actionResponse = actionTxt;
 		},
 		//run maro file
-		runFile(filename) {
-			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
+		async runFile(filename) {
+			await store.dispatch("machine/sendCode", `M98 P"${Path.combine(this.directory, filename)}"`);
+			//this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
 		},
 		//run gcode commands - taken from codeinput.vue
 		hasUnprecedentedParameters: (code) => !code || /(M23|M28|M30|M32|M36|M117)[^0-9]/i.test(code),
 		async send() {
 			this.showItems = false;
 
-			const code = (!this.code || this.code.constructor === String) ? this.code : this.code.value;
+			const code = (this.code instanceof Object) ?this.code.value : this.code;
 			if (code && code.trim() !== '' && !this.doingCode) {
 				let codeToSend = '', bareCode = '', inQuotes = false, inExpression = false, inWhiteSpace = false, inComment = false;
 				if (!this.hasUnprecedentedParameters(codeToSend) &&
@@ -290,12 +307,16 @@ export default {
 				// Send the code and wait for completion
 				this.doingCode = true;
 				try {
-					const reply = await this.sendCode({ code: codeToSend, fromInput: true });
-					if (!inQuotes && !reply.startsWith('Error: ') && !reply.startsWith('Warning: ') &&
-						bareCode.indexOf('M587') === -1 && bareCode.indexOf('M589') === -1 &&
-						!this.disableAutoComplete && this.codes.indexOf(codeToSend.trim()) === -1) {
+					const reply = await store.dispatch("machine/sendCode", {
+						code: codeToSend,
+						fromInput: true
+					});
+
+					if (!inQuotes && !store.state.settings.disableAutoComplete &&
+						!reply.startsWith("Error: ") && !reply.startsWith("Warning: ") &&
+						bareCode.indexOf("M587") === -1 && bareCode.indexOf("M589") === -1) {
 						// Automatically remember successful codes
-						//this.addCode(codeToSend.trim());
+						//store.commit("machine/cache/addLastSentCode", codeToSend.trim());
 					}
 				} catch {
 					// handled before we get here

@@ -170,18 +170,19 @@
 
 
 <script>
-    import {mapState} from 'vuex';
+    import store from "@/store";
     export default {
         props: {
             value: Boolean,
             tmpSBCCUsr: {
                 type: Object
             },
-            bMQTT: Boolean,
-            enableSelects: Boolean
+            bMQTT: Boolean
         },
         computed: {
-            ...mapState('machine/model', {systemDirectory: state => state.directories.system}),
+            systemDirectory() {
+                return store.state.machine.model.directories.system;
+            },
             show: {
                 get () {
                     return this.value
@@ -241,8 +242,6 @@
                     this.alertReqVal = false;
                     return;
                 }else {
-                    // localStorage.setItem('btnCmdsettings', JSON.stringify(this.passedObject));
-                    //this.$emit('exit', true);
                     this.dialog = false;
                     return;
                 }                
@@ -291,19 +290,19 @@
                 this.show = false;
             },
             generateUUID(strType) { 
-			// based on code from Public Domain/MIT
-            var d = new Date().getTime();
-            if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-                d += performance.now(); //use high-precision timer if available
-            }
-            var tmpMask = `xxxxxxxx-xxxx-${strType}xxx-yxxx-xxxxxxxxxxxx`
-			var newGuid = tmpMask.replace(/[xy]/g, function (c) {
-                var r = (d + Math.random() * 16) % 16 | 0;
-                d = Math.floor(d / 16);
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            });            
-            return newGuid;
-        },
+                // based on code from Public Domain/MIT
+                var d = new Date().getTime();
+                if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
+                    d += performance.now(); //use high-precision timer if available
+                }
+                var tmpMask = `xxxxxxxx-xxxx-${strType}xxx-yxxx-xxxxxxxxxxxx`
+                var newGuid = tmpMask.replace(/[xy]/g, function (c) {
+                    var r = (d + Math.random() * 16) % 16 | 0;
+                    d = Math.floor(d / 16);
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });            
+                return newGuid;
+            },
 		},
     }
 </script>
