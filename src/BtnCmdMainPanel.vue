@@ -965,7 +965,7 @@ export default {
 			btnCmdVersion: '01.01.01',
 			btnCmd : {
 				btnCmdVersion: '01.01.01',
-				btnCmdIDUpdateRun: true,
+				btnCmdIDUpdateRun: false,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
