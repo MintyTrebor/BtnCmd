@@ -74,7 +74,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="Auto Backup file name*" v-model="passedObject.ABackupFileName" required placeholder="BtnCmdABMyPc"></v-text-field>
+                                    <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" label="Auto Backup file name*" @keydown.space.prevent v-model="passedObject.ABackupFileName" required placeholder="BtnCmdABMyPc"></v-text-field>
                                 </template>
                                 <span>Choose a unique filename per browser/device. The .json suffix will automatically be appended to the file name</span>
                             </v-tooltip>

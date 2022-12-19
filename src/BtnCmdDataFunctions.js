@@ -259,6 +259,7 @@ export default {
 			const content = new Blob([JSON.stringify(this.btnCmd)]);
 			var tmpFName = this.btnCmd.globalSettings.ABackupFileName.replace(/\n/g," ").replace(/[<>:"/\\|?*]| +$/g,"").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/,x=>x+"_");
 			const setFileName = Path.combine(this.systemDirectory, `${tmpFName}.json`);
+			console.log("setFileName", setFileName)
 			try {
 				await store.dispatch("machine/upload", { filename: setFileName, content, showSuccess: false });
 			} catch (e) {

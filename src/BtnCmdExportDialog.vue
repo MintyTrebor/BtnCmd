@@ -31,7 +31,7 @@
         </v-row>
       </v-card-title>
       <v-row justify="center" class="mt-2" align="center">
-        <v-col cols="6"><v-text-field v-model="exportFileName" label="Enter Export File Name" required clearable @change="validateFileName()"></v-text-field></v-col>
+        <v-col cols="6"><v-text-field v-model="exportFileName" @keydown.space.prevent label="Enter Export File Name" required clearable @change="validateFileName()"></v-text-field></v-col>
       </v-row>
       <v-row justify="center" class="pl-4 ml-4 pr-4 mr-4 mt-n6" align="center">
         <v-text-field v-model="exportComment" label="Enter a Export Comment" clearable></v-text-field>

@@ -736,7 +736,7 @@
 						<v-col cols="12">
 							<v-tooltip bottom>
 								<template v-slot:activator="{ on, attrs }">
-									<v-text-field v-bind="attrs" v-on="on" class="custom-label-color" label="File Name*" v-model="btnCmd.globalSettings.lastBackupFileName" placeholder="BtnCmdSettings"></v-text-field>
+									<v-text-field v-bind="attrs" v-on="on" class="custom-label-color" label="File Name*" @keydown.space.prevent v-model="btnCmd.globalSettings.lastBackupFileName" placeholder="BtnCmdSettings"></v-text-field>
 								</template>
 								<span>File name (do not include the file name extension - this will be automatically added for you)</span>
 							</v-tooltip>
