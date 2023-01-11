@@ -15,7 +15,7 @@
                     <v-toolbar-title>Edit Panel {{isCNCMode}}</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
-                        <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue' || passedObject.panelType == 'txtLabel' || passedObject.panelType == 'vInput'">Click to Enter Settings</span>
+                        <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue' || passedObject.panelType == 'txtLabel' || passedObject.panelType == 'vInput' || passedObject.panelType == 'BtnCmdChart'">Click to Enter Settings</span>
                         <span v-else>Close</span>
                     </v-btn>
                 </v-toolbar>
@@ -126,6 +126,7 @@
                 {text: 'Alt Webcam', value: 'altwebcam', disabled: false, hSize: 275, wSize: 489},
                 {text: 'DWC Webcam', value: 'webcam', disabled: false, hSize: 283, wSize: 354},
                 {text: 'Baby-Stepping', value: 'z-babystep-panel', disabled: false, hSize: 200, wSize: 300},
+                {text: 'Custom Chart', value: 'BtnCmdChart', disabled: false, hSize: 400, wSize: 400},
                 // {text: 'CNC Axes Position', value: 'cnc-axes-position', disabled: true, hSize: 300, wSize: 380},
                 {text: 'CNC Info Panel', value: 'cnc-container-panel', disabled: !this.isCNCMode, hSize: 400, wSize: 800},
                 {text: 'CNC Movement', value: 'cnc-movement-panel', disabled: !this.isCNCMode, hSize: 530, wSize: 1000},
@@ -201,6 +202,10 @@
                     this.show = false;
                     return;
                 }else if (this.passedObject.panelType == 'vInput') {
+                    this.$emit('exit', true);
+                    this.show = false;
+                    return;
+                }else if (this.passedObject.panelType == 'BtnCmdChart') {
                     this.$emit('exit', true);
                     this.show = false;
                     return;

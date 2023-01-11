@@ -32,12 +32,20 @@
                         </v-col>
                     </v-row>
                     <v-row dense v-if="passedObject.panelType == 'mmValue'" >
-                        <v-col cols="12">
+                        <v-col cols="11">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field required v-bind="attrs" v-on="on" label="Model Path" v-model="tmpModelPath" placeholder="heat.heaters[0].current"></v-text-field>
                                 </template>
                                 <span>Use the Object Model Browser Plugin to get Model Paths</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="1">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn v-bind="attrs" v-on="on" class="mt-4 btn-fix" fab x-small @click="closeOMSelector()"><v-icon>mdi-toy-brick-search-outline</v-icon></v-btn>
+                                </template>
+                                <span>Lookup Object Model</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -118,6 +126,7 @@
                 </tbody>
             </v-card-text>
             <BtnCmdColPickerDialogue v-if="showColPicker" v-model="showColPicker" :passedObject="passedObject" :colField="colField"></BtnCmdColPickerDialogue>
+            <ObjectModelSelector @exit="closeOMSelector" v-model="showOMSelector"></ObjectModelSelector>
         </v-card>
     </v-dialog>
 </template>
@@ -125,9 +134,11 @@
 
 <script>
     import BtnCmdColPickerDialogue from './BtnCmdColPickDialogue.vue'
+    import ObjectModelSelector from './ObjectModelSelector.vue'
     export default {
         components: {
-            BtnCmdColPickerDialogue
+            BtnCmdColPickerDialogue,
+            ObjectModelSelector
         },
         props: {
             value: Boolean,
@@ -164,7 +175,8 @@
                 showInfo: false,
                 showColPicker: false,
                 colField:'',
-                tmpModelPath:''
+                tmpModelPath:'',
+                showOMSelector: false
             }
         },
         methods: {
@@ -197,6 +209,12 @@
             setColor(colorField){
                 this.colField = colorField;
                 this.showColPicker = true;
+            },
+            closeOMSelector(txtVal){
+                this.showOMSelector = !this.showOMSelector;
+                if(txtVal){
+                    this.tmpModelPath = txtVal;
+                };
             }
         },
         mounted() {

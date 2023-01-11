@@ -10,7 +10,7 @@ export default {
 			//returns a clean copy of the main data structure, used for resetting config, and config data upgrades
 			return {
 				btnCmdVersion: this.btnCmdVersion,
-				btnCmdIDUpdateRun: false,
+				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -45,24 +45,6 @@ export default {
 					API_KEY: 1234567890234,
 					SUBNET: "0.0.0.0"
 				},
-				monitoredEvents: [
-					{
-						eventID: 1,
-						eventType: 'status',
-						eventOnlyInPrint: true,
-						eventTrigValue: 'busy',
-						eventTrigActionType: 'http',
-						eventTrigActionCmd: 'http://',
-						eventTrigActionTopic: '',
-						eventEnabled: false,
-						eventName: 'Example Event',
-						eventTgrmChatID: '',
-						eventTgrmAPIToken: '',
-						eventHttpType: 'GET',
-						eventHttpData: null,
-						eventHttpContType: 'text'
-					}
-				],
 				btns: [
 					{
 						btnID: '1',
@@ -166,7 +148,20 @@ export default {
 						inputControlVals: [],
 						inputControlRange:[],
 						inputControlSteps: 1,
-						bPanelActivated: false
+						bPanelActivated: false,
+						chartLabel: 'Custom Chart',
+						chartOMDataArr: [],
+						chartYaxisLabel: 'Y Axis',
+						chartXaxisLabel: 'X Axis',
+						chartYaxisMin: 30,
+						chartYaxisMax: 50,
+						chartYaxisStep: 10,
+						chartYaxisMode: 'time',
+						chartTickValue: 5,
+						chartXaxisOMData: null,
+						chartXaxisMaxSample: 600,
+						chartUpdateKey: 0,
+						chartRetainData: false
 					}
 				],
 				SBCC_Cmds: [
@@ -357,14 +352,13 @@ export default {
 			if(this.btnCmdVersion != this.btnCmd.btnCmdVersion) {
 				var prevVer = this.btnCmd.btnCmdVersion;
 				//versions are different run the upgrade
-				this.setActionResponse('Running Configuration Data Upgrade to : ' + this.btnCmdVersion);
+				this.setActionResponse('Running Configuration Data Update to: ' + this.btnCmdVersion);
 				this.newData = {
 					btnCmdVersion: null,
 					btnCmdIDUpdateRun: false,
 					systemSettings: null,
 					globalSettings: null,
 					SBCCSettings: null,
-					monitoredEvents: [],
 					btns: [],
 					tabs: [],
 					panels: [],
@@ -388,10 +382,6 @@ export default {
 				}else{
 					this.newData.SBCCSettings = refData.SBCCSettings;
 				}				
-				//merge events
-				for(ni in this.btnCmd.monitoredEvents){
-					this.newData.monitoredEvents.push(merge(refData.monitoredEvents[0], this.btnCmd.monitoredEvents[ni]))
-				}
 				ni = null;
 				//merge buttons
 				for(ni in this.btnCmd.btns){
@@ -476,7 +466,7 @@ export default {
 					}
 					this.btnCmd.btnCmdIDUpdateRun = true;
 				}
-				this.setActionResponse('Configuration Data Upgraded from :' + prevVer + ' to : ' + this.btnCmdVersion);
+				this.setActionResponse('Configuration Data updated from: ' + prevVer + ' to : ' + this.btnCmdVersion);
 				this.newData = null;
 				this.btnCmd.btnCmdVersion = this.btnCmdVersion;
 				this.saveSettings();

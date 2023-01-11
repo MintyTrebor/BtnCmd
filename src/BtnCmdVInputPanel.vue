@@ -200,6 +200,21 @@ export default {
 	methods: {
 		getModelValue(){
 			if(this.passedObject.inputVarName){
+				let tmpNum = null;
+				let tmpArr = null;
+				//detect if this is a global variable array and retrieve the array value - dwc 3.5
+				tmpArr = this.passedObject.inputVarName.match(/(?<=\[)[0-9]+?(?=\])/g);
+				if(tmpArr){
+					tmpNum = Number(tmpArr[0]);
+					let tmpStr = this.passedObject.inputVarName.replace(/\[.*\]/g, "");
+					if(store.state.machine.model.global.has(tmpStr)){
+						this.doRightALign();
+						let globArr = store.state.machine.model.global.get(tmpStr);
+						return globArr[tmpNum]
+					}else{ 
+						return "###";
+					}
+				} 
 				if(store.state.machine.model.global.has(this.passedObject.inputVarName)){
 					this.doRightALign();
 					return store.state.machine.model.global.get(this.passedObject.inputVarName);

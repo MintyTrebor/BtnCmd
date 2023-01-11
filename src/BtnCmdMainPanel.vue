@@ -169,6 +169,7 @@
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
 																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
 																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
+																	<BtnCmdChart v-if="panel.panelType == 'BtnCmdChart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :passedObject="panel" :cfgChgNum="panel.chartUpdateKey" :key="panel.panelID" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdChart>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="mytabs-card pa-0 ma-0">
 																		<tbody>
 																			<tr class="pa-0 ma-0">
@@ -428,6 +429,7 @@
 				<BtnCmdPanelSettingsDialogue @exit="afterAddPanel()" v-if="showPanelEdit" v-model="showPanelEdit" :customPanels="getAllCustomPanels()" :passedObject="panelObjectToPass[0]" :createMode="createMode" :isCNCMode="isCNCMode"></BtnCmdPanelSettingsDialogue>
 				<BtnCmdAWCPanelDialogue @exit="saveSettings()" v-if="showAWCPanelEdit" v-model="showAWCPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdAWCPanelDialogue>
 				<BtnCmdMMPanelDialogue @exit="saveSettings()" v-if="showMMPanelEdit" v-model="showMMPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdMMPanelDialogue>
+				<BtnCmdChartPanelDialogue @exit="saveSettings()" v-if="showChartPanelEdit" v-model="showChartPanelEdit" :passedObject="panelObjectToPass[0]"></BtnCmdChartPanelDialogue>
 				<BtnCmdVInputDialogue @exit="updatePanObject" v-if="showVInputPanelEdit" v-model="showVInputPanelEdit" :passedObject="panelObjectToPass[0]" ></BtnCmdVInputDialogue>
 				<BtnCmdGlobalSettingsDialogue @exit="saveSettings()" v-if="showGSEdit" v-model="showGSEdit" :showBottomNavigation="showBottomNavigation" :mobileActive="mobileActive" :passedObject="btnCmd.globalSettings" @rldSBCCSet="reloadSBCCSet = true" :systemDSFVer="systemDSFVer"></BtnCmdGlobalSettingsDialogue>
 				<BtnCmdSBCCSettingsDialogue @exit="saveSettings()" @updateSettings="saveSBCCSettingsToFile()" v-if="showSBCCEdit" v-model="showSBCCEdit"  :tmpSBCCUsr="btnCmd"></BtnCmdSBCCSettingsDialogue>
@@ -780,6 +782,9 @@ import BtnCmdConsole from './BtnCmdConsole.vue';
 import BtnCmdExportDialog from './BtnCmdExportDialog.vue';
 import BtnCmdImportDialog from './BtnCmdImportDialog.vue';
 import BtnCmdListPanel from './BtnCmdListPanel.vue';
+import BtnCmdChart from './BtnCmdChart.vue';
+import BtnCmdChartPanelDialogue from './BtnCmdChartPanelDialogue.vue';
+
 
 
 export default {
@@ -802,7 +807,9 @@ export default {
 		BtnCmdExportDialog,
 		BtnCmdImportDialog,
 		BtnCmdConsole,
-		BtnCmdListPanel
+		BtnCmdListPanel,
+		BtnCmdChart,
+		BtnCmdChartPanelDialogue
     },
 	computed: {
 		status() {
@@ -916,6 +923,7 @@ export default {
 			showBtnSBCCDialog: false,
 			showAWCPanelEdit: false,
 			showMMPanelEdit: false,
+			showChartPanelEdit: false,
 			showVInputPanelEdit: false,
 			bShowExportDialog: false,
 			bShowImportDialog: false,
@@ -962,10 +970,10 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.01.01',
+			btnCmdVersion: '01.01.02',
 			btnCmd : {
-				btnCmdVersion: '01.01.01',
-				btnCmdIDUpdateRun: false,
+				btnCmdVersion: '01.01.02',
+				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
 					lastTabID: 2,
@@ -1000,24 +1008,6 @@ export default {
 					API_KEY: 1234567890234,
 					SUBNET: "0.0.0.0"
 				},
-				monitoredEvents: [
-					{
-						eventID: 1,
-						eventType: 'status',
-						eventOnlyInPrint: true,
-						eventTrigValue: 'busy',
-						eventTrigActionType: 'http',
-						eventTrigActionCmd: 'http://',
-						eventTrigActionTopic: '',
-						eventEnabled: false,
-						eventName: 'Example Event',
-						eventTgrmChatID: '',
-						eventTgrmAPIToken: '',
-						eventHttpType: 'GET',
-						eventHttpData: null,
-						eventHttpContType: 'text'
-					}
-				],
 				btns: [
 					{
 						btnID: '1',
@@ -1121,7 +1111,20 @@ export default {
 						inputControlVals: [],
 						inputControlRange:[],
 						inputControlSteps: 1,
-						bPanelActivated: false
+						bPanelActivated: false,
+						chartLabel: 'Custom Chart',
+						chartOMDataArr: [],
+						chartYaxisLabel: 'Y Axis',
+						chartXaxisLabel: 'X Axis',
+						chartYaxisMin: 30,
+						chartYaxisMax: 50,
+						chartYaxisStep: 10,
+						chartYaxisMode: 'time',
+						chartTickValue: 5,
+						chartXaxisOMData: null,
+						chartXaxisMaxSample: 600,
+						chartUpdateKey: 0,
+						chartRetainData: false
 					}
 				],
 				SBCC_Cmds: [
@@ -1274,6 +1277,9 @@ export default {
 			}
 			if(this.panelObjectToPass[0].panelType == "vInput"){
 				this.showVInputPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "BtnCmdChart"){
+				this.showChartPanelEdit = true;
 			}			
 		},
 		//dragging functions
@@ -1359,6 +1365,10 @@ export default {
 			this.currPanelObj.panelWSize = this.checkGridCompat(width);
 			this.currPanelObj.panelHSize = this.checkGridCompat(height);
 			this.currPanelObj.bPanelActivated = false;
+			//re-size chart update
+			if(this.currPanelObj.panelType === 'BtnCmdChart'){
+				this.currPanelObj.chartUpdateKey = this.currPanelObj.chartUpdateKey + 1
+			}
 		},
 		updateSizeKey(){
 			this.sizeKey = this.currPanelObj.panelWSize + this.currPanelObj.panelHSize;
@@ -1392,12 +1402,12 @@ export default {
 		},
 		getTabPanels(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput");
+			var result = this.btnCmd.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput" && item.panelType != "BtnCmdChart");
 			return result;
 		},
 		getTabPanelsEditable(tabID){
 			//need to change this to a case
-			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput"));
+			var result = this.btnCmd.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput" || item.panelType == "BtnCmdChart"));
 			return result;
 		},
 		getAllCustomPanels(){
@@ -1559,6 +1569,9 @@ export default {
 			}
 			if(this.panelObjectToPass[0].panelType == "vInput"){
 				this.showVInputPanelEdit = true;
+			}
+			if(this.panelObjectToPass[0].panelType == "BtnCmdChart"){
+				this.showChartPanelEdit = true;
 			}
 		},
 		onAddBtnClick(tmpTab){					

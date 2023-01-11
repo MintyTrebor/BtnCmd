@@ -78,6 +78,20 @@ export default {
 			if(this.passedObject.panelMMPath){
 				if(this.passedObject.panelMMPath.startsWith("global.")){
 					let tmpStr = this.passedObject.panelMMPath.replace("global.", "");
+					let tmpNum = null;
+					let tmpArr = null;
+					//detect if this is a global variable array and retrieve the array value - dwc 3.5
+					tmpArr = tmpStr.match(/(?<=\[)[0-9]+?(?=\])/g);
+					if(tmpArr){
+						tmpNum = Number(tmpArr[0]);
+						tmpStr = tmpStr.replace(/\[.*\]/g, "");
+						if(store.state.machine.model.global.has(tmpStr)){
+							let globArr = store.state.machine.model.global.get(tmpStr);
+							return globArr[tmpNum]
+						}else{
+							return "###";
+						}
+					}
 					if(store.state.machine.model.global.has(tmpStr)){
 						return store.state.machine.model.global.get(tmpStr);
 					}else{

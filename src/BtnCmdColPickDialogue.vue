@@ -69,6 +69,9 @@
                 if(this.colField == "MMValueColor"){
                     this.passedObject.panelMMValueColor = this.currColor;
                 }
+                if(this.colField == "ChartLineColor"){
+                    this.passedObject.OMColor = this.currColor;
+                }
                 this.$emit('exit', true);
                 this.show = false;
                 return;
@@ -83,6 +86,9 @@
             }
             if(this.colField == "MMValueColor"){
                 this.currColor = this.passedObject.panelMMValueColor;
+            }
+            if(this.colField == "ChartLineColor"){
+                this.currColor = this.passedObject.OMColor;
             }
         }
     }
