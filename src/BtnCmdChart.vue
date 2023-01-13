@@ -19,16 +19,34 @@
 <template>
 	<v-card class="d-flex flex-column flex-grow-1">
 		<v-card-title class="pt-2 pb-0">
-			<v-icon class="mr-1">mdi-chart-timeline-variant</v-icon>
-			{{ passedObject.chartLabel }}
-			<v-tooltip left>
-				<template v-slot:activator="{ on, attrs }">
-					<v-btn color="primary" class="mt-6 btn-fix" v-bind="attrs" v-on="on" fab small absolute top right @click="downloadChartData()">
-						<v-icon>mdi-floppy</v-icon>
-					</v-btn>
-				</template>
-				<span>Save Chart Data</span>
-			</v-tooltip>
+			<v-row dense>
+				<v-col cols="5" align="left">
+					<v-icon class="mr-1">mdi-chart-timeline-variant</v-icon>
+					{{ passedObject.chartLabel }}
+				</v-col>
+				<v-col cols="6" align="right">
+					<div :id="selectedPanel"></div>
+				</v-col>
+				<v-col cols="1" align="right">
+					<!-- <v-tooltip left>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn color="primary" class="btn-fix" v-bind="attrs" v-on="on" fab x-small @click="toggleRenderChart()">
+								<v-icon v-if="!isChartPaused">mdi-pause</v-icon>
+								<v-icon v-else>mdi-play</v-icon>
+							</v-btn>
+						</template>
+						<span>Pause/Resume</span>
+					</v-tooltip> -->
+					<v-tooltip left>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn color="primary" class="btn-fix" v-bind="attrs" v-on="on" fab x-small @click="downloadChartData()">
+								<v-icon>mdi-floppy</v-icon>
+							</v-btn>
+						</template>
+						<span>Save Chart Data</span>
+					</v-tooltip>
+				</v-col>
+			</v-row>			
 		</v-card-title>
 		<v-card-text class="content flex-grow-1 px-2 py-0">
 			<canvas :ref="passedObject.panelID"></canvas>
@@ -38,17 +56,16 @@
 
 <script lang="ts">
 
-///This is a butcher/very hacky re-work of DWC 3.5 Temp Chart////
+///This is a butcher/very hacky re-work of DWC 3.5 Temp Chart original ////
 
 
-import Chart, { ChartDataSets, MajorTickOptions, NestedTickOptions } from "chart.js";
+import Chart, { ChartDataSets, MajorTickOptions, NestedTickOptions, ChartTooltipOptions, TimeUnit } from "chart.js";
 import dateFnsLocale from "date-fns/locale/en-US";
 import Vue from "vue";
 import i18n from "@/i18n";
 import store from "@/store";
 import Events from "@/utils/events";
 import jsonpath from 'jsonpath';
-import { AnyAaaaRecord } from "dns";
 
 
 /**
@@ -79,7 +96,7 @@ interface ExtraDatasetValues {
 /**
  * Type used for chart datasets in this component
  */
-type TempChartDataset = ChartDataSets & ExtraDatasetValues;
+type TempChartDataset = ChartDataSets & ExtraDatasetValues & ChartTooltipOptions;
 
 /**
  * Make a new dataset to render temperature data
@@ -104,7 +121,8 @@ function makeDataset(index: number, extra: boolean, label: string, numSamples: n
 		pointRadius: showDataPoint ? 1:0,
 		pointHitRadius: 1,
 		rawLabel: null,
-		showLine: true
+		showLine: true,
+		intersect: false
 	};
 }
 
@@ -186,7 +204,7 @@ function getLineColor(usrColor: string){
 	return trueColor;
 }
 
-let storeSubscribed = false, instances: Array<{ update: () => void }> = []
+let storeSubscribed = false, instances: Array<{ update: () => void;  }> = [];
 
 export default Vue.extend({
 	props: {
@@ -299,6 +317,10 @@ export default Vue.extend({
 		},	
 		createChart(){
 			// Create the chart
+			var currPID = this.selectedPanel
+			var tmpThis = this
+			var yTimeMarks: TimeUnit = "minute"
+			if(this.passedObject.chartXaxisMaxSample < 61){yTimeMarks="second"}
 			this.chart = new Chart(this.$refs[this.passedObject.panelID] as HTMLCanvasElement, {
 				type: "line",
 				options: {
@@ -314,6 +336,45 @@ export default Vue.extend({
 						labels: {
 							filter: (legendItem, data) => data.datasets![legendItem.datasetIndex!].showLine,
 							fontFamily: "Roboto,sans-serif"
+						}
+					},
+					tooltips: {
+						// Disable the on-canvas tooltip
+						enabled: false,
+
+						custom: function(tooltipModel) {
+							// Tooltip Element
+							var tooltipEl:any  = document.getElementById(currPID);
+
+							function getBody(bodyItem: any) {
+								return bodyItem.lines;
+							}
+
+							// Set Text
+							if (tooltipModel.body) {
+								var titleLines = tooltipModel.title || [];
+								var bodyLines = tooltipModel.body.map(getBody);
+								var txtDataToShow: any = "";
+								var txtColourToShow: any = "";
+								titleLines.forEach(function(title) {
+									txtDataToShow = `${title} - `;
+								});			
+								
+								bodyLines.forEach(function(body, i) {
+									var colors = tooltipModel.labelColors[i];
+									txtColourToShow = colors.backgroundColor;
+									txtDataToShow = txtDataToShow + body;
+								});
+
+								tooltipEl.innerHTML = "";
+								
+								var newSpan = document.createElement('span');
+								newSpan.className = "mr-1 v-chip v-chip--label v-chip--no-color theme--dark v-size--default text-caption";
+								newSpan.style.backgroundColor = txtColourToShow;
+								newSpan.addEventListener('click', function () {tmpThis.clearToolTip();});
+								newSpan.innerHTML = `<span class="v-chip__content" >${txtDataToShow}</span></span>`;
+								tooltipEl.appendChild(newSpan);
+							}
 						}
 					},
 					//events: [],
@@ -342,10 +403,12 @@ export default Vue.extend({
 									}
 								},
 								time: {
-									unit: "minute",
+									unit: yTimeMarks,
 									displayFormats: {
-										minute: "HH:mm"
-									}
+										minute: "HH:mm:ss",
+										second: "HH:mm:ss"
+									},
+									tooltipFormat: 'HH:mm:ss',
 								},
 								type: "time",
 							}
@@ -373,7 +436,7 @@ export default Vue.extend({
 				data: {
 					labels: tempSamples[this.selectedPanel].times,
 					datasets: tempSamples[this.selectedPanel].temps
-				}
+				},
 			});
 			this.applyDarkTheme(this.darkTheme);
 		},
@@ -406,15 +469,18 @@ export default Vue.extend({
 						}
 						dataset.times.push(now);
 
+						
 						// Deal with visibility and tell chart instances to update
 						dataset.temps.forEach((dataset) => {
 							dataset.showLine = true;
 						}, this);
+					
 						instances.forEach(instance =>{
 							if(instance === this) {
-								instance.update()
+								instance.update();
 							}
 						});
+						
 					}
 				});
 				storeSubscribed = true;
@@ -436,26 +502,41 @@ export default Vue.extend({
 				this.update();
 				instances.push(this);
 				this.eventMonitors();
+				var tmpEle: HTMLElement | null = document.getElementById(this.selectedPanel);
+				if(tmpEle){
+					tmpEle.innerHTML = "";
+				}
 			}
 		},
 		downloadChartData(){
 			try{
 				const dataToExp = tempSamples[this.selectedPanel]
-				var dateStrArr: any  = [];
 				var txtToExport: string = "";
-				txtToExport = '"Time:",';
-				dataToExp.times.forEach(item => {
-					var conDate = new Date(item);
-					dateStrArr.push(`${conDate.toTimeString().split(' ')[0]}:${conDate.getMilliseconds()}`)
-				});
-				txtToExport = txtToExport + dateStrArr.toString()
-				txtToExport = txtToExport + "\n";
-				// add datalines
+				var headerArr: any = [];
+				var dataArr:  any = [];
+				var tmpArr: any = [];
+				//construct csv data format
+				//column headers
+				headerArr.push('"Time"');
 				dataToExp.temps.forEach((dataline: any) => {
-					txtToExport = txtToExport + `"${dataline.label}:",`;
-					txtToExport = txtToExport + dataline.data.toString();
-					txtToExport = txtToExport + "\n";
+					headerArr.push(`"${dataline.label}"`);
 				});
+				txtToExport = headerArr.toString();
+				txtToExport = txtToExport + "\n";
+
+				//data array
+				dataToExp.times.forEach((item: any, index: number) => {
+					var conDate = new Date(item);
+					tmpArr = [];
+					tmpArr.push(`${conDate.toTimeString().split(' ')[0]}:${conDate.getMilliseconds()}`)
+					//console.log(tmpArr)
+					dataToExp.temps.forEach((dataline: any) => {
+						tmpArr.push(dataline.data[index])
+					})
+					//console.log(tmpArr)
+					txtToExport = txtToExport + tmpArr.toString();
+					txtToExport = txtToExport + "\n";
+				});				
 				const blob = new Blob([txtToExport], {type: 'text/plain'})
 				const e = new MouseEvent("click", {
 					view: window,
@@ -474,6 +555,12 @@ export default Vue.extend({
 				return false;
 			}
 		},
+		clearToolTip(){
+			var tmpHTML: HTMLElement | null = document.getElementById(this.selectedPanel);
+			if(tmpHTML){
+				tmpHTML.innerHTML = "";
+			}
+		}
 	},
 	mounted() {
 		if(!this.isChartCreated){
@@ -490,7 +577,11 @@ export default Vue.extend({
 			instances.push(this);
 			this.eventMonitors();
 			this.isChartCreated = true;
-		}
+			var tmpEle: HTMLElement | null = document.getElementById(this.selectedPanel);
+			if(tmpEle){
+				tmpEle.innerHTML = "";
+			}
+		};
 	},
 	beforeDestroy() {
 		// Don't update this instance any more...
@@ -515,6 +606,15 @@ export default Vue.extend({
 			handler: 'cfgChangedActions',
 			immediate: true,
 			deep: true
+		},
+		isChartPaused(to: boolean){
+			if(to){
+				console.log("stopping")
+				this.chart.stop();
+			}else{
+				console.log("starting")
+				this.chart.render();
+			}
 		}
 	}
 });

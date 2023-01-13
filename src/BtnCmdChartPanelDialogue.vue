@@ -118,8 +118,14 @@
                                                     <span>Delete Data Line</span>
                                                 </v-tooltip>
                                             </v-col>
-                                            <v-col cols="9" align="center">
-                                                <span >{{element.OMString}}</span>
+                                            <v-col cols="4" align="left">
+                                                <span><v-chip label class="mr-1">OM</v-chip>{{element.OMString}}</span>
+                                            </v-col>
+                                            <v-col cols="1" align="center">
+                                                <v-spacer></v-spacer>
+                                            </v-col>
+                                            <v-col cols="4" align="left">
+                                                <span><v-chip label class="mr-1">Legend</v-chip>{{element.name}}</span>
                                             </v-col>
                                             <v-col cols="1" align="center">
                                                 <span><v-icon :color="element.OMColor">mdi-chart-line-variant</v-icon></span>
@@ -348,7 +354,7 @@
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
             //chart data lines array setup/validation
             if(this.tmpPassedObject.chartOMDataArr.length === 0){                
-                this.tmpPassedObject.chartOMDataArr.push(this.refOMDataArrItem)
+                this.tmpPassedObject.chartOMDataArr.push(JSON.parse(JSON.stringify(this.refOMDataArrItem)))
             }else{
                 //DATA UPGRADE
                 //validate the array contains the correct items - this will be needed if any updates are made to the array contents in future releases past 01.01.02 when charts introduced

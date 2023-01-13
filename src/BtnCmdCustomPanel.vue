@@ -42,7 +42,8 @@
                                         <BtnCmdWebPanel v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0"></BtnCmdWebPanel>
                                         <BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" :passedObject="panel" class="mytabs-card pa-0 ma-0" style="height: 100%; width: 100%"></BtnCmdMMPanel>                                     
                                         <BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="LZIndex"></BtnCmdVInputPanel>
-                                    </td>
+                                        <BtnCmdChart v-if="panel.panelType == 'BtnCmdChart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :passedObject="panel" :cfgChgNum="panel.chartUpdateKey" :key="panel.panelID" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdChart>
+									</td>
                                 </v-row>
                             </v-card>
                         </vue-draggable-resizable>
@@ -107,6 +108,7 @@
     import BtnCmdCustPanelBtnActionFunctions from './BtnCmdCustPanelBtnActionFunctions';    
     import BtnCmdVInputPanel from './BtnCmdVInputPanel.vue';
     import BtnCmdMsgDialog from './BtnCmdMsgDialog.vue';
+    import BtnCmdChart from './BtnCmdChart.vue';
 
     export default {
         components: {
@@ -115,7 +117,8 @@
             BtnCmdWebPanel,
             BtnCmdMMPanel,
             BtnCmdVInputPanel,
-            BtnCmdMsgDialog
+            BtnCmdMsgDialog,
+            BtnCmdChart
         },
         props: {
             passedObject: {
@@ -185,12 +188,12 @@
             },
             getTabPanels(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput");
+                var result = this.mainData.panels.filter(item => item.tabID === tabID && item.panelType != "altwebcam" && item.panelType != "remSrc" && item.panelType != "mmValue" && item.panelType != "txtLabel" && item.panelType != "vInput" && item.panelType != "BtnCmdChart");
                 return result;
             },
             getTabPanelsEditable(tabID){
                 //need to change this to a case
-                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput"));
+                var result = this.mainData.panels.filter(item => (item.tabID === tabID) && (item.panelType == "altwebcam" || item.panelType == "remSrc" || item.panelType == "mmValue" || item.panelType == "txtLabel" || item.panelType == "vInput" || item.panelType == "BtnCmdChart"));
                 return result;
             },
             chkJobEnabled(item){
