@@ -14,7 +14,8 @@ In BtnCmd you can create Tabs, with custom buttons in a freeform layout. You may
 * Object Model Values  
 * Text/Label Panel  
 * User Created Custom Panels  
-* Global Variable Input Panels (Change/update the value of global variables)  
+* Global Variable Input Panels (Change/update the value of global variables) 
+* Custom Charts (Create your own charts from the Object Model) 
 
 ![BtnCmd Edit Mode](https://raw.githubusercontent.com/MintyTrebor/BtnCmd/main/wikires/v0.8.13_BtnCmd_MainWindow_EditMode_1.png)  
 
