@@ -29,6 +29,8 @@
         max-height: 150px;
         min-height: 200px;
 	}
+    .btn-fix:focus::before { opacity: 0 !important; }
+    .btn-fix:hover::before { opacity: 0.08 !important; }
 </style>
 <template>
     <v-dialog v-model="show" persistent max-width="700">
@@ -46,14 +48,26 @@
             <v-card-text>
                 <v-form lazy-validation class="mx-2">
                     <v-row dense>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-col cols="12" v-bind="attrs" v-on="on">
-                                    <v-select @change="clearConfig()" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Variable Type" required v-model="tmpPassedObject.inputType"></v-select>
-                                </v-col>
-                            </template>
-                            <span>Note: Changing this value can clear existing configuration data</span>
-                        </v-tooltip>
+                        <v-col cols="4">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-col cols="12" v-bind="attrs" v-on="on">
+                                        <span v-bind="attrs" v-on="on"><v-switch label="Link To OM" v-model="tmpPassedObject.inputLinkToOM" @change="clearModelPath()"></v-switch></span>
+                                    </v-col>
+                                </template>
+                                <span>Link to a value in the OM</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="8">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-col cols="12" v-bind="attrs" v-on="on">
+                                        <v-select @change="clearConfig()" :disabled="bToggleExInp" :items="radioVarTypeItems" class="custom-label-color" item-text="text" item-value="value" label="Type" required v-model="tmpPassedObject.inputType"></v-select>
+                                    </v-col>
+                                </template>
+                                <span>Note: Changing this value can clear existing configuration data</span>
+                            </v-tooltip>
+                        </v-col>
                     </v-row>
                     <v-row dense align="center">
                         <v-tooltip bottom>
@@ -132,7 +146,7 @@
                                 <v-text-field label="Hover Text" v-model="tmpPassedObject.panelHoverText"></v-text-field>
                             </v-col>
                         </v-row>
-                        <v-row dense>
+                        <v-row v-if="!tmpPassedObject.inputLinkToOM" dense>
                             <v-col cols="12">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
@@ -141,13 +155,41 @@
                                     <span>Variables must be pre-defined before use.</span>
                                 </v-tooltip>
                             </v-col>
-                        </v-row>                    
+                        </v-row>
+                        <v-row v-if=" tmpPassedObject.inputLinkToOM" dense>
+                            <v-col cols="11">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field class="custom-label-color" v-bind="attrs" v-on="on" required label="Object Model Path*" v-model="tmpModelPath"></v-text-field>
+                                    </template>
+                                    <span>Enter OM Path to link to</span>
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn v-bind="attrs" v-on="on" class="mt-4 btn-fix" fab x-small @click="closeOMSelector()"><v-icon>mdi-toy-brick-search-outline</v-icon></v-btn>
+                                    </template>
+                                    <span>Lookup Object Model</span>
+                                </v-tooltip>
+                            </v-col>
+                        </v-row>
+                        <v-row dense>
+                            <v-col cols="12">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field v-bind="attrs" v-on="on" label="Post Change Gcode Command*" v-model="tmpPassedObject.inputAfterChangeGCodeCMD"></v-text-field>
+                                    </template>
+                                    <span>Enter Gcode command to execute after change (Use ##VALUE## to include inputted value in command)</span>
+                                </v-tooltip>
+                            </v-col>
+                        </v-row>                   
                         <v-row dense> 
                             <v-col cols="12">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="tmpPassedObject.panelMMTextSize" row required>
-                                            <v-radio v-for="type in textSizeItems" :key="'MMTS'+type.value" :label="type.text" :value="type.value"></v-radio>
+                                            <v-radio v-for="typex in textSizeItems" :key="'MMTS'+typex.value" :label="typex.text" :value="typex.value"></v-radio>
                                         </v-radio-group>
                                     </template>
                                     <span>Modify the font size</span>
@@ -212,7 +254,8 @@
                     </v-alert>
                 </tbody>
             </v-card-text>
-            <BtnCmdColPickerDialogue v-if="showColPicker" v-model="showColPicker" :tmpPassedObject="tmpPassedObject" :colField="colField"></BtnCmdColPickerDialogue>
+            <BtnCmdColPickerDialogue v-if="showColPicker" v-model="showColPicker" :passedObject="tmpPassedObject" :colField="colField"></BtnCmdColPickerDialogue>
+            <ObjectModelSelector @exit="closeOMSelector" v-model="showOMSelector"></ObjectModelSelector>
         </v-card>
     </v-dialog>
 </template>
@@ -222,10 +265,12 @@
     import BtnCmdColPickerDialogue from './BtnCmdColPickDialogue.vue';
     import draggable from 'vuedraggable';
     import store from "@/store";
+    import ObjectModelSelector from './ObjectModelSelector.vue'
     export default {
         components: {
             BtnCmdColPickerDialogue,
             draggable,
+            ObjectModelSelector
         },
         props: {
             value: Boolean,
@@ -271,6 +316,13 @@
             },
             txtColorHover(){
                 if(this.tmpPassedObject.inputDispType == 'slider'){return "Click to edit Slider Color"}else{return "Click to edit text colour"}
+            },
+            bOMLink(){
+                if(this.tmpPassedObject.inputLinkToOM){
+                    return true;
+                }else {
+                    return false;
+                }
             }
         },
         data: function () {
@@ -308,6 +360,7 @@
                         }
                     }
                 },
+                showOMSelector: false
                 
             }
         },
@@ -336,6 +389,9 @@
                 this.tmpPassedObject.inputControlVals = [],
 				this.tmpPassedObject.inputControlRange = [0,100],
 				this.tmpPassedObject.inputControlSteps = 1
+            },
+            clearModelPath(){
+                this.tmpModelPath = '';
             },
             setColor(colorField){
                 this.colField = colorField;
@@ -380,11 +436,17 @@
                 }else {
                     return "Suffix Text"
                 }
+            },
+            closeOMSelector(txtVal){
+                this.showOMSelector = !this.showOMSelector;
+                if(txtVal){
+                    this.tmpModelPath = txtVal;
+                };
             }
         },
         mounted() {
             this.tmpPassedObject = JSON.parse(JSON.stringify(this.passedObject));
-            this.tmpModelPath = this.tmpPassedObject.inputVarName;
+            this.tmpModelPath = this.tmpPassedObject.inputVarName;            
         }
     }
 </script>

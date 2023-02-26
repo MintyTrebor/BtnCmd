@@ -49,6 +49,16 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense v-if="passedObject.panelType == 'mmValue'" >
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="OM Value Expression" v-model="passedObject.panelMMEvalMathStr" placeholder="##VALUE##/60"></v-text-field>
+                                </template>
+                                <span>Expression to change OM Value - Use ##VALUE## to insert selected OM value - Numeric OM values ONLY</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="passedObject.panelType == 'mmValue'">
                         <v-col class="d-flex flex-column">
                             <v-tooltip top>

@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.01.02',
+			btnCmdVersion: '01.02.01',
 			btnCmd : {
-				btnCmdVersion: '01.01.02',
+				btnCmdVersion: '01.02.01',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1080,6 +1080,7 @@ export default {
 						panelMMPrefixColor: '',
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
+						panelMMEvalMathStr: '',
 						panelColor: '',
 						panelBGColor: '',
 						panelUseDWCThemeBGColor: true,
@@ -1124,7 +1125,10 @@ export default {
 						chartXaxisOMData: null,
 						chartXaxisMaxSample: 600,
 						chartUpdateKey: 0,
-						chartRetainData: false
+						chartRetainData: false,
+						inputLinkToOM: false,
+						inputAfterChangeGCodeCMD: '',
+						inputLinkedOMKey: ''
 					}
 				],
 				SBCC_Cmds: [

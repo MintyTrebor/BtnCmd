@@ -16,14 +16,14 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
+											<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
 							<v-row v-else justify="center" align="center">
-								<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
+								<v-slider v-model="passedObject.inputLastVal" thumb-label="always" @start="setPauseUpdate()" @end="setVarVal($event)" :max="passedObject.inputControlRange[1]" :min="passedObject.inputControlRange[0]" :step="passedObject.inputControlSteps" :label="passedObject.inputPrefixText" style="height: 10px; margin-top: 10px;" :color="passedObject.panelMMPrefixColor" :class="`text-${passedObject.panelMMTextSize}`" align="center" justify="center" ></v-slider>
 							</v-row>
 						</v-col>
 					</v-row>
@@ -33,32 +33,46 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+											<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
 							<v-row v-else justify="center" align="center">
-								<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+								<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 							</v-row>
 						</v-col>
 					</v-row>
 					<v-row v-if="passedObject.inputType != 'boolean' && passedObject.inputDispType == 'input'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
+							<v-row dense v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-text-field flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`"  :class="`text-${passedObject.panelMMTextSize}`" :prefix="passedObject.inputPrefixText" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :suffix="passedObject.inputSuffixText" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="setVarVal($event)"></v-text-field>
+											<v-text-field ref="txtRef1" flat dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+											<v-overlay :absolute="true" :opacity="0" :value="!bPauseUpdates" align="center" justify="center" @click="setPauseUpdateText()">
+												<v-row justify="center" align="center" style="height: 100%;" class="mt-n3">
+													<v-spacer></v-spacer>
+													<span :class="`text-${passedObject.panelMMTextSize} text--primary`" :elevation="1">{{ matchedVarVal }}</span>
+													<v-spacer></v-spacer>
+												</v-row>
+											</v-overlay>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
-							<v-row v-else justify="center" align="center">
+							<v-row dense v-else justify="center" align="center">
 								<v-row justify="center" align="center" style="height: 100%;">
-									<v-text-field flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`"  :class="`text-${passedObject.panelMMTextSize}`" :prefix="passedObject.inputPrefixText" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :suffix="passedObject.inputSuffixText" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="setVarVal($event)"></v-text-field>
+									<v-text-field ref="txtRef1" flat dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+									<v-overlay :absolute="true" :opacity="0" :value="!bPauseUpdates" align="center" justify="center" @click="setPauseUpdateText()">
+										<v-row justify="center" align="center" style="height: 100%;" class="mt-n3">
+											<v-spacer></v-spacer>
+											<span :class="`text-${passedObject.panelMMTextSize} text--primary`" :elevation="1">{{ matchedVarVal }}</span>
+											<v-spacer></v-spacer>
+										</v-row>
+									</v-overlay>
 								</v-row>
 							</v-row>
 						</v-col>
@@ -146,6 +160,7 @@
 'use strict'
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
 import store from "@/store";
+import jsonpath from 'jsonpath';
 
 export default {
 	props: {
@@ -195,11 +210,13 @@ export default {
 				showItems: false,
 				code: '',
 				newValTemp: null,
+				bPauseUpdates: false
 			}
 	},
 	methods: {
 		getModelValue(){
-			if(this.passedObject.inputVarName){
+			const jp = jsonpath;
+			if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
 				let tmpNum = null;
 				let tmpArr = null;
 				//detect if this is a global variable array and retrieve the array value - dwc 3.5
@@ -221,25 +238,70 @@ export default {
 				}else{
 					return "###";
 				}
+			}else if(this.passedObject.inputVarName && this.passedObject.inputLinkToOM){
+				if(this.passedObject.inputVarName.startsWith("global.")){
+					let tmpStr = this.passedObject.inputVarName.replace("global.", "");
+					let tmpNum = null;
+					let tmpArr = null;
+					//detect if this is a global variable array and retrieve the array value - dwc 3.5
+					tmpArr = tmpStr.match(/(?<=\[)[0-9]+?(?=\])/g);
+					if(tmpArr){
+						tmpNum = Number(tmpArr[0]);
+						tmpStr = tmpStr.replace(/\[.*\]/g, "");
+						if(store.state.machine.model.global.has(tmpStr)){
+							let globArr = store.state.machine.model.global.get(tmpStr);
+							return globArr[tmpNum]
+						}else{
+							return "###";
+						}
+					}
+					if(store.state.machine.model.global.has(tmpStr)){
+						return store.state.machine.model.global.get(tmpStr);
+					}else{
+						return "###";
+					}
+				}else if(this.passedObject.inputVarName.startsWith("plugins.")){
+					return "plugins Object cannot be used here";
+				}else{
+					var matchInModel = jp.query(store.state.machine.model, (`$.${this.passedObject.inputVarName}`));
+					if(JSON.stringify(matchInModel) != "[]"){
+						return  matchInModel[0];
+					}else{
+						return "###";
+					}
+				}
 			}else {
 				return "###";
 			}		
 		},
-		setVal(newValue){
-			console.log(newValue)
+		setPauseUpdate(){
+			//console.log("Pausing")
+			this.newValTemp = this.matchedVarVal;
+			this.bPauseUpdates = true;
+		},
+		setPauseUpdateText(){
+			//console.log("Pausing For Text")
+			this.newValTemp = this.matchedVarVal;
+			this.bPauseUpdates = true;
+			this.$refs.txtRef1.focus();
+		},
+		unPauseUpdate(){
+			//console.log("UnPausing")
+			this.bPauseUpdates = false;
 		},
 		async setVarVal(newValue){
+			//console.log("Run setvarval", newValue)
 			var tmpParent = this;
 			var tmpCmd = "";
-			if(this.passedObject.inputVarName){
+			if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
 				if(this.passedObject.inputType == "text" && this.passedObject.inputDispType == 'input'){
-					let tmpValue = newValue.target.value;
+					//let tmpValue = newValue.target.value;
+					let tmpValue = newValue;
 					if(!tmpValue) {tmpValue="";}
 					tmpCmd = `set global.${this.passedObject.inputVarName} = "${tmpValue}"`;
 					tmpParent.code = tmpCmd;
 					tmpParent.send();
 					this.passedObject.inputLastVal = tmpValue;
-					return;
 				}else if(this.passedObject.inputType == "number" && this.passedObject.inputDispType == 'slider'){
 					tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(this.passedObject.inputLastVal)}`;
 					tmpParent.code = tmpCmd;
@@ -262,22 +324,46 @@ export default {
 					tmpParent.code = tmpCmd;
 					tmpParent.send();
 					this.passedObject.inputLastVal = Number(tmpValue);
-					return;
 				}
+			}
+			if(this.passedObject.inputAfterChangeGCodeCMD){
+				let tmpCmdStr = "";
+				if(this.passedObject.inputType == "number"){
+					tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", Number(newValue));
+				}else{
+					tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", newValue);
+				}
+				tmpParent.code = tmpCmdStr;
+				tmpParent.send();
+			}
+			this.newValTemp = null;
+			this.bPauseUpdates = false;
+		},
+		clearTextInputFocus(event, newValue) {
+			this.setVarVal(newValue);
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				event.target.blur();
 			}
 		},
 		async setBoolVal(newValue){
+			this.bPauseUpdates = true;
 			var tmpParent = this;
 			var tmpCmd = "";
 			var tmpValue = newValue;
 			if (newValue != true){tmpValue = false;}
-			if(this.passedObject.inputVarName){
+			if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
 				tmpCmd = `set global.${this.passedObject.inputVarName} = ${tmpValue}`;
 				tmpParent.code = tmpCmd;
 				tmpParent.send();
 				this.passedObject.inputLastVal = Number(tmpValue);
-				return;
 			}
+			if(this.passedObject.inputAfterChangeGCodeCMD){
+				let tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", tmpValue.toString());
+				tmpParent.code = tmpCmdStr;
+				tmpParent.send();
+			}
+			this.bPauseUpdates = false;
 		},
 		doRightALign(){
 			//dirty hack to align text inputs 
@@ -318,7 +404,9 @@ export default {
 			}
 		},
 		matchedVarVal(to){
-			this.passedObject.inputLastVal = to;
+			if(!this.bPauseUpdates){
+				this.passedObject.inputLastVal = to;
+			}
 		},
 		wInpType(){
 			this.doRightALign()

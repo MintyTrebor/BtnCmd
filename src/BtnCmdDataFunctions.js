@@ -117,6 +117,7 @@ export default {
 						panelMMPrefixColor: '',
 						panelMMValueColor: '',
 						panelMMTextSize: 'body-2',
+						panelMMEvalMathStr: '',
 						panelColor: '',
 						panelBGColor: '',
 						panelUseDWCThemeBGColor: true,
@@ -161,7 +162,10 @@ export default {
 						chartXaxisOMData: null,
 						chartXaxisMaxSample: 600,
 						chartUpdateKey: 0,
-						chartRetainData: false
+						chartRetainData: false,
+						inputLinkToOM: false,
+						inputAfterChangeGCodeCMD: '',
+						inputLinkedOMKey: ''
 					}
 				],
 				SBCC_Cmds: [
@@ -211,13 +215,14 @@ export default {
 					this.resetSettings();
 			}
 		},
-		resetSettings(){
+		async resetSettings(){
 			
-			//console.log("running auto restore")
-			if(this.autoRestore()){
+			const awtAR = await this.autoRestore()
+		
+			if(awtAR){
 				return;
 			}
-
+		
 			this.btnCmd = this.getRefData();
 			var defTabID = this.generateUUID('TAB');
 			var defCustTabID = this.generateUUID('TAB');

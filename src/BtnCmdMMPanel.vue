@@ -62,6 +62,7 @@
 <script>
 import jsonpath from 'jsonpath';
 import store from "@/store";
+import { evaluate } from 'mathjs'
 
 export default {
 	props: {
@@ -87,13 +88,34 @@ export default {
 						tmpStr = tmpStr.replace(/\[.*\]/g, "");
 						if(store.state.machine.model.global.has(tmpStr)){
 							let globArr = store.state.machine.model.global.get(tmpStr);
-							return globArr[tmpNum]
+							if(!isNaN(globArr[tmpNum]) && this.passedObject.panelMMEvalMathStr.length > 0){
+								let tmpMathStr3 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", globArr[tmpNum]);
+								try{
+									let tmpRet3 = evaluate(tmpMathStr3);
+									return tmpRet3;
+								}catch{
+									return "#Invalid Expression#"
+								}
+							}else{
+								return globArr[tmpNum];
+							}
 						}else{
 							return "###";
 						}
 					}
 					if(store.state.machine.model.global.has(tmpStr)){
-						return store.state.machine.model.global.get(tmpStr);
+						let tmpVal = store.state.machine.model.global.get(tmpStr)
+						if(!isNaN(tmpVal) && this.passedObject.panelMMEvalMathStr.length > 0){
+							let tmpMathStr = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", tmpVal);
+							try{
+								let tmpRet = evaluate(tmpMathStr);
+								return tmpRet;
+							}catch{
+								return "#Invalid Expression#"
+							}
+						}else{
+							return tmpVal;
+						}
 					}else{
 						return "###";
 					}
@@ -102,7 +124,18 @@ export default {
 				}else{
 					var matchInModel = jp.query(store.state.machine.model, (`$.${this.passedObject.panelMMPath}`));
 					if(JSON.stringify(matchInModel) != "[]"){
-						return  matchInModel[0];
+						let tmpVal2 = matchInModel[0];
+						if(!isNaN(tmpVal2) && this.passedObject.panelMMEvalMathStr.length > 0){
+							let tmpMathStr2 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", tmpVal2);
+							try{
+								let tmpRet2 = evaluate(tmpMathStr2);
+								return tmpRet2;
+							}catch{
+								return "#Invalid Expression#"
+							}
+						}else{
+							return tmpVal2;
+						}
 					}else{
 						return "###";
 					}
