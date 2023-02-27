@@ -46,33 +46,21 @@
 					</v-row>
 					<v-row v-if="passedObject.inputType != 'boolean' && passedObject.inputDispType == 'input'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row dense v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
+							<v-row dense v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center" style="height: 100%; width: 100%">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
-										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-text-field ref="txtRef1" flat dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-											<v-overlay :absolute="true" :opacity="0" :value="!bPauseUpdates" align="center" justify="center" @click="setPauseUpdateText()">
-												<v-row justify="center" align="center" style="height: 100%;" class="mt-n3">
-													<v-spacer></v-spacer>
-													<span :class="`text-${passedObject.panelMMTextSize} text--primary`" :elevation="1">{{ matchedVarVal }}</span>
-													<v-spacer></v-spacer>
-												</v-row>
-											</v-overlay>
+										<v-row justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
+											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @click="setPauseUpdateText"></v-text-field>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
-							<v-row dense v-else justify="center" align="center">
-								<v-row justify="center" align="center" style="height: 100%;">
-									<v-text-field ref="txtRef1" flat dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-									<v-overlay :absolute="true" :opacity="0" :value="!bPauseUpdates" align="center" justify="center" @click="setPauseUpdateText()">
-										<v-row justify="center" align="center" style="height: 100%;" class="mt-n3">
-											<v-spacer></v-spacer>
-											<span :class="`text-${passedObject.panelMMTextSize} text--primary`" :elevation="1">{{ matchedVarVal }}</span>
-											<v-spacer></v-spacer>
-										</v-row>
-									</v-overlay>
+							<v-row dense v-else justify="center" align="center" style="height: 100%; width: 100%">
+								<v-row justify="center" align="center" style="height: 100%; width: 100%!important;">
+									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @click="setPauseUpdateText"></v-text-field>
 								</v-row>
 							</v-row>
 						</v-col>
@@ -177,6 +165,7 @@ export default {
 		currfinResize() {return this.passedObject.bPanelActivated},
 		wInpType(){return this.passedObject.inputType},
 		wInpDType(){return this.passedObject.inputDispType},
+		darkTheme(){ return store.state.settings.darkTheme; },
 		bHasPrefix(){
 			if(this.passedObject.inputPrefixText){
 				let tempText = this.passedObject.inputPrefixText.replace(/ /g, "");
@@ -199,6 +188,24 @@ export default {
 				}
 			}else{
 				return false;
+			}
+		},
+		overlayTextColor(){
+			if(!this.darkTheme){
+				return "text-field-style-black"
+			}else{
+				return "text-field-style-white"
+			}
+		},
+		overlayBackgroundColor(){
+			if(this.passedObject.panelColor.length > 0){
+				return this.passedObject.panelColor
+			}else{
+				if(!this.darkTheme){
+					return "white"
+				}else{
+					return "black"
+				}
 			}
 		}
 	},
@@ -283,7 +290,7 @@ export default {
 			//console.log("Pausing For Text")
 			this.newValTemp = this.matchedVarVal;
 			this.bPauseUpdates = true;
-			this.$refs.txtRef1.focus();
+			setTimeout(() => {this.$refs.txtRef1.focus()},0);
 		},
 		unPauseUpdate(){
 			//console.log("UnPausing")
@@ -336,10 +343,13 @@ export default {
 				tmpParent.code = tmpCmdStr;
 				tmpParent.send();
 			}
+			//console.log("endsetvar")
+			var tmpParent = null;
 			this.newValTemp = null;
 			this.bPauseUpdates = false;
 		},
 		clearTextInputFocus(event, newValue) {
+			//console.log("newvalue", newValue)
 			this.setVarVal(newValue);
 			if (event.keyCode === 13) {
 				event.preventDefault();
