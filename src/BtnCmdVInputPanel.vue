@@ -51,7 +51,7 @@
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
 											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @click="setPauseUpdateText"></v-text-field>
+											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @focus="setPauseUpdateText" ></v-text-field>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
@@ -60,7 +60,7 @@
 							<v-row dense v-else justify="center" align="center" style="height: 100%; width: 100%">
 								<v-row justify="center" align="center" style="height: 100%; width: 100%!important;">
 									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @click="setPauseUpdateText"></v-text-field>
+									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @focus="setPauseUpdateText"></v-text-field>
 								</v-row>
 							</v-row>
 						</v-col>
@@ -321,7 +321,8 @@ export default {
 						tmpParent.send();
 					}
 				}else{
-					let tmpValue = newValue.target.value;
+					//let tmpValue = newValue.target.value;
+					let tmpValue = newValue;
 					if(!tmpValue){
 						tmpParent.$makeNotification('error', 'Invalid Number Entered!', 'The value of the variable has not been changed');
 						return;
@@ -346,7 +347,7 @@ export default {
 			//console.log("endsetvar")
 			var tmpParent = null;
 			this.newValTemp = null;
-			this.bPauseUpdates = false;
+			this.unPauseUpdate();
 		},
 		clearTextInputFocus(event, newValue) {
 			//console.log("newvalue", newValue)
