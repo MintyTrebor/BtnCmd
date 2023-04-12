@@ -163,6 +163,7 @@ export default {
 						chartXaxisMaxSample: 600,
 						chartUpdateKey: 0,
 						chartRetainData: false,
+						chartShowValueInLegend: false,
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
 						inputLinkedOMKey: ''

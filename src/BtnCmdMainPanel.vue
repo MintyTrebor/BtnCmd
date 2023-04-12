@@ -60,13 +60,13 @@
 				</v-row>-->
 				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ printerMode }}</span></v-col></v-row> -->
 				<v-row>
-					<v-tabs class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
+					<v-tabs :eager="true" class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
-						<v-tab v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
+						<v-tab :eager="true" v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
 							<v-icon v-if="tab.icon" class="mr-1" :style="'color:' + getMainBackgroundColor">{{ tab.icon }}</v-icon><span :style="'color:' + getMainBackgroundColor">{{ tab.caption }}</span>
 						</v-tab>
-						<v-tabs-items v-model="getCurrTabIndex">
-							<v-tab-item v-for="(tab) in getTabs" :key="tab.tabID" :value="`tab-${tab.tabID}`">
+						<v-tabs-items :eager="true" v-model="getCurrTabIndex">
+							<v-tab-item v-for="(tab) in getTabs" :eager="true" :key="tab.tabID" :value="`tab-${tab.tabID}`">
 								<v-card class="mytab-item-wrapper" id="BtnCmdMainTabCard" :height="tabCardHeight()" :key="'maincard' + tab.tabID" >
 									<v-container fluid class="pa-0 ma-0 mytabs-default">
 										<v-row class="pa-0 ma-0 mytabs-default">
@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.02',
+			btnCmdVersion: '01.02.03',
 			btnCmd : {
-				btnCmdVersion: '01.02.02',
+				btnCmdVersion: '01.02.03',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1126,6 +1126,7 @@ export default {
 						chartXaxisMaxSample: 600,
 						chartUpdateKey: 0,
 						chartRetainData: false,
+						chartShowValueInLegend: false,
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
 						inputLinkedOMKey: ''

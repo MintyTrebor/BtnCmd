@@ -48,7 +48,7 @@
                         </v-col>
                     </v-row>
                     <v-row dense class="mb-n8">
-                        <v-col cols="3">
+                        <v-col cols="2">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field v-bind="attrs" v-on="on" label="Y-Axis Min" v-model="tmpPassedObject.chartYaxisMin"></v-text-field>
@@ -56,7 +56,7 @@
                                 <span>Lowest Value on Chart</span>
                             </v-tooltip>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="2">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field v-bind="attrs" v-on="on" label="Y-Axis Max" v-model="tmpPassedObject.chartYaxisMax"></v-text-field>
@@ -64,7 +64,7 @@
                                 <span>Highest Value on Chart</span>
                             </v-tooltip>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="2">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field v-bind="attrs" v-on="on" label="X-Axis Time Range (Secs)" v-model="tmpPassedObject.chartXaxisMaxSample"></v-text-field>
@@ -78,6 +78,14 @@
                                     <span v-bind="attrs" v-on="on" align="center"><v-switch label="Retain All Data" v-model="tmpPassedObject.chartRetainData" @change="alertRetainData = tmpPassedObject.chartRetainData"></v-switch></span>
                                 </template>
                                 <span>Retain All recorded chart data in Memory (not just visible data)</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="3">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on" align="center"><v-switch label="Show Legend Values" v-model="tmpPassedObject.chartShowValueInLegend"></v-switch></span>
+                                </template>
+                                <span>Show Latest Values In Lengend</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -309,7 +317,8 @@
                     this.passedObject.chartTickValue = this.tmpPassedObject.chartTickValue;
                     this.passedObject.chartXaxisOMData = this.tmpPassedObject.chartXaxisOMData;  
                     this.passedObject.chartYaxisStep = Number(this.tmpPassedObject.chartYaxisStep);
-                    this.passedObject.chartRetainData = this.tmpPassedObject.chartRetainData;                  
+                    this.passedObject.chartRetainData = this.tmpPassedObject.chartRetainData;
+                    this.passedObject.chartShowValueInLegend = this.tmpPassedObject.chartShowValueInLegend;       
                     this.$emit('exit', true);
                     this.show = false;
                     return;

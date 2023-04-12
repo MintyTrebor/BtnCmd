@@ -3,10 +3,10 @@
     "id": "BtnCmd",
     "name": "BtnCmd",
     "author": "Minty Trebor",
-    "version": "01.02.01",
+    "version": "01.02.03",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/MintyTrebor",
-    "dwcVersion": "auto",
+    "dwcVersion": "3.5",
     "dependencies": {
       "precompiled-mqtt": "^4.3.7",
       "deepmerge": "^4.2.2",

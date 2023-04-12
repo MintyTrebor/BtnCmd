@@ -8,7 +8,11 @@
 .content {
 	position: relative;
 }
-
+.ttDiv {
+	position: absolute;
+	top: 8px;
+	right: 60px;
+}
 .content > canvas {
 	position: absolute;
 }
@@ -17,26 +21,17 @@
 </style>
 
 <template>
-	<v-card class="d-flex flex-column flex-grow-1">
-		<v-card-title class="pt-2 pb-0">
+	<v-card class="d-flex flex-column flex-grow-1" style="position: relative !important;">
+		<v-card-title class="pt-2 pb-0">			
 			<v-row dense>
-				<v-col cols="5" align="left">
+				<v-col cols="11" align="left">
 					<v-icon class="mr-1">mdi-chart-timeline-variant</v-icon>
 					{{ passedObject.chartLabel }}
 				</v-col>
-				<v-col cols="6" align="right">
-					<div :id="selectedPanel"></div>
-				</v-col>
+				<!-- <v-col cols="6" align="right">
+					
+				</v-col> -->
 				<v-col cols="1" align="right">
-					<!-- <v-tooltip left>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn color="primary" class="btn-fix" v-bind="attrs" v-on="on" fab x-small @click="toggleRenderChart()">
-								<v-icon v-if="!isChartPaused">mdi-pause</v-icon>
-								<v-icon v-else>mdi-play</v-icon>
-							</v-btn>
-						</template>
-						<span>Pause/Resume</span>
-					</v-tooltip> -->
 					<v-tooltip left>
 						<template v-slot:activator="{ on, attrs }">
 							<v-btn color="primary" class="btn-fix" v-bind="attrs" v-on="on" fab x-small @click="downloadChartData()">
@@ -51,6 +46,7 @@
 		<v-card-text class="content flex-grow-1 px-2 py-0">
 			<canvas :ref="passedObject.panelID"></canvas>
 		</v-card-text>
+		<div class="ttDiv" :id="selectedPanel"></div>
 	</v-card>
 </template>
 
@@ -216,7 +212,8 @@ export default Vue.extend({
 	computed: {
 		darkTheme(): boolean { return store.state.settings.darkTheme; },
 		selectedPanel(): string { return this.passedObject.panelID; },
-		chgNum(): number | null {return this.cfgChgNum;}
+		chgNum(): number | null {return this.cfgChgNum;},
+		showLegendVals(): boolean {return this.passedObject.chartShowValueInLegend}
 	},
 	data() {
 		return {
@@ -323,6 +320,10 @@ export default Vue.extend({
 			if(this.passedObject.chartXaxisMaxSample < 61){yTimeMarks="second"}
 			this.chart = new Chart(this.$refs[this.passedObject.panelID] as HTMLCanvasElement, {
 				type: "line",
+				data: {
+					labels: tempSamples[this.selectedPanel].times,
+					datasets: tempSamples[this.selectedPanel].temps
+				},
 				options: {
 					animation: {
 						duration: 0					// general animation time
@@ -334,8 +335,21 @@ export default Vue.extend({
 					},
 					legend: {
 						labels: {
-							filter: (legendItem, data) => data.datasets![legendItem.datasetIndex!].showLine,
-							fontFamily: "Roboto,sans-serif"
+							generateLabels: (chart) => {
+								const datasets:any = chart.data.datasets;
+								return datasets.map((ds:any, i:number) => {
+									let tmpLeg:string = `${ds.label}`;
+									if(this.showLegendVals){
+										tmpLeg = `${ds.label} [${ds.data[ds.data.length -1]}]`;
+									}
+									return {
+										text: tmpLeg,
+										fillStyle: ds.backgroundColor,
+										index: i,
+										fontFamily: "Roboto,sans-serif"
+									}
+								})
+							}
 						}
 					},
 					tooltips: {
@@ -432,10 +446,6 @@ export default Vue.extend({
 							}
 						]
 					}
-				},
-				data: {
-					labels: tempSamples[this.selectedPanel].times,
-					datasets: tempSamples[this.selectedPanel].temps
 				},
 			});
 			this.applyDarkTheme(this.darkTheme);
