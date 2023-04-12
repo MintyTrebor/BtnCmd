@@ -21,7 +21,9 @@ try{
 	var tmpSession = {
 		globalSettings: {
 			enableLaunchAtLoad: false,
+			enableBounceAtLoad: false,
 			enableChangeTopBar: false,
+			bounceAtLoadDelay: 1,
 			TopBarColor: ''
 		},
 	};
@@ -39,7 +41,9 @@ function getFromCache() {
 		tmpSession = {
 			globalSettings: {
 				enableLaunchAtLoad: false,
+				enableBounceAtLoad: false,
 				enableChangeTopBar: false,
+				bounceAtLoadDelay: 1,
 				TopBarColor: ''
 			},
 		};
@@ -47,8 +51,12 @@ function getFromCache() {
 }
 
 function runStartup(){
-	if(tmpSession.globalSettings.enableLaunchAtLoad){
+	if(tmpSession.globalSettings.enableLaunchAtLoad && !tmpSession.globalSettings.enableBounceAtLoad){
 		router.replace('/BtnCmd');
+	}
+	if(tmpSession.globalSettings.enableBounceAtLoad && !tmpSession.globalSettings.enableLaunchAtLoad){
+		router.replace('/BtnCmd');
+		delay(1000 * tmpSession.globalSettings.bounceAtLoadDelay).then(() => router.replace('/'));
 	}
 	if(tmpSession.globalSettings.enableChangeTopBar && tmpSession.globalSettings.TopBarColor){
 		let aptb = document.getElementsByClassName("v-app-bar")
@@ -57,3 +65,9 @@ function runStartup(){
 		//aptb[0].style.backgroundColor = "";
 	}
 }
+
+function delay(time) {
+	return new Promise(resolve => setTimeout(resolve, time));
+}
+  
+  

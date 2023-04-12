@@ -38,7 +38,9 @@ export default {
 					ABackupFileName: '',
 					enableLaunchAtLoad: false,
 					enableChangeTopBar: false,
-					TopBarColor: ''
+					TopBarColor: '',
+					enableBounceAtLoad: false,
+					bounceAtLoadDelay: 1
 				},
 				SBCCSettings: {					
 					HTTP_Port: "8091",

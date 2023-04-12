@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.03',
+			btnCmdVersion: '01.02.04',
 			btnCmd : {
-				btnCmdVersion: '01.02.03',
+				btnCmdVersion: '01.02.04',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1001,7 +1001,9 @@ export default {
 					ABackupFileName: '',
 					enableLaunchAtLoad: false,
 					enableChangeTopBar: false,
-					TopBarColor: ''
+					TopBarColor: '',
+					enableBounceAtLoad: false,
+					bounceAtLoadDelay: 1
 				},
 				SBCCSettings: {					
 					HTTP_Port: "8091",

@@ -84,9 +84,27 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable AutoStart" v-model="passedObject.enableLaunchAtLoad"></v-switch></span>
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable Auto Load" v-model="passedObject.enableLaunchAtLoad" @change="passedObject.enableLaunchAtLoad ? passedObject.enableBounceAtLoad = false : passedObject.enableBounceAtLoad = passedObject.enableBounceAtLoad"></v-switch></span>
                                 </template>
                                 <span>Automatically Switch to BtnCmd on Start</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="6">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Enable AutoStart" v-model="passedObject.enableBounceAtLoad" @change="passedObject.enableBounceAtLoad ? passedObject.enableLaunchAtLoad = false : passedObject.enableLaunchAtLoad = passedObject.enableLaunchAtLoad"></v-switch></span>
+                                </template>
+                                <span>Launch BtnCmd on Start to begin chart data collection, then return to DWC Dashboard</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field class="custom-label-color" :disabled="!passedObject.enableBounceAtLoad" v-bind="attrs" v-on="on" label="Return Delay*" v-model="passedObject.bounceAtLoadDelay" required number></v-text-field>
+                                </template>
+                                <span>Load Delay before returning. To allow for slow browser/network/server processing</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
