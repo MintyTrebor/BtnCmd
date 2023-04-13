@@ -54,19 +54,19 @@
 		<div class="mydiv">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!--<v-row mt-0>
+				<!--<v-row mt-0>s
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
 				</v-row>-->
 				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ printerMode }}</span></v-col></v-row> -->
 				<v-row>
-					<v-tabs :eager="true" class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
+					<v-tabs class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
 						<v-tabs-slider :style="'color:' + getMainBackgroundColor"></v-tabs-slider>
-						<v-tab :eager="true" v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
+						<v-tab v-for="(tab) in getTabs" :key="tab.tabID" @click="onChangeTab(tab.tabID)" :href="`#tab-${tab.tabID}`">
 							<v-icon v-if="tab.icon" class="mr-1" :style="'color:' + getMainBackgroundColor">{{ tab.icon }}</v-icon><span :style="'color:' + getMainBackgroundColor">{{ tab.caption }}</span>
 						</v-tab>
-						<v-tabs-items :eager="true" v-model="getCurrTabIndex">
-							<v-tab-item v-for="(tab) in getTabs" :eager="true" :key="tab.tabID" :value="`tab-${tab.tabID}`">
+						<v-tabs-items v-model="getCurrTabIndex">
+							<v-tab-item v-for="(tab) in getTabs" :eager="!editMode" :key="`inEdit${editMode}${tab.tabID}`" :value="`tab-${tab.tabID}`">
 								<v-card class="mytab-item-wrapper" id="BtnCmdMainTabCard" :height="tabCardHeight()" :key="'maincard' + tab.tabID" >
 									<v-container fluid class="pa-0 ma-0 mytabs-default">
 										<v-row class="pa-0 ma-0 mytabs-default">
@@ -169,7 +169,7 @@
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
 																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
 																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
-																	<BtnCmdChart v-if="panel.panelType == 'BtnCmdChart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :passedObject="panel" :cfgChgNum="panel.chartUpdateKey" :key="panel.panelID" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdChart>
+																	<BtnCmdChart v-if="panel.panelType == 'BtnCmdChart'" min-height="180px" align="center" class="mytabs-card d-flex pa-0 ma-0" :passedObject="panel" :cfgChgNum="panel.chartUpdateKey" :key="'chart' + panel.panelID" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'" :pauseChart="editMode"></BtnCmdChart>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" align="center" justify="center" class="mytabs-card pa-0 ma-0">
 																		<tbody>
 																			<tr class="pa-0 ma-0">
@@ -701,7 +701,7 @@
 				<div class="mx-1">
 					<v-tooltip top>
 						<template v-slot:activator="{ on, attrs }">
-							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="backupMode" @click="editModeToggle()">
+							<v-btn  :small="!mobileActive" :x-small="mobileActive" :fab="mobileActive" v-bind="attrs" v-on="on" :disabled="backupMode" @click="saveExitEditMode()">
 								<v-icon color="green">mdi-content-save-move</v-icon>
 							</v-btn>
 						</template>
@@ -1639,32 +1639,55 @@ export default {
 			}
 			this.btnCmd.panels.splice(requiredIndex, 1);
 		},
-		editModeToggle(){
+		async editModeToggle(){
 			this.setActionResponse('');
+			var tmpCurrTabID = this.currTab
 			this.editMode = !this.editMode;
-			if(!this.editMode){
-				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === false);
-				this.onChangeTab(tmpArr[0].tabID);
-				this.saveSettings();
+			if(this.editMode){
+				await this.$nextTick()
+				this.onChangeTab(tmpCurrTabID);
 				this.saveBtnCol = 'primary';
-				this.createMode = false;
 			}else {
 				this.saveBtnCol = 'green';
 			}
 		},
 		createModeToggle(){
 			this.setActionResponse('');
-			this.createMode = true;
-			var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
-			if(tmpArr.length >= 1){
-				this.onChangeTab(tmpArr[0].tabID);
-			}
-			this.editModeToggle()
+			this.createMode = !this.createMode;
+			if(this.createMode){
+				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
+				if(tmpArr.length >= 1){
+					this.onChangeTab(tmpArr[0].tabID);
+				}
+				this.editMode = true;
+			}else{
+				this.editMode = false;
+			};
 		},
-		undoEditChanges(){
+		async saveExitEditMode(){
+			this.saveSettings();
+			await this.$nextTick();
+			var tmpCurrTabID = this.currTab;
+			if(this.createMode){
+				this.createMode = false
+			}
+			if(this.editMode){
+				this.editMode = false
+			}
+			await this.$nextTick()
+			this.onChangeTab(tmpCurrTabID);
+			this.saveBtnCol = 'primary'
+			
+		},
+		async undoEditChanges(){
 			this.setActionResponse('');
-			this.loadSettings();
-			this.editModeToggle();
+			var tmpCurrTabID = this.currTab;
+			this.loadSettings();			
+			await this.$nextTick();
+			if(this.createMode){this.createMode = false}
+			if(this.editMode){this.editMode = false}
+			await this.$nextTick()
+			this.onChangeTab(tmpCurrTabID);
 		},
 		brBtnClick(){
 			this.setActionResponse('');
@@ -1677,7 +1700,6 @@ export default {
 		},
 		onChangeTab(tmpTabID){
 			this.currTab = tmpTabID;
-			//this.currTabIdx = tmpTabIndex;
 			this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];

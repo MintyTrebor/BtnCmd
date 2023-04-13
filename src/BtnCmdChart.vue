@@ -207,13 +207,15 @@ export default Vue.extend({
 		passedObject: {
 			type: Object
 		},
-		cfgChgNum: Number
+		cfgChgNum: Number,
+		pauseChart: Boolean
     },
 	computed: {
 		darkTheme(): boolean { return store.state.settings.darkTheme; },
 		selectedPanel(): string { return this.passedObject.panelID; },
 		chgNum(): number | null {return this.cfgChgNum;},
-		showLegendVals(): boolean {return this.passedObject.chartShowValueInLegend}
+		showLegendVals(): boolean {return this.passedObject.chartShowValueInLegend},
+		isChartPaused(): boolean {return this.pauseChart}
 	},
 	data() {
 		return {
@@ -221,7 +223,7 @@ export default Vue.extend({
 			pauseUpdate: false,
 			firstChgNum: 0,
 			isChartCreated: false,
-			isChartPaused: false
+			//isChartPaused: false
 		}
 	},
 	methods: {
@@ -255,7 +257,7 @@ export default Vue.extend({
 
 			this.chart.update();
 		},
-		getModelValue(omString: string, scaleFactor: number){
+		getModelValue(omString: string, scaleFactor: number, setPrecision: boolean, precisionVal: number){
 			const jp = jsonpath;
 			let tmpScaleFactor:number = 1;
 			if(scaleFactor && scaleFactor > 0){
@@ -274,7 +276,11 @@ export default Vue.extend({
 						if(store.state.machine.model.global.has(tmpStr)){
 							let globArr = store.state.machine.model.global.get(tmpStr);
 							if(!isNaN(globArr[tmpNum])){
-								return (globArr[tmpNum] * tmpScaleFactor)
+								if(setPrecision){
+									return parseFloat((globArr[tmpNum] * tmpScaleFactor).toFixed(precisionVal))
+								}else{
+									return (globArr[tmpNum] * tmpScaleFactor)
+								}
 							}else{
 								return 0
 							}
@@ -284,7 +290,11 @@ export default Vue.extend({
 					}
 					if(store.state.machine.model.global.has(tmpStr)){
 						if(!isNaN(store.state.machine.model.global.get(tmpStr))){
-							return (store.state.machine.model.global.get(tmpStr) * tmpScaleFactor);
+							if(setPrecision){
+								return parseFloat((store.state.machine.model.global.get(tmpStr) * tmpScaleFactor).toFixed(precisionVal))
+							}else{
+								return (store.state.machine.model.global.get(tmpStr) * tmpScaleFactor);
+							}							
 						}else{
 							return 0;
 						}
@@ -297,7 +307,11 @@ export default Vue.extend({
 					var matchInModel = jp.query(store.state.machine.model, (`$.${omString}`));
 					if(JSON.stringify(matchInModel) != "[]"){
 						if(!isNaN(matchInModel[0])){
-							return (matchInModel[0] * tmpScaleFactor);
+							if(setPrecision){
+								return parseFloat((matchInModel[0] * tmpScaleFactor).toFixed(precisionVal))
+							}else{
+								return (matchInModel[0] * tmpScaleFactor);
+							}							
 						}else{
 							return 0;
 						}
@@ -309,9 +323,7 @@ export default Vue.extend({
 				return 0;
 			}		
 		},
-		toggleRenderChart(){
-			this.isChartPaused = !this.isChartPaused;
-		},	
+		
 		createChart(){
 			// Create the chart
 			var currPID = this.selectedPanel
@@ -340,7 +352,7 @@ export default Vue.extend({
 								return datasets.map((ds:any, i:number) => {
 									let tmpLeg:string = `${ds.label}`;
 									if(this.showLegendVals){
-										tmpLeg = `${ds.label} [${ds.data[ds.data.length -1]}]`;
+										tmpLeg = `${ds.label} [${parseFloat(ds.data[ds.data.length -1].toFixed(3))}]`;
 									}
 									return {
 										text: tmpLeg,
@@ -469,7 +481,7 @@ export default Vue.extend({
 						let tmpCount: any = 0;
 						for(tmpCount in this.passedObject.chartOMDataArr){
 							let currObj: any = this.passedObject.chartOMDataArr[tmpCount]
-							currObj.lastReading = this.getModelValue(currObj.OMString, Number(currObj.scaleFactor))
+							currObj.lastReading = this.getModelValue(currObj.OMString, Number(currObj.scaleFactor), currObj.setPrecision, Number(currObj.precisionVal))
 							pushSeriesData(this.selectedPanel, tmpCount, currObj, this.passedObject);
 						}				
 						// Record time and deal wih expired temperature samples
@@ -597,6 +609,7 @@ export default Vue.extend({
 		// Don't update this instance any more...
 		instances = instances.filter(instance => instance !== this, this);
 		this.chart.destroy;
+		this.$root.$off(Events.machineModelUpdated)
 		this.isChartCreated = false;
 	},
 	watch: {
@@ -619,10 +632,10 @@ export default Vue.extend({
 		},
 		isChartPaused(to: boolean){
 			if(to){
-				console.log("stopping")
+				//console.log("stopping")
 				this.chart.stop();
 			}else{
-				console.log("starting")
+				//console.log("starting")
 				this.chart.render();
 			}
 		}

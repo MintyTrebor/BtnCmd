@@ -182,11 +182,11 @@
                                     </v-col>
                                 </v-row>
                                 <v-row dense>
-                                    <v-col cols="6">
+                                    <v-col cols="3">
                                         <v-select label="Line Colour" :items="lineColors" v-model="editArrObj.OMColor"></v-select>
                                     </v-col>
                                     <v-spacer></v-spacer>
-                                    <v-col cols="3" align="center">
+                                    <v-col cols="2" align="center">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on, attrs }">
                                                 <span v-bind="attrs" v-on="on" align="center"><v-switch label="Enable Datapoints" v-model="editArrObj.showDataPoint"></v-switch></span>
@@ -194,13 +194,32 @@
                                             <span>Show datapoints with mouseover info</span>
                                         </v-tooltip>
                                     </v-col>
-                                    <v-col cols="3" align="center">
+                                    <v-col cols="2" align="center">
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on, attrs }">
                                                 <span v-bind="attrs" v-on="on" align="center"><v-switch label="Dashed Line" v-model="editArrObj.lineDash"></v-switch></span>
                                             </template>
                                             <span>Show line with dashes</span>
                                         </v-tooltip>
+                                    </v-col>
+                                    <v-col cols="2" align="center">
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <span v-bind="attrs" v-on="on" align="center"><v-switch label="Set Precision" v-model="editArrObj.setPrecision"></v-switch></span>
+                                            </template>
+                                            <span>Enable Fixed Precision</span>
+                                        </v-tooltip>
+                                    </v-col>
+                                    <v-col cols="2" align="center" v-if="editArrObj.setPrecision">
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-text-field v-bind="attrs" v-on="on" number label="Precision" v-model="editArrObj.precisionVal"></v-text-field>
+                                            </template>
+                                            <span>Precison Places (number)</span>
+                                        </v-tooltip>
+                                    </v-col>
+                                    <v-col cols="2" align="center" v-else>
+                                        <v-spacer/>
                                     </v-col>
                                 </v-row>
                                 <v-tooltip left>
@@ -298,7 +317,7 @@
                 alertRetainData: false,
                 showOMSelector: false,
                 //After 01.01.02 any changes to refOMDataArrItem also need to be accounted for in mounted() data upgrade below
-                refOMDataArrItem: {OMString: 'NEW', OMColor: 'primary', name: 'NEW', lastReading: 0, lineDash: false, showDataPoint: false, scaleFactor: 1}
+                refOMDataArrItem: {OMString: 'NEW', OMColor: 'primary', name: 'NEW', lastReading: 0, lineDash: false, showDataPoint: false, scaleFactor: 1, setPrecision: false, precisionVal: 4}
             }
         },
         methods: {
@@ -367,11 +386,10 @@
             }else{
                 //DATA UPGRADE
                 //validate the array contains the correct items - this will be needed if any updates are made to the array contents in future releases past 01.01.02 when charts introduced
-                // this.tmpPassedObject.chartOMDataArr.forEach(item => {
-                //     if(!item.doesnotexist){
-                //         item.doesnotexist = 'xxxx'
-                //     }
-                // });
+                this.tmpPassedObject.chartOMDataArr.forEach(item => {
+                    item.setPrecision ||= false;
+                    item.precisionVal ||= 4;
+                });
             }
         }
     }
