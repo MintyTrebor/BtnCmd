@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.04',
+			btnCmdVersion: '01.02.05',
 			btnCmd : {
-				btnCmdVersion: '01.02.04',
+				btnCmdVersion: '01.02.05',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
