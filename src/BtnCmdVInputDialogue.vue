@@ -142,6 +142,35 @@
                             </v-col>
                         </v-row>
                         <v-row dense>
+                        <v-col cols="7">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Top Icon [mdi-*]" v-model="tmpPassedObject.inputIconAbove" placeholder="mdi-"></v-text-field>
+                                </template>
+                                <span>Material design icon name (Format = mdi-[icon name])</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="1">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <a v-bind="attrs" v-on="on" href="https://pictogrammers.com/library/mdi/" target="_blank">
+                                        <v-icon v-if="tmpPassedObject.inputIconAbove" class="mr-1 pt-3">{{ tmpPassedObject.inputIconAbove }}</v-icon>
+                                        <v-icon v-else class="mr-1 pt-3">mdi-cog</v-icon>
+                                    </a>
+                                </template>
+                                <span>Click to open Material Design Icons web page</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Icon Size" v-model="tmpPassedObject.inputIconAboveSize" placeholder="25" number></v-text-field>
+                                </template>
+                                <span>Size (num [def=25])</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                        <v-row dense>
                             <v-col cols="12">
                                 <v-text-field label="Hover Text" v-model="tmpPassedObject.panelHoverText"></v-text-field>
                             </v-col>
@@ -228,6 +257,22 @@
                                 </v-tooltip>
                             </v-col>
                         </v-row>
+                        <v-row v-if="tmpPassedObject.inputIconAbove">
+                            <v-col>
+                                <v-row dense><v-col><span style="font-weight: bold">Icon Colour</span></v-col></v-row>
+                            </v-col>
+                            <v-col>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-row dense>
+                                            <v-col align-self="center"><v-icon @click="setColor('inputIconAboveColor')" v-on="on" :color="tmpPassedObject.inputIconAboveColor">{{ tmpPassedObject.inputIconAbove }}</v-icon></v-col>
+                                            <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="tmpPassedObject.inputIconAboveColor = ''">Reset</v-btn></div></v-col>
+                                        </v-row>
+                                    </template>
+                                    <span>Click to edit icon colour</span>
+                                </v-tooltip>
+                            </v-col>
+                        </v-row>
                         <v-row>
                             <v-col cols="6">
                                 <v-tooltip bottom>
@@ -292,11 +337,11 @@
             },
             bAddButtonDisabled(){
                 if(this.tmpListItem){
-                    if(this.tmpListItem.length > 0){
+                    //if(this.tmpListItem.length() > 0){
                         if(isNaN(this.tmpListItem) && this.tmpPassedObject.inputType == 'number'){
                             return true;
                         }else{return false}
-                    }else{return true}
+                    //}else{return true}
                 }else{return true}
             },
             bICTType(){

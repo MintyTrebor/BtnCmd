@@ -72,6 +72,9 @@
                 if(this.colField == "ChartLineColor"){
                     this.passedObject.OMColor = this.currColor;
                 }
+                if(this.colField == "inputIconAboveColor"){
+                    this.passedObject.inputIconAboveColor = this.currColor;
+                }
                 this.$emit('exit', true);
                 this.show = false;
                 return;
@@ -89,6 +92,9 @@
             }
             if(this.colField == "ChartLineColor"){
                 this.currColor = this.passedObject.OMColor;
+            }
+            if(this.colField == "inputIconAboveColor"){
+                this.currColor = this.passedObject.inputIconAboveColor;
             }
         }
     }

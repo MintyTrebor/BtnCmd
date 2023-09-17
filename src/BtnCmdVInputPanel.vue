@@ -10,9 +10,19 @@
 		<v-card :id="`gip-${passedObject.panelID}`" class="pa-1 ma-0" :key="'vInput' + passedObject.inputPrefixText + passedObject.inputSuffixText + passedObject.inputVarName + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
 			<v-row align="center" style="height: 98%; width: 98%" class="pa-0 ma-0">
 				<v-card-text class="text-center pa-0 ma-0">
+					<v-row v-if="passedObject.inputIconAbove && passedObject.inputDispType != 'slider' && passedObject.inputType != 'boolean'" justify="center" align="center" class="d-flex pa-0 ma-0">
+						<v-col cols="12" justify="center">
+							<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
+						</v-col>
+					</v-row>
 					<v-row v-if="passedObject.inputType == 'number' && passedObject.inputDispType == 'slider'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
+							<v-row v-if="passedObject.inputIconAbove" justify="center" align="center" class="d-flex pa-0 ma-0 mt-n16">
+								<v-col cols="12" justify="center">
+									<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
+								</v-col>
+							</v-row>
+							<v-row v-if="passedObject.panelHoverText" justify="center" align="center">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
@@ -29,7 +39,7 @@
 					</v-row>
 					<v-row v-if="passedObject.inputDispType == 'selection'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
+							<v-row v-if="passedObject.panelHoverText" justify="center" align="center">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
@@ -46,12 +56,12 @@
 					</v-row>
 					<v-row v-if="passedObject.inputType != 'boolean' && passedObject.inputDispType == 'input'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row dense v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center" style="height: 100%; width: 100%">
+							<v-row dense v-if="passedObject.panelHoverText" justify="center" align="center" style="height: 100%; width: 100%">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
-											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @focus="setPauseUpdateText" ></v-text-field>
+											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText" ></v-text-field>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
@@ -59,15 +69,20 @@
 							</v-row>
 							<v-row dense v-else justify="center" align="center" style="height: 100%; width: 100%">
 								<v-row justify="center" align="center" style="height: 100%; width: 100%!important;">
-									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" :background-color="passedObject.panelColor" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
-									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" :background-color="passedObject.panelColor" :elevation="1" @focus="setPauseUpdateText"></v-text-field>
+									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText"></v-text-field>
 								</v-row>
 							</v-row>
 						</v-col>
 					</v-row>
 					<v-row v-if="passedObject.inputType == 'boolean'" dense justify="center" align="center">
 						<v-col class="d-flex flex-column pa-0 ma-0" justify="center" align="center" cols="10">
-							<v-row v-if="passedObject.panelHoverText.length >= 1" justify="center" align="center">
+							<v-row v-if="passedObject.inputIconAbove" justify="center" align="center" class="d-flex pa-0 ma-0 mb-n4">
+								<v-col cols="12" justify="center">
+									<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
+								</v-col>
+							</v-row>
+							<v-row v-if="passedObject.panelHoverText" justify="center" align="center" class="d-flex pa-0 ma-0">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row v-if="bHasPrefix && bHasSuffix" justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
@@ -104,7 +119,7 @@
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
-							<v-row v-else justify="center" align="center">
+							<v-row v-else justify="center" align="center" class="d-flex pa-0 ma-0">
 								<v-row v-if="bHasPrefix && bHasSuffix" justify="center" align="center" style="height: 100%;">
 									<v-col cols="3" justify="right">
 										<span v-bind="attrs" v-on="on" :style="'color: ' + passedObject.panelMMPrefixColor + ';'" :class="`text-${passedObject.panelMMTextSize}`">{{passedObject.inputPrefixText}}</span>
@@ -169,7 +184,7 @@ export default {
 		bHasPrefix(){
 			if(this.passedObject.inputPrefixText){
 				let tempText = this.passedObject.inputPrefixText.replace(/ /g, "");
-				if(tempText.length > 0){
+				if(tempText){
 					return true;
 				}else {
 					return false;
@@ -181,7 +196,7 @@ export default {
 		bHasSuffix(){
 			if(this.passedObject.inputSuffixText){
 				let tempText = this.passedObject.inputSuffixText.replace(/ /g, "");
-				if(tempText.length > 0){
+				if(tempText){
 					return true;
 				}else {
 					return false;
@@ -198,7 +213,7 @@ export default {
 			}
 		},
 		overlayBackgroundColor(){
-			if(this.passedObject.panelColor.length > 0){
+			if(this.passedObject.panelColor){
 				return this.passedObject.panelColor
 			}else{
 				if(!this.darkTheme){

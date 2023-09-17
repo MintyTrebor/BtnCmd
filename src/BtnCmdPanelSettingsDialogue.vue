@@ -12,7 +12,7 @@
             </v-row> -->
             <v-card-title>
 				<v-toolbar dark dense>
-                    <v-toolbar-title>Edit Panel {{isCNCMode}}</v-toolbar-title>
+                    <v-toolbar-title>Add / Edit Panel Type</v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" text @click="validateData()">
                         <span v-if="passedObject.panelType == 'altwebcam' || passedObject.panelType == 'mmValue' || passedObject.panelType == 'txtLabel' || passedObject.panelType == 'vInput' || passedObject.panelType == 'BtnCmdChart'">Click to Enter Settings</span>
@@ -149,9 +149,9 @@
                 {text: 'Object Model Value', value: 'mmValue', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Remote Source', value: 'remSrc', disabled: false, hSize: 145, wSize: 500},
                 {text: 'Speed', value: 'speed', disabled: false, hSize: 230, wSize: 320},
-                {text: 'Static Text / Label', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300},
                 {text: 'Status Panel', value: 'status-panel', disabled: this.isCNCMode, hSize: 288, wSize: 534},
-                {text: 'Temperature Chart', value: 'temperature-chart', disabled: this.isCNCMode, hSize: 240, wSize: 280}, 
+                {text: 'Temperature Chart', value: 'temperature-chart', disabled: this.isCNCMode, hSize: 240, wSize: 280},
+                {text: 'Text / Icon / Blank', value: 'txtLabel', disabled: false, hSize: 100, wSize: 300}, 
                 {text: 'Tools', value: 'tools-panel', disabled: false, hSize: 235, wSize: 661},
                 {text: 'Custom Panel', value: 'custom', disabled: this.createMode, hSize: 250, wSize: 250},
                 

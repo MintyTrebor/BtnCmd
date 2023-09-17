@@ -52,12 +52,12 @@
                         <v-col cols="1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <a v-bind="attrs" v-on="on" href="https://materialdesignicons.com/" target="_blank">
+                                    <a v-bind="attrs" v-on="on" href="https://pictogrammers.com/library/mdi/" target="_blank">
                                         <v-icon v-if="passedObject.btnIcon.length>0" class="mr-1 pt-3">{{ passedObject.btnIcon }}</v-icon>
                                         <v-icon v-if="passedObject.btnIcon.length==0" class="mr-1 pt-3">mdi-cog</v-icon>
                                     </a>
                                 </template>
-                                <span>Go To https://materialdesignicons.com</span>
+                                <span>Click to open Material Design Icons web page</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>

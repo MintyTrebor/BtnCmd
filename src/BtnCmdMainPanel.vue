@@ -421,7 +421,7 @@
 						<a href="https://www.npmjs.com/package/vuedraggable" target="_blank">vuedraggable</a><br>
 						Plus re-uses components and code from <strong>DWC</strong>.<br>
 						<a href="https://github.com/MintyTrebor/BtnCmd/wiki" target="_blank">BtnCmd Wiki</a><br>
-						<a href="https://materialdesignicons.com/" target="_blank">Material Design Icon Library</a><br>
+						<a href="https://pictogrammers.com/library/mdi/" target="_blank">Material Design Icon Library</a><br>
 					</v-alert>
 				</v-row>
 				<BtnCmdSettingsDialogue v-if="showEdit" v-model="showEdit" :passedObject="objectToPass" :bMQTT="btnCmd.globalSettings.enableMQTT" :enableSBCC="btnCmd.globalSettings.enableSBCC" :SBCCCombinedJson="tmpSBCCSet"></BtnCmdSettingsDialogue>
@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.06',
+			btnCmdVersion: '01.02.07',
 			btnCmd : {
-				btnCmdVersion: '01.02.06',
+				btnCmdVersion: '01.02.07',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1114,6 +1114,9 @@ export default {
 						inputControlVals: [],
 						inputControlRange:[],
 						inputControlSteps: 1,
+						inputIconAbove: '',
+						inputIconAboveSize: 25,
+						inputIconAboveColor: '',
 						bPanelActivated: false,
 						chartLabel: 'Custom Chart',
 						chartOMDataArr: [],

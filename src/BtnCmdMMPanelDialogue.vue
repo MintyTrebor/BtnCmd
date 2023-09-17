@@ -31,6 +31,35 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-col cols="7">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Top Icon [mdi-*]" v-model="passedObject.inputIconAbove" placeholder="mdi-"></v-text-field>
+                                </template>
+                                <span>Material design icon name (Format = mdi-[icon name])</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="1">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <a v-bind="attrs" v-on="on" href="https://pictogrammers.com/library/mdi/" target="_blank">
+                                        <v-icon v-if="passedObject.inputIconAbove" class="mr-1 pt-3">{{ passedObject.inputIconAbove }}</v-icon>
+                                        <v-icon v-else class="mr-1 pt-3">mdi-cog</v-icon>
+                                    </a>
+                                </template>
+                                <span>Click to open Material Design Icons web page</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="4">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Icon Size" v-model="passedObject.inputIconAboveSize" placeholder="25" number></v-text-field>
+                                </template>
+                                <span>Size (num [def=25])</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                     <v-row dense v-if="passedObject.panelType == 'mmValue'" >
                         <v-col cols="11">
                             <v-tooltip bottom>
@@ -114,6 +143,22 @@
                                     </v-row>
                                 </template>
                                 <span>Click to edit value colour</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.inputIconAbove">
+                        <v-col>
+                            <v-row dense><v-col><span style="font-weight: bold">Icon Colour</span></v-col></v-row>
+                        </v-col>
+                        <v-col>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-row dense>
+                                        <v-col align-self="center"><v-icon @click="setColor('inputIconAboveColor')" v-on="on" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></v-col>
+                                        <v-col cols="3" align-self="center"><div align="center" style="cursor:pointer"><v-btn x-small @click="passedObject.inputIconAboveColor = ''">Reset</v-btn></div></v-col>
+                                    </v-row>
+                                </template>
+                                <span>Click to edit icon colour</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
@@ -207,7 +252,7 @@
                         this.alertReqVal = false;
                     }
                 }else if (this.passedObject.panelType != 'mmValue'){
-                    if(this.passedObject.panelMMPrefix) {
+                    if(this.passedObject.panelMMPrefix || this.passedObject.inputIconAbove) {
                         //req fields met so exit
                         this.passedObject.panelMMPath = this.tmpModelPath;
                         this.$emit('exit', true);
