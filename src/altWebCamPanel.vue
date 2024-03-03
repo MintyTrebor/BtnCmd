@@ -64,12 +64,17 @@ img {
 	-webkit-transform: rotate(270deg);
 	-o-transform: rotate(270deg);
 }
+.canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 </style>
 
 <template>
 	<v-card>
-		<v-card-text class="pa-0 img-container">
-			<v-btn v-if="showConfigBtn" right app fixed inset top fab small @click="showConfig()" style="background-color: transparent; opacity: 0.4;"><v-icon color="#F5F5F5">mdi-cog</v-icon></v-btn>
+		<v-card-text class="pa-0 img-container" style="position: absolute; top: 0px;">
+			<v-btn v-if="showConfigBtn && !showCrossHair" right app fixed inset top fab small @click="showConfig()" style="background-color: transparent; opacity: 1;"><v-icon color="#F5F5F5">mdi-cog</v-icon></v-btn>
 			<v-responsive v-if="passedObject.altWebCamiFrame" :aspect-ratio="16/9">
 				<iframe :src="passedObject.altWebCamURL" :class="classList"></iframe>
 			</v-responsive>
@@ -77,7 +82,13 @@ img {
 			<a v-else :href="passedObject.altWebCamClickURL ? passedObject.altWebCamClickURL : 'javascript:void(0)'">
 				<img :alt="$t('panel.webcam.alt')" :src="active ? url : ''" :class="classList">
 			</a>
+			<v-overlay v-if="showCrossHair" :opacity="0">
+				<canvas class="canvas" ref="crossHairCanvas" ></canvas>
+				<v-btn v-if="showConfigBtn" right app fixed inset top fab small @click="showConfig()" style="background-color: transparent; opacity: 1;"><v-icon color="#F5F5F5">mdi-cog</v-icon></v-btn>
+				<v-btn left app fixed bottom fab small class="ml-n2 mb-n2" @click="showNozzleConfig()" style="background-color: transparent; opacity: 1;"><v-icon color="#3aeb34">mdi-crosshairs-gps</v-icon></v-btn>
+			</v-overlay>
 		</v-card-text>
+		
 		<v-dialog v-model="showConfigDialog" width="80vw">
 			<v-card height="80vh">
 				<div class="iframe-dialog" width="100%" height="95%">
@@ -85,6 +96,41 @@ img {
 						<span>Your browser does not support iFrames</span>
 					</iframe>
 				</div>		
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="showNozzleConfigDialog" width="500px">
+			<v-card height="60px" style="overflow-y: hidden;">
+				<v-card-text>
+					<v-row dense>
+						<v-col cols="5">
+							<v-tooltip bottom>
+								<template v-slot:activator="{ on, attrs }">
+									<v-text-field v-bind="attrs" v-on="on" label="Nozzle Diameter" v-model.number="passedObject.nozzleDiameter" placeholder="0.4"></v-text-field>
+								</template>
+								<span>Nozzle diameter (eg 0.4)</span>
+							</v-tooltip>
+						</v-col>
+						<v-col cols="5">
+							<v-tooltip bottom>
+								<template v-slot:activator="{ on, attrs }">
+									<v-text-field v-bind="attrs" v-on="on" label="Pixels per 1mm" v-model.number="passedObject.pixelPerMM" placeholder="100"></v-text-field>
+								</template>
+								<span>Number of screen pixels per 1mm of travel</span>
+							</v-tooltip>
+						</v-col>
+						<v-col cols="2">
+							<v-tooltip bottom>
+								<template v-slot:activator="{ on, attrs }">
+									<v-btn small fab v-bind="attrs" v-on="on" @click="saveExitNozCfg()" class="mt-2 ml-4">
+										<v-icon color="blue">mdi-content-save-move</v-icon>
+									</v-btn>
+								</template>
+								<span>Save & Close</span>
+							</v-tooltip>
+						</v-col>
+					</v-row>
+				</v-card-text>	
 			</v-card>
 		</v-dialog>
 	</v-card>
@@ -99,6 +145,12 @@ export default {
 	props: {
 		passedObject: {
 			type: Object
+		},
+		currWSize: {
+			type: Number
+		},
+		currHSize: {
+			type: Number
 		}
     },
 	computed: {
@@ -127,6 +179,27 @@ export default {
 			}else{
 				return false;
 			}
+		},
+		showCrossHair() {
+			if(this.passedObject.showCrossHair){
+				return true;
+			}else{
+				return false;
+			}
+		},
+		show: {
+			get () {
+				return this.value
+			},
+			set (value) {
+				this.$emit('input', value)
+			}
+		},
+		pxPerMM(){
+			return this.passedObject.pixelPerMM;
+		},
+		nozDiam() {
+			return this.passedObject.nozzleDiameter;
 		}
 	},
 	data() {
@@ -134,7 +207,10 @@ export default {
 			active: true,
 			updateTimer: null,
 			url: '',
-			showConfigDialog: false
+			showConfigDialog: false,
+			showNozzleConfigDialog: false,
+			vueCanvas: null,
+			canvas: null
 		}
 	},
 	activated() {
@@ -165,7 +241,61 @@ export default {
 			}else{
 				this.showConfigDialog = true;
 			}
-		}
+		},
+		showNozzleConfig(){
+			this.showNozzleConfigDialog = true;
+		},
+
+		saveExitNozCfg(){
+			this.$emit('exit', true);
+			this.showNozzleConfigDialog = false;
+		},
+		
+		drawCrossHairOverlay() {
+			// adapted from klipper mainsail https://github.com/HelgeKeck/mainsail/blob/idex/src/components/webcams/streamers/MjpegstreamerAdaptive.vue
+			// canvas center
+			let canW = this.currWSize //Math.round(this.canvas.width);
+			let canH = this.currHSize //Math.round(this.canvas.height);
+			this.canvas.width = canW;
+			this.canvas.height = canH;
+			//console.log("w,h", canW, canH)
+			let canvasCenterX = Math.round(canW / 2)
+			let canvasCenterY = Math.round(canH / 2)
+			//console.log("canvW, canvH", this.canvas.width, this.canvas.height)
+
+
+			// ----------------------------------------------------------------
+			// Overlay
+			// ----------------------------------------------------------------
+			this.vueCanvas.beginPath()
+			this.vueCanvas.lineWidth = 3
+			this.vueCanvas.fillStyle = 'transparent'
+			this.vueCanvas.strokeStyle = '#3aeb34'
+
+			// ----------------------------------------------------------------
+			// draw crosshairs circles
+			// ----------------------------------------------------------------
+			let innerCircleRX = canW / (canW / (this.passedObject.nozzleDiameter * this.passedObject.pixelPerMM)) / 2
+			let innerCircleRY = canH / (canH / (this.passedObject.nozzleDiameter * this.passedObject.pixelPerMM)) / 2
+			let outerCircleRX = canW / (canW / (1.0 * this.passedObject.pixelPerMM)) / 2
+			let outerCircleRY = canH / (canH / (1.0 * this.passedObject.pixelPerMM)) / 2
+			this.vueCanvas.ellipse(canvasCenterX, canvasCenterY, innerCircleRX, innerCircleRY, 0, 0, 360)
+			this.vueCanvas.ellipse(canvasCenterX, canvasCenterY, outerCircleRX, outerCircleRY, 0, 0, 360)
+			this.vueCanvas.fill()
+
+			// ----------------------------------------------------------------
+			// draw crosshairs lines
+			// ----------------------------------------------------------------
+			let crosshairsLengthX = Math.round(canW / (canW / (1.5 * this.passedObject.pixelPerMM)))
+			let crosshairsLengthY = Math.round(canH / (canH / (1.5 * this.passedObject.pixelPerMM)))
+			this.vueCanvas.moveTo(canvasCenterX, canvasCenterY - crosshairsLengthY / 2)
+			this.vueCanvas.lineTo(canvasCenterX, canvasCenterY + crosshairsLengthY / 2)
+			this.vueCanvas.moveTo(canvasCenterX - Math.round(crosshairsLengthX / 2), canvasCenterY)
+			this.vueCanvas.lineTo(canvasCenterX + Math.round(crosshairsLengthX / 2), canvasCenterY)
+
+			this.vueCanvas.stroke()
+		},
+		
 	},
 	mounted() {
 		if (!this.passedObject.altWebCamiFrame) {
@@ -173,6 +303,12 @@ export default {
 			if (this.passedObject.altWebCamUpdateTimer > 0) {
 				this.updateTimer = setInterval(this.updateWebcam, this.passedObject.altWebCamUpdateTimer);
 			}
+		}
+		if(this.passedObject.showCrossHair){
+			this.canvas = this.$refs.crossHairCanvas;
+			var ctx = this.canvas.getContext('2d');
+			this.vueCanvas = ctx;
+			this.drawCrossHairOverlay();
 		}
 	},
 	watch: {
@@ -183,6 +319,22 @@ export default {
 					// For persistent images we need to apply updates independently of the update loop
 					this.updateWebcam();
 				}
+			}
+		},
+		pxPerMM(){
+			if(this.passedObject.showCrossHair){
+				this.canvas = this.$refs.crossHairCanvas;
+				var ctx = this.canvas.getContext('2d');
+				this.vueCanvas = ctx;
+				this.drawCrossHairOverlay();
+			}
+		},
+		nozDiam(){
+			if(this.passedObject.showCrossHair){
+				this.canvas = this.$refs.crossHairCanvas;
+				var ctx = this.canvas.getContext('2d');
+				this.vueCanvas = ctx;
+				this.drawCrossHairOverlay();
 			}
 		}
 	},

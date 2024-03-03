@@ -3,7 +3,7 @@
     "id": "BtnCmd",
     "name": "BtnCmd",
     "author": "Minty Trebor",
-    "version": "01.02.07",
+    "version": "01.02.08",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/MintyTrebor",
     "dwcVersion": "auto",
@@ -16,4 +16,4 @@
       "vuedraggable": "^2.24.3",
       "mathjs": "^11.6.0"
     }
-  }
+  } 

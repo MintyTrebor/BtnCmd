@@ -135,7 +135,10 @@ export default {
 							altWebCamAppndHTTP: false,
 							altWebCamClickURL: '',
 							altWebCamConfigURL: '',
-							altWebCamConfigNewWin: false					
+							altWebCamConfigNewWin: false,
+							showCrossHair: false,
+							nozzleDiameter: 0.4,
+							pixelPerMM: 100					
 						},
 						MMParams: {
 

@@ -165,7 +165,7 @@
 														<v-card align="center" justify="center" flat class="mytabs-card pa-0 ma-0 " style="height: 100%; width: 100%" color="transparent">
 															<v-row align="center" justify="center" class="mytabs-card ma-0 pa-0">
 																<td class="mytabs-card ma-0 pa-0" align="center" justify="center">
-																	<altWebCamPanel :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
+																	<altWebCamPanel @exit="saveSettings()" :key="'awp'+panel.panelID" v-if="panel.panelType == 'altwebcam'" align="center" justify="center" :passedObject="panel.altWebCamParams" :currWSize="panel.panelWSize" :currHSize="panel.panelHSize" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></altWebCamPanel>
 																	<BtnCmdWebPanel :key="'wbp'+panel.panelID" v-if="panel.panelType == 'remSrc'" align="center" justify="center" :passedObject="panel.altWebCamParams" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdWebPanel>
 																	<BtnCmdMMPanel v-if="panel.panelType == 'mmValue' || panel.panelType == 'txtLabel'" :key="'mmV' + panel.panelMMPrefix + panel.panelID + panel.panelMMPath" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%"></BtnCmdMMPanel>
 																	<BtnCmdVInputPanel v-if="panel.panelType == 'vInput'" :key="'vInput' + panel.inputVarName + panel.panelID" align="center" justify="center" class="mytabs-card pa-0 ma-0" :passedObject="panel" style="height: 100%; width: 100%" :LZIndex="tab.lastZIndex"></BtnCmdVInputPanel>
@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.07',
+			btnCmdVersion: '01.02.08',
 			btnCmd : {
-				btnCmdVersion: '01.02.07',
+				btnCmdVersion: '01.02.08',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1098,7 +1098,10 @@ export default {
 							altWebCamAppndHTTP: false,
 							altWebCamClickURL: '',
 							altWebCamConfigURL: '',
-							altWebCamConfigNewWin: false					
+							altWebCamConfigNewWin: false,
+							showCrossHair: false,
+							nozzleDiameter: 0.4,
+							pixelPerMM: 100
 						},
 						MMParams: {
 

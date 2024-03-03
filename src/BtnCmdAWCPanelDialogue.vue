@@ -33,7 +33,7 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Webcam Image Click URL" v-model="passedObject.altWebCamParams.altWebCamClickURL" placeholder="http://"></v-text-field>
+                                    <v-text-field v-bind="attrs" v-on="on" dense label="Webcam Image Click URL" v-model="passedObject.altWebCamParams.altWebCamClickURL" placeholder="http://"></v-text-field>
                                 </template>
                                 <span>URL to open on click of the Alt Webcam Img</span>
                             </v-tooltip>
@@ -58,7 +58,7 @@
                         </v-col>
                     </v-row>
                     <v-row dense>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-select v-bind="attrs" v-on="on" :items="rotateItems" item-text="text" item-value="value" label="Webcam Rotation" required v-model="passedObject.altWebCamParams.altWebCamRotation"></v-select>
@@ -66,9 +66,7 @@
                                 <span>Rotation Angle</span>
                             </v-tooltip>
                         </v-col>
-                    </v-row>
-                    <v-row dense>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-select v-bind="attrs" v-on="on" :items="flipItems" item-text="text" item-value="value" label="Flip Webcam Img" required v-model="passedObject.altWebCamParams.altWebCamFlip"></v-select>
@@ -81,14 +79,40 @@
                         <v-col cols="12">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-text-field v-bind="attrs" v-on="on" label="Refresh Period (ms)*" v-model.number="passedObject.altWebCamParams.altWebCamUpdateTimer" placeholder="0"></v-text-field>
+                                    <v-text-field v-bind="attrs" v-on="on" label="Refresh Period (ms)*" dense C="passedObject.altWebCamParams.altWebCamUpdateTimer" placeholder="0"></v-text-field>
                                 </template>
                                 <span>Period in milliseconds to refresh image</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
                     <v-row dense>
-                        <v-col cols="12">
+                        <v-col cols="4">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="Nozzle Alignment" v-model="passedObject.altWebCamParams.showCrossHair"></v-switch></span>
+                                </template>
+                                <span>Overlay Nozzle Alignment Crosshairs</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="4" v-if="bshowNozzleAlignment">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Nozzle Diameter" v-model.number="passedObject.altWebCamParams.nozzleDiameter" placeholder="0.4"></v-text-field>
+                                </template>
+                                <span>Nozzle diameter (eg 0.4)</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="4" v-if="bshowNozzleAlignment">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-bind="attrs" v-on="on" label="Pixels per 1mm" v-model.number="passedObject.altWebCamParams.pixelPerMM" placeholder="100"></v-text-field>
+                                </template>
+                                <span>Number of screen pixels per 1mm of travel</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col cols="6">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-switch label="Remove extra HTTP qualifier on reload" v-model="passedObject.altWebCamParams.altWebCamAppndHTTP"></v-switch></span>
@@ -96,9 +120,7 @@
                                 <span>Do not append extra HTTP qualifier when reloading images</span>
                             </v-tooltip>
                         </v-col>
-                    </v-row>
-                    <v-row dense>
-                        <v-col cols="12">
+                        <v-col cols="6">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on"><v-switch label="Embedd Webcam image in iFrame" v-model="passedObject.altWebCamParams.altWebCamiFrame"></v-switch></span>
@@ -135,6 +157,9 @@
                 set (value) {
                     this.$emit('input', value)
                 }
+            },
+            bshowNozzleAlignment(){
+                return this.passedObject.altWebCamParams.showCrossHair
             }
         },
         data: function () {
