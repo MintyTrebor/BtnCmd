@@ -175,7 +175,8 @@ export default {
 						chartShowValueInLegend: false,
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
-						inputLinkedOMKey: ''
+						inputLinkedOMKey: '',
+						inputRequireEnter: true
 					}
 				],
 				SBCC_Cmds: [

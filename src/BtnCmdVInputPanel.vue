@@ -59,8 +59,12 @@
 							<v-row dense v-if="passedObject.panelHoverText" justify="center" align="center" style="height: 100%; width: 100%">
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
-										<v-row justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
+										<v-row v-if="passedObject.inputRequireEnter" justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
 											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText" ></v-text-field>
+										</v-row>
+										<v-row v-else justify="center" align="center" style="height: 100%; width: 100%!important;" v-bind="attrs" v-on="on">
+											<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @change="updateTextInput(newValTemp)"></v-text-field>
 											<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText" ></v-text-field>
 										</v-row>
 									</template>
@@ -68,8 +72,12 @@
 								</v-tooltip>
 							</v-row>
 							<v-row dense v-else justify="center" align="center" style="height: 100%; width: 100%">
-								<v-row justify="center" align="center" style="height: 100%; width: 100%!important;">
+								<v-row v-if="passedObject.inputRequireEnter" justify="center" align="center" style="height: 100%; width: 100%!important;">
 									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @keyup.enter="clearTextInputFocus($event, newValTemp)"></v-text-field>
+									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText"></v-text-field>
+								</v-row>
+								<v-row v-else justify="center" align="center" style="height: 100%; width: 100%!important;">
+									<v-text-field v-if="bPauseUpdates" ref="txtRef1" flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="newValTemp" :value="newValTemp" background-color="#FFFFFF00" :elevation="1" @change="updateTextInput(newValTemp)"></v-text-field>
 									<v-text-field v-else flat solo dense hide-details :style="`color: ${passedObject.panelMMPrefixColor};`" :class="`text-${passedObject.panelMMTextSize}`" :type="passedObject.inputType" :clearable="passedObject.inputEnableClear" :prefix="passedObject.inputPrefixText" :suffix="passedObject.inputSuffixText" v-model="matchedVarVal" :value="matchedVarVal" background-color="#FFFFFF00" :elevation="1" @focus="setPauseUpdateText"></v-text-field>
 								</v-row>
 							</v-row>
@@ -371,6 +379,9 @@ export default {
 				event.preventDefault();
 				event.target.blur();
 			}
+		},
+		updateTextInput(newValue){
+			this.setVarVal(newValue);
 		},
 		async setBoolVal(newValue){
 			this.bPauseUpdates = true;

@@ -214,7 +214,7 @@
                             </v-col>
                         </v-row>                   
                         <v-row dense> 
-                            <v-col cols="12">
+                            <v-col cols="6">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="tmpPassedObject.panelMMTextSize" row required>
@@ -222,6 +222,14 @@
                                         </v-radio-group>
                                     </template>
                                     <span>Modify the font size</span>
+                                </v-tooltip>
+                            </v-col>
+                            <v-col cols="6" v-if="tmpPassedObject.inputDispType == 'input'">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span v-bind="attrs" v-on="on"><v-switch label="Enter to Accept" v-model="tmpPassedObject.inputRequireEnter"></v-switch></span>
+                                    </template>
+                                    <span>Require ENTER to accept new value</span>
                                 </v-tooltip>
                             </v-col>
                         </v-row>

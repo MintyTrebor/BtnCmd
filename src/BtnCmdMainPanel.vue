@@ -970,9 +970,9 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.02.08',
+			btnCmdVersion: '01.02.09',
 			btnCmd : {
-				btnCmdVersion: '01.02.08',
+				btnCmdVersion: '01.02.09',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1137,7 +1137,8 @@ export default {
 						chartShowValueInLegend: false,
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
-						inputLinkedOMKey: ''
+						inputLinkedOMKey: '',
+						inputRequireEnter: true
 					}
 				],
 				SBCC_Cmds: [
