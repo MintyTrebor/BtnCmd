@@ -330,18 +330,18 @@ export default {
 					if(!tmpValue) {tmpValue="";}
 					tmpCmd = `set global.${this.passedObject.inputVarName} = "${tmpValue}"`;
 					tmpParent.code = tmpCmd;
-					tmpParent.send();
-					this.passedObject.inputLastVal = tmpValue;
+					await tmpParent.send();
+					
 				}else if(this.passedObject.inputType == "number" && this.passedObject.inputDispType == 'slider'){
 					tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(this.passedObject.inputLastVal)}`;
 					tmpParent.code = tmpCmd;
-					tmpParent.send();
+					await tmpParent.send();
 				}else if(this.passedObject.inputType == "text" && this.passedObject.inputDispType == 'selection'){
 					if(newValue){
 						tmpCmd = `set global.${this.passedObject.inputVarName} = "${newValue}"`;
 						this.passedObject.inputLastVal = newValue;
 						tmpParent.code = tmpCmd;
-						tmpParent.send();
+						await tmpParent.send();
 					}
 				}else{
 					//let tmpValue = newValue.target.value;
@@ -353,7 +353,7 @@ export default {
 						tmpCmd = `set global.${this.passedObject.inputVarName} = ${Number(tmpValue)}`;
 					}
 					tmpParent.code = tmpCmd;
-					tmpParent.send();
+					await tmpParent.send();
 					this.passedObject.inputLastVal = Number(tmpValue);
 				}
 			}
@@ -365,7 +365,7 @@ export default {
 					tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", newValue);
 				}
 				tmpParent.code = tmpCmdStr;
-				tmpParent.send();
+				await tmpParent.send();
 			}
 			//console.log("endsetvar")
 			var tmpParent = null;
@@ -392,13 +392,13 @@ export default {
 			if(this.passedObject.inputVarName && !this.passedObject.inputLinkToOM){
 				tmpCmd = `set global.${this.passedObject.inputVarName} = ${tmpValue}`;
 				tmpParent.code = tmpCmd;
-				tmpParent.send();
+				await tmpParent.send();
 				this.passedObject.inputLastVal = Number(tmpValue);
 			}
 			if(this.passedObject.inputAfterChangeGCodeCMD){
 				let tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", tmpValue.toString());
 				tmpParent.code = tmpCmdStr;
-				tmpParent.send();
+				await tmpParent.send();
 			}
 			this.bPauseUpdates = false;
 		},
