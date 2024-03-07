@@ -1,0 +1,3 @@
+npm install precompiled-mqtt deepmerge axios jsonpath vuedraggable mathjs
+npm i --save-dev @types/jsonpath
+npm install vue-draggable-resizable@2.3.0
