@@ -29,7 +29,8 @@
                                         <cnc-container-panel v-if="panel.panelType == 'cnc-container-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></cnc-container-panel>
                                         <cnc-movement-panel v-if="panel.panelType == 'cnc-movement-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></cnc-movement-panel>
                                         <spindle-speed-panel v-if="panel.panelType == 'spindle-speed-panel'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></spindle-speed-panel>
-										<webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
+										<job-progress v-if="panel.panelType == 'jobProgress'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-progress>																	
+                                        <webcam-panel v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
                                     </td>
                                 </v-row>
                             </v-card>

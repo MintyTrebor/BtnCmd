@@ -143,6 +143,7 @@
                 {text: 'Job Estimations', value: 'jobestimates', disabled: false, hSize: 110, wSize: 280},
                 {text: 'Job Info Panel', value: 'jobinfo', disabled: false, hSize: 200, wSize: 200},
                 {text: 'Job List Panel', value: 'joblist', disabled: false, hSize: 250, wSize: 500},
+                {text: 'Job Progress Bar Panel', value: 'jobProgress', disabled: false, hSize: 50, wSize: 200},
                 {text: 'Layer Chart', value: 'layerchart', disabled: false, hSize: 240, wSize: 280},
                 {text: 'Macro File List Panel', value: 'macrolist', disabled: false, hSize: 250, wSize: 500},
                 {text: 'Movement Panel', value: 'movement-panel', disabled: this.isCNCMode, hSize: 272, wSize: 800},

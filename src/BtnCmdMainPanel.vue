@@ -99,6 +99,7 @@
 																	<BtnCmdConsole v-if="panel.panelType == 'console'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></BtnCmdConsole>
 																	<webcam-panel :key="'wcp'+panel.panelID" v-if="panel.panelType == 'webcam'" align="center" justify="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></webcam-panel>
 																	<BtnCmdCustomPanel v-if="panel.panelType == 'custom'" align="center" class="mytabs-card pa-0 ma-0" :tmpSBCCSet="tmpSBCCSet" :systemDSFVer="systemDSFVer" :mainData="btnCmd" :passedObject="panel" @updateActionResponse="updateAR" :LZIndex="tab.lastZIndex"></BtnCmdCustomPanel>
+																	<job-progress v-if="panel.panelType == 'jobProgress'" align="center" class="mytabs-card pa-0 ma-0" :style="'background-color:' + getDWCPanelBGColor(panel.panelBGColor, panel.panelUseDWCThemeBGColor) + ' !important'"></job-progress>
 																	<v-overlay :absolute="true" :opacity="0.5" :value="editMode" :style="`z-index:${tab.lastZIndex+100}`">
 																		<tbody>
 																			<tr align="center" justify="center">
@@ -972,7 +973,7 @@ export default {
 			tmpSBCCDef: {},
 			btnCmdVersion: '01.02.09',
 			btnCmd : {
-				btnCmdVersion: '01.02.09',
+				btnCmdVersion: '01.02.10',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
