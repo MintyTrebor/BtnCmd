@@ -1,6 +1,6 @@
 import mqtt from 'precompiled-mqtt';
 import axios from 'axios';
-import Path from '../../utils/path';
+import Path from '@/utils/path';
 import jsonpath from 'jsonpath';
 import store from "@/store";
 
@@ -204,8 +204,8 @@ export default {
 			this.$emit("updateActionResponse", actionTxt);
 		},
 		//run maro file
-		runFile(filename) {
-			this.sendCode(`M98 P"${Path.combine(this.directory, filename)}"`);
+		async runFile(filename) {
+			await store.dispatch("machine/sendCode", `M98 P"${Path.combine(this.directory, filename)}"`);
 		},
 		//run gcode commands - taken from codeinput.vue
 		hasUnprecedentedParameters: (code) => !code || /(M23|M28|M30|M32|M36|M117)[^0-9]/i.test(code),
