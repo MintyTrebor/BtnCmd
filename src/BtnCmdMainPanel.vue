@@ -54,10 +54,10 @@
 		<div class="mydiv">
 		<v-row class="pa-0 ma-0">
 			<v-col cols="12" class="pa-0 ma-0">
-				<!--<v-row mt-0>s
+				<!-- <v-row mt-0>s
 					<v-col><span class="text-caption">tab data= {{ directory }}</span></v-col>
 					<v-col><span class="text-caption">curr tab = {{ tmpDebgug }}</span></v-col>
-				</v-row>-->
+				</v-row> -->
 				<!-- <v-row mt-0><v-col><span class="text-caption">debug value = {{ printerMode }}</span></v-col></v-row> -->
 				<v-row>
 					<v-tabs class="elevation-2 pa-0 ma-0 mytabs-default" v-model="getCurrTabIndex">
@@ -971,9 +971,10 @@ export default {
 			bSBCCInstalled: false,
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
-			btnCmdVersion: '01.03.03',
+			lastLayoutTabID: null,
+			btnCmdVersion: '01.03.04',
 			btnCmd : {
-				btnCmdVersion: '01.03.03',
+				btnCmdVersion: '01.03.04',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1650,6 +1651,7 @@ export default {
 		async editModeToggle(){
 			this.setActionResponse('');
 			var tmpCurrTabID = this.currTab
+			//this.tmpDebgug = this.currTab
 			this.editMode = !this.editMode;
 			if(this.editMode){
 				await this.$nextTick()
@@ -1662,6 +1664,7 @@ export default {
 		createModeToggle(){
 			this.setActionResponse('');
 			this.createMode = !this.createMode;
+			this.lastLayoutTabID = this.currTab;
 			if(this.createMode){
 				var tmpArr = this.btnCmd.tabs.filter(item => item.embedTab === true);
 				if(tmpArr.length >= 1){
@@ -1676,8 +1679,10 @@ export default {
 			this.saveSettings();
 			await this.$nextTick();
 			var tmpCurrTabID = this.currTab;
+
 			if(this.createMode){
 				this.createMode = false
+				tmpCurrTabID = this.lastLayoutTabID;
 			}
 			if(this.editMode){
 				this.editMode = false
@@ -1692,7 +1697,10 @@ export default {
 			var tmpCurrTabID = this.currTab;
 			this.loadSettings();			
 			await this.$nextTick();
-			if(this.createMode){this.createMode = false}
+			if(this.createMode){
+				this.createMode = false
+				tmpCurrTabID = this.lastLayoutTabID;
+			}
 			if(this.editMode){this.editMode = false}
 			await this.$nextTick()
 			this.onChangeTab(tmpCurrTabID);
@@ -1707,7 +1715,9 @@ export default {
 			}
 		},
 		onChangeTab(tmpTabID){
+			//console.log("Changing Tab to: ", tmpTabID)
 			this.currTab = tmpTabID;
+			//this.tmpDebgug = this.currTab
 			this.getCurrTabIndex = "tab-"+tmpTabID;
 			var tmpTabObj = this.btnCmd.tabs.filter(item => item.tabID == tmpTabID);
 			this.currTabObj = tmpTabObj[0];
