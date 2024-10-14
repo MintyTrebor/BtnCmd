@@ -972,9 +972,9 @@ export default {
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
 			lastLayoutTabID: null,
-			btnCmdVersion: '01.03.05',
+			btnCmdVersion: '01.03.06',
 			btnCmd : {
-				btnCmdVersion: '01.03.05',
+				btnCmdVersion: '01.03.06',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
