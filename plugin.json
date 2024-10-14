@@ -3,17 +3,17 @@
     "id": "BtnCmd",
     "name": "BtnCmd",
     "author": "Minty Trebor",
-    "version": "01.03.0",
+    "version": "01.03.06",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/MintyTrebor",
     "dwcVersion": "auto",
     "dependencies": {
       "precompiled-mqtt": "^4.3.7",
-      "deepmerge": "^4.2.2",
-      "axios": "^1.2.1",
+      "deepmerge": "^4.3.1",
+      "axios": "^1.7.7",
       "vue-draggable-resizable": "^2.3.0",
       "jsonpath": "^1.1.1",
       "vuedraggable": "^2.24.3",
-      "mathjs": "^11.6.0"
+      "mathjs": "^13.2.0"
     }
   } 
