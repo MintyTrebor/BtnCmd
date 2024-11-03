@@ -393,7 +393,7 @@ export default {
 				tmpCmd = `set global.${this.passedObject.inputVarName} = ${tmpValue}`;
 				tmpParent.code = tmpCmd;
 				await tmpParent.send();
-				this.passedObject.inputLastVal = Number(tmpValue);
+				this.passedObject.inputLastVal = tmpValue;
 			}
 			if(this.passedObject.inputAfterChangeGCodeCMD){
 				let tmpCmdStr = this.passedObject.inputAfterChangeGCodeCMD.replace("##VALUE##", tmpValue.toString());
