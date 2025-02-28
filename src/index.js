@@ -5,6 +5,7 @@ import VueRouter from 'vue-router'
 
 
 
+
 registerRoute(BtnCmdMainPanel, {
 	Control: {
 		BtnCmd: {
@@ -16,6 +17,8 @@ registerRoute(BtnCmdMainPanel, {
 });
 
 Vue.use(VueRouter);
+
+
 
 try{
 	var tmpSession = {

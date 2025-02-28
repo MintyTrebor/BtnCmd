@@ -6,7 +6,7 @@
     "version": "01.03.05",
     "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/MintyTrebor",
-    "dwcVersion": "auto",
+    "dwcVersion": "auto-major",
     "dependencies": {
       "precompiled-mqtt": "^4.3.7",
       "deepmerge": "^4.2.2",

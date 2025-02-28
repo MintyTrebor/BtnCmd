@@ -44,8 +44,9 @@
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <a v-bind="attrs" v-on="on" href="https://pictogrammers.com/library/mdi/" target="_blank">
-                                        <v-icon v-if="passedObject.inputIconAbove" class="mr-1 pt-3">{{ passedObject.inputIconAbove }}</v-icon>
-                                        <v-icon v-else class="mr-1 pt-3">mdi-cog</v-icon>
+                                        <v-icon v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" class="mr-1 pt-3">{{ passedObject.inputIconAbove }}</v-icon>
+                                        <img v-if="passedObject.inputIconAbove && passedObject.inputIconAbove =='boxturtle'" class="pt-3" src="./BoxTurtle.svg" width="50" height="50">
+                                        <v-icon v-if="!passedObject.inputIconAbove" class="mr-1 pt-3">mdi-cog</v-icon>
                                     </a>
                                 </template>
                                 <span>Click to open Material Design Icons web page</span>
@@ -146,7 +147,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row v-if="passedObject.inputIconAbove">
+                    <v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'">
                         <v-col>
                             <v-row dense><v-col><span style="font-weight: bold">Icon Colour</span></v-col></v-row>
                         </v-col>
@@ -159,6 +160,18 @@
                                     </v-row>
                                 </template>
                                 <span>Click to edit icon colour</span>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="passedObject.panelMMPrefix">
+                        <v-col cols="12">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-radio-group v-bind="attrs" v-on="on" label="Text Size :" v-model="passedObject.panelMMTextSize" row required>
+                                        <v-radio v-for="typex in textSizeItems" :key="'MMTS'+typex.value" :label="typex.text" :value="typex.value"></v-radio>
+                                    </v-radio-group>
+                                </template>
+                                <span>Modify the font size</span>
                             </v-tooltip>
                         </v-col>
                     </v-row>
