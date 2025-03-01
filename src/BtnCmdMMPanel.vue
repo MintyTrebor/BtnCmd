@@ -1,15 +1,9 @@
-<style>
-	.boxturtle {
-		background-image: url('BoxTurtle.svg');
-		background-size: cover;
-	}
-</style>
 <template>
 	<div>
-	<v-card :class="`${cardClass}`" v-if="passedObject.panelMMPrefix" :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
+	<v-card :style="`${cardClass}`" v-if="passedObject.panelMMPrefix" :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
 		<v-row align="center" style="height: 100%; width: 100%" class="pa-0 ma-0">
 			<v-card-text v-if="passedObject.panelMMOrientation == 'V'" class="text-center pa-0 ma-0" align="center">
-				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" justify="center" align="center" class="d-flex pa-0 ma-0">
+				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')" justify="center" align="center" class="d-flex pa-0 ma-0">
 					<v-col cols="12" justify="center">
 						<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
 					</v-col>
@@ -30,7 +24,7 @@
 				</v-row>
 			</v-card-text>
 			<v-card-text v-else class="text-center pa-0 ma-0">
-				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" justify="center" align="center" class="d-flex pa-0 ma-0">
+				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')" justify="center" align="center" class="d-flex pa-0 ma-0">
 					<v-col cols="12" justify="center">
 						<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
 					</v-col>
@@ -50,10 +44,10 @@
 			</v-card-text>
 		</v-row>
 	</v-card>
-	<v-card :class="`${cardClass}`" v-else :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
+	<v-card :style="`${cardClass}`" v-else :key="'mmVal' + passedObject.panelMMPrefix + passedObject.panelID + passedObject.panelHSize + passedObject.panelWSize" :flat="passedObject.borderless" :height="passedObject.panelHSize" :width="passedObject.panelWSize" :color="passedObject.panelColor" style="height: 100%; width: 100%">
 		<v-row align="center" style="height: 100%; width: 100%" class="pa-0 ma-0">
 			<v-card-text v-if="passedObject.panelMMOrientation == 'V'" class="text-center pa-0 ma-0" align="center">
-				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" justify="center" align="center" class="d-flex pa-0 ma-0">
+				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')" justify="center" align="center" class="d-flex pa-0 ma-0">
 					<v-col cols="12" justify="center">
 						<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
 					</v-col>
@@ -67,7 +61,7 @@
 				</v-row>
 			</v-card-text>
 			<v-card-text v-else class="text-center pa-0 ma-0">
-				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" justify="center" align="center" class="d-flex pa-0 ma-0">
+				<v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')" justify="center" align="center" class="d-flex pa-0 ma-0">
 					<v-col cols="12" justify="center">
 						<v-layout column align-center><span justify="center"><v-icon :size="passedObject.inputIconAboveSize" :color="passedObject.inputIconAboveColor">{{ passedObject.inputIconAbove }}</v-icon></span></v-layout>
 					</v-col>
@@ -90,6 +84,7 @@ import jsonpath from 'jsonpath';
 import store from "@/store";
 import { evaluate } from 'mathjs'
 
+
 export default {
 	props: {
 		passedObject: {
@@ -99,8 +94,8 @@ export default {
 	computed: {
 		matchedMMVal() {return this.getModelValue();},
 		cardClass() {
-			if(this.passedObject.inputIconAbove =='boxturtle'){
-				return 'boxturtle';
+			if(!this.passedObject.inputIconAbove.startsWith('mdi-')){
+				return `background-image: url('${this.passedObject.inputIconAbove}'); background-size: cover;`;
 			}else {
 				return '';
 			}

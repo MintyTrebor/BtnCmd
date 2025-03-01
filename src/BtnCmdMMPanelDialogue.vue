@@ -41,16 +41,16 @@
                             </v-tooltip>
                         </v-col>
                         <v-col cols="1">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')">
                                 <template v-slot:activator="{ on, attrs }">
                                     <a v-bind="attrs" v-on="on" href="https://pictogrammers.com/library/mdi/" target="_blank">
-                                        <v-icon v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'" class="mr-1 pt-3">{{ passedObject.inputIconAbove }}</v-icon>
-                                        <img v-if="passedObject.inputIconAbove && passedObject.inputIconAbove =='boxturtle'" class="pt-3" src="./BoxTurtle.svg" width="50" height="50">
+                                        <v-icon  class="mr-1 pt-3">{{ passedObject.inputIconAbove }}</v-icon>
                                         <v-icon v-if="!passedObject.inputIconAbove" class="mr-1 pt-3">mdi-cog</v-icon>
                                     </a>
                                 </template>
                                 <span>Click to open Material Design Icons web page</span>
                             </v-tooltip>
+                            <img v-if="passedObject.inputIconAbove && !passedObject.inputIconAbove.startsWith('mdi-')" class="pt-3" :src="passedObject.inputIconAbove" width="50" height="50">            
                         </v-col>
                         <v-col cols="4">
                             <v-tooltip bottom>
@@ -147,7 +147,7 @@
                             </v-tooltip>
                         </v-col>
                     </v-row>
-                    <v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove !='boxturtle'">
+                    <v-row v-if="passedObject.inputIconAbove && passedObject.inputIconAbove.startsWith('mdi-')">
                         <v-col>
                             <v-row dense><v-col><span style="font-weight: bold">Icon Colour</span></v-col></v-row>
                         </v-col>
@@ -203,6 +203,7 @@
 <script>
     import BtnCmdColPickerDialogue from './BtnCmdColPickDialogue.vue'
     import ObjectModelSelector from './ObjectModelSelector.vue'
+
     export default {
         components: {
             BtnCmdColPickerDialogue,
