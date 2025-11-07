@@ -972,9 +972,9 @@ export default {
 			showSBCCEdit: false,
 			tmpSBCCDef: {},
 			lastLayoutTabID: null,
-			btnCmdVersion: '01.04.00',
+			btnCmdVersion: '01.04.11',
 			btnCmd : {
-				btnCmdVersion: '01.04.00',
+				btnCmdVersion: '01.04.11',
 				btnCmdIDUpdateRun: true,
 				systemSettings: {
 					lastID: 1,
@@ -1140,7 +1140,10 @@ export default {
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
 						inputLinkedOMKey: '',
-						inputRequireEnter: true
+						inputRequireEnter: true,
+						inputUseFileForList: false,
+						inputListFilePath: '',
+						inputListFromDB:false
 					}
 				],
 				SBCC_Cmds: [

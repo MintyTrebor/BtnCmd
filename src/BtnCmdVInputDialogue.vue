@@ -72,13 +72,29 @@
                     <v-row dense align="center">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on, attrs }">
-                                <v-col cols="11" v-bind="attrs" v-on="on">
+                                <v-col cols="5" v-bind="attrs" v-on="on">
                                     <v-select @change="clearConfig()" :disabled="bToggleExInp" v-if="tmpPassedObject.inputType" :items="dispTypeList()" class="custom-label-color" item-text="text" item-value="value" label="Input Control Type" required v-model="tmpPassedObject.inputDispType"></v-select>
                                 </v-col>
                             </template>
                             <span>Note: Changing this value can clear existing configuration data</span>
                         </v-tooltip>
-                        <v-col cols="1">
+                        <v-col cols="3" v-if="tmpPassedObject.inputDispType == 'selection'">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="List From File" v-model="tmpPassedObject.inputUseFileForList" @change="tmpPassedObject.inputUseFileForList ? tmpPassedObject.inputListFromDB = false : tmpPassedObject.inputListFromDB = tmpPassedObject.inputListFromDB"></v-switch></span>
+                                </template>
+                                <span>Use a data file from SD card to populate selection list</span>
+                            </v-tooltip>
+                        </v-col>
+                        <v-col cols="3" v-if="tmpPassedObject.inputDispType == 'selection'">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on"><v-switch label="List From Filament DB" v-model="tmpPassedObject.inputListFromDB"  @change="tmpPassedObject.inputListFromDB ? tmpPassedObject.inputUseFileForList = false : tmpPassedObject.inputUseFileForList = tmpPassedObject.inputUseFileForList"></v-switch></span>
+                                </template>
+                                <span>Use the Filaments DB to Generate Selection List</span>
+                        </v-tooltip>
+                        </v-col>
+                        <v-col cols="1" v-if="tmpPassedObject.inputDispType == 'selection' && !tmpPassedObject.inputUseFileForList && !tmpPassedObject.inputListFromDB">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn v-bind="attrs" v-on="on" :disabled="bICTType" @click="bToggleExInp = !bToggleExInp"><v-icon>{{!bToggleExInp ? 'mdi-arrow-expand-down' : 'mdi-arrow-expand-up'}}</v-icon></v-btn>
@@ -139,6 +155,14 @@
                             </v-col>
                             <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType != 'selection'">
                                 <v-text-field :label="getSuffixLabel()" v-model="tmpPassedObject.inputSuffixText"></v-text-field>
+                            </v-col>
+                            <v-col cols="6" v-if="tmpPassedObject.inputDispType != 'slider' && tmpPassedObject.inputDispType == 'selection' && tmpPassedObject.inputUseFileForList">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field v-bind="attrs" v-on="on" label="File Name" v-model="tmpPassedObject.inputListFilePath"></v-text-field>
+                                    </template>
+                                    <span>File Name (####.json) in system folder</span>
+                                </v-tooltip>
                             </v-col>
                         </v-row>
                         <v-row dense>

@@ -176,7 +176,10 @@ export default {
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
 						inputLinkedOMKey: '',
-						inputRequireEnter: true
+						inputRequireEnter: true,
+						inputUseFileForList: false,
+						inputListFilePath: '',
+						inputListFromDB:false
 					}
 				],
 				SBCC_Cmds: [
@@ -297,6 +300,24 @@ export default {
 				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
 					console.warn(e);
 				}
+			}
+		},
+		async loadSelectListFromFile(passedFilePath){
+			var selFileJSON = null;
+			try {
+				console.log("passedFilePath", passedFilePath);
+				const setFileName = Path.combine(this.systemDirectory, passedFilePath);
+				const response = await store.dispatch("machine/download", { filename: setFileName, type: 'json', showSuccess: false });
+				selFileJSON = response;
+				console.log("selFileJSON", selFileJSON);
+				return selFileJSON;
+			} catch (e) {
+				if (!(e instanceof DisconnectedError) && !(e instanceof OperationCancelledError)) {
+					console.warn(e);
+				}
+				console.log("loadselectfilelist error", e);
+				selFileJSON = {"listValues": []};
+				return selFileJSON;
 			}
 		},
 		async loadDefSBCCmds() {

@@ -43,14 +43,14 @@
 								<v-tooltip bottom :style="`position: absolute; z-index:${LZIndex+1}`">
 									<template v-slot:activator="{ on, attrs }">
 										<v-row justify="center" align="center" style="height: 100%;" v-bind="attrs" v-on="on">
-											<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+											<v-select :items="tempInputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 										</v-row>
 									</template>
 									<span >{{ passedObject.panelHoverText }}</span>
 								</v-tooltip>
 							</v-row>
 							<v-row v-else justify="center" align="center">
-								<v-select :items="passedObject.inputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
+								<v-select :items="tempInputControlVals" :value="matchedVarVal" @focus="setPauseUpdate()" :class="`text-${passedObject.panelMMTextSize}`" :label="passedObject.inputPrefixText" @change="setVarVal($event)"></v-select>
 							</v-row>
 						</v-col>
 					</v-row>
@@ -170,6 +170,8 @@
 <script>
 'use strict'
 import BtnCmdBtnActionFunctions from './BtnCmdBtnActionFunctions.js';
+import BtnCmdDataFunctions from './BtnCmdDataFunctions.js';
+import Path from "@/utils/path";
 import store from "@/store";
 import jsonpath from 'jsonpath';
 
@@ -189,6 +191,9 @@ export default {
 		wInpType(){return this.passedObject.inputType},
 		wInpDType(){return this.passedObject.inputDispType},
 		darkTheme(){ return store.state.settings.darkTheme; },
+		systemDirectory() {
+			return store.state.machine.model.directories.system;
+		},
 		bHasPrefix(){
 			if(this.passedObject.inputPrefixText){
 				let tempText = this.passedObject.inputPrefixText.replace(/ /g, "");
@@ -233,14 +238,17 @@ export default {
 		}
 	},
 	mixins: [
-		BtnCmdBtnActionFunctions
+		BtnCmdBtnActionFunctions,
+		BtnCmdDataFunctions
 	],
 	data: function () {
             return {
 				showItems: false,
 				code: '',
 				newValTemp: null,
-				bPauseUpdates: false
+				bPauseUpdates: false,
+				tempInputControlVals: [],
+				directory: Path.filaments
 			}
 	},
 	methods: {
@@ -422,11 +430,34 @@ export default {
 					}
 				}
 			}
+		},
+		async doListValues(){
+			if(this.passedObject.inputUseFileForList){
+				const tmpList = await this.loadSelectListFromFile(this.passedObject.inputListFilePath);
+				console.log("tmpList", tmpList);
+				this.tempInputControlVals = tmpList.listValues;
+			} else if(this.passedObject.inputListFromDB){
+				console.log("directory", this.directory);
+				const files = await store.dispatch("machine/getFileList", this.directory);
+				console.log("files", files);
+				if(files){
+					for (var i = 0; i < files.length; i++) {
+						this.tempInputControlVals.push(files[i].name);
+					}
+				}else{
+					this.tempInputControlVals = [];
+				}
+			} else{
+				console.log("gettin data from cookie");
+				this.tempInputControlVals = this.passedObject.inputControlVals;			
+			}
 		}
+		
 	},
 	mounted(){
 		this.doRightALign();
 		this.passedObject.inputLastVal = this.matchedVarVal;
+		if(this.passedObject.inputDispType == 'selection') {this.doListValues();}
 	},
 	activated(){
 		this.doRightALign();
