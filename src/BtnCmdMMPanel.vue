@@ -107,17 +107,30 @@ export default {
 			if(this.passedObject.panelMMPath){
 				if(this.passedObject.panelMMPath.startsWith("global.")){
 					let tmpStr = this.passedObject.panelMMPath.replace("global.", "");
-					let tmpNum = null;
 					let tmpArr = null;
 					//detect if this is a global variable array and retrieve the array value - dwc 3.5
 					tmpArr = tmpStr.match(/(?<=\[)[0-9]+?(?=\])/g);
 					if(tmpArr){
-						tmpNum = Number(tmpArr[0]);
-						tmpStr = tmpStr.replace(/\[.*\]/g, "");
-						if(store.state.machine.model.global.has(tmpStr)){
-							let globArr = store.state.machine.model.global.get(tmpStr);
-							if(!isNaN(globArr[tmpNum]) && this.passedObject.panelMMEvalMathStr.length > 0){
-								let tmpMathStr3 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", globArr[tmpNum]);
+						tmpArr = JSON.parse("[" + tmpArr + "]");
+						if(tmpArr.length > 0){
+							let fetchStr = tmpStr.replace(/\[.*\]/g, "");
+							let fetchedArr = store.state.machine.model.global.get(fetchStr);
+							let tmpArrLen = tmpArr.length;
+							let i = 0;
+							let tmpFetchedArr = fetchedArr;
+							let tmpRet = null;
+							for (; i < tmpArrLen; i++){
+								let x =  tmpArr[i];
+								let currTmpV = Object.values(tmpFetchedArr[x]);
+								if(currTmpV.length > 0){
+									tmpFetchedArr = currTmpV;
+									tmpRet = tmpFetchedArr[x];
+								}else {
+									tmpRet = tmpFetchedArr[x];
+								}
+							}
+							if(!isNaN(tmpRet) && this.passedObject.panelMMEvalMathStr.length > 0){
+								let tmpMathStr3 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", tmpRet);
 								try{
 									let tmpRet3 = evaluate(tmpMathStr3);
 									return tmpRet3;
@@ -125,10 +138,8 @@ export default {
 									return "#Invalid Expression#"
 								}
 							}else{
-								return globArr[tmpNum];
+								return tmpRet;
 							}
-						}else{
-							return "###";
 						}
 					}
 					if(store.state.machine.model.global.has(tmpStr)){
