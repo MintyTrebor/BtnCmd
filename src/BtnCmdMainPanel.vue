@@ -1137,6 +1137,7 @@ export default {
 						chartUpdateKey: 0,
 						chartRetainData: false,
 						chartShowValueInLegend: false,
+						chartShowSeconds: false,
 						inputLinkToOM: false,
 						inputAfterChangeGCodeCMD: '',
 						inputLinkedOMKey: '',
