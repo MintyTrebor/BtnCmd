@@ -114,32 +114,37 @@ export default {
 						tmpArr = JSON.parse("[" + tmpArr + "]");
 						if(tmpArr.length > 0){
 							let fetchStr = tmpStr.replace(/\[.*\]/g, "");
-							let fetchedArr = store.state.machine.model.global.get(fetchStr);
-							let tmpArrLen = tmpArr.length;
-							let i = 0;
-							let tmpFetchedArr = fetchedArr;
-							let tmpRet = null;
-							for (; i < tmpArrLen; i++){
-								let x =  tmpArr[i];
-								let currTmpV = Object.values(tmpFetchedArr[x]);
-								if(currTmpV.length > 0){
-									tmpFetchedArr = currTmpV;
-									tmpRet = tmpFetchedArr[x];
-								}else {
-									tmpRet = tmpFetchedArr[x];
+							try {
+								let fetchedArr = store.state.machine.model.global.get(fetchStr);
+								let tmpArrLen = tmpArr.length;
+								let i = 0;
+								let tmpFetchedArr = fetchedArr;
+								let tmpRet = null;
+								for (; i < tmpArrLen; i++){
+									let x =  tmpArr[i];
+									let currTmpV = Object.values(tmpFetchedArr[x]);
+									if(currTmpV.length > 0){
+										tmpFetchedArr = currTmpV;
+										tmpRet = tmpFetchedArr[x];
+									}else {
+										tmpRet = tmpFetchedArr[x];
+									}
 								}
-							}
-							if(!isNaN(tmpRet) && this.passedObject.panelMMEvalMathStr.length > 0){
-								let tmpMathStr3 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", tmpRet);
-								try{
-									let tmpRet3 = evaluate(tmpMathStr3);
-									return tmpRet3;
-								}catch{
-									return "#Invalid Expression#"
+								if(!isNaN(tmpRet) && this.passedObject.panelMMEvalMathStr.length > 0){
+									let tmpMathStr3 = this.passedObject.panelMMEvalMathStr.replace("##VALUE##", tmpRet);
+									try{
+										let tmpRet3 = evaluate(tmpMathStr3);
+										return tmpRet3;
+									}catch{
+										return "#Invalid Expression#"
+									}
+								}else{
+									return tmpRet;
 								}
-							}else{
-								return tmpRet;
+							} catch (error) {
+								return "###";
 							}
+							
 						}
 					}
 					if(store.state.machine.model.global.has(tmpStr)){

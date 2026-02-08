@@ -329,7 +329,7 @@ export default Vue.extend({
 			var currPID = this.selectedPanel
 			var tmpThis = this
 			var yTimeMarks: TimeUnit = "minute"
-			if(this.passedObject.chartXaxisMaxSample < 61){yTimeMarks="second"}
+			if(this.passedObject.chartShowSeconds == true){yTimeMarks="second"}
 			this.chart = new Chart(this.$refs[this.passedObject.panelID] as HTMLCanvasElement, {
 				type: "line",
 				data: {
@@ -431,7 +431,7 @@ export default Vue.extend({
 								time: {
 									unit: yTimeMarks,
 									displayFormats: {
-										minute: "HH:mm:ss",
+										minute: "HH:mm",
 										second: "HH:mm:ss"
 									},
 									tooltipFormat: 'HH:mm:ss',
